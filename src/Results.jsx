@@ -3,18 +3,14 @@ import PropTypes from 'prop-types';
 import { DataGrid, huHU } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import Link from '@mui/material/Link';
 import LinearProgress from '@mui/material/LinearProgress';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
-import BookmarkAddedIcon from '@mui/icons-material/BookmarkAdded';
+import BookmarkRemoveIcon from '@mui/icons-material/BookmarkRemove';
 import CustomNoRowsOverlay from './Overlay';
-import { BookmarkAdded } from '@mui/icons-material';
 
 const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
-  useEffect(() => {
-    console.log('myProp changed:', savedLessons);
-    // Add other debugging information or checks here
-  }, [savedLessons]);
-
   const columns = [
     {
       field: 'actions',
@@ -35,11 +31,10 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
           <Button
             variant="outlined"
             onClick={onClick}
-            color="success"
-            startIcon={!isSaved ? <BookmarkAddIcon /> : <BookmarkAddedIcon />}
-            disabled={isSaved}
+            color={!isSaved ? "success" : "error"}
+            startIcon={!isSaved ? <BookmarkAddIcon /> : <BookmarkRemoveIcon />}
           >
-            {!isSaved ? "Mentés" : "Mentve"}
+            {!isSaved ? "Mentés" : "Eltávolítás"}
           </Button>
         );
       }
@@ -47,17 +42,17 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
     {
       field: 'code',
       headerName: 'Tárgykód',
-      width: 130
+      width: 180
     },
     {
       field: 'name',
       headerName: 'Tárgynév',
-      width: 220,
+      width: 300,
     },
     {
       field: 'type',
       headerName: 'Típus',
-      width: 80,
+      width: 120,
     },
     {
       field: 'course',
@@ -67,7 +62,23 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
     {
       field: 'teacher',
       headerName: 'Oktató',
-      width: 100
+      width: 250
+    },
+    {
+      field: 'reviews',
+      type: 'actions',
+      headerName: 'Oktató vélemények',
+      width: 150,
+      cellClassName: 'actions',
+      sortable: false,
+      renderCell: (params) => {
+        const teacherName = params.row.teacher.replace("Dr. ", "").replace(" Dr.", "");
+        const url = "https://www.markmyprofessor.com/kereses?q=" + encodeURI(teacherName);
+
+        return (
+          <Chip label="MMP" component={Link} variant="outlined" href={url} target="_blank" clickable />
+        );
+      }
     },
     {
       field: 'comment',
@@ -77,7 +88,7 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
     {
       field: 'location',
       headerName: 'Helyszín',
-      width: 220
+      width: 270
     },
     {
       field: 'day',

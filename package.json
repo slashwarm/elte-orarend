@@ -13,15 +13,19 @@
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^5.0.8",
+    "@fullcalendar/core": "^6.1.10",
+    "@fullcalendar/daygrid": "^6.1.10",
+    "@fullcalendar/react": "^6.1.10",
+    "@fullcalendar/timegrid": "^6.1.10",
     "@mui/icons-material": "^5.15.7",
     "@mui/lab": "^5.0.0-alpha.163",
     "@mui/material": "^5.15.7",
     "@mui/x-data-grid": "^6.19.3",
     "axios": "^1.6.7",
     "crc-32": "^1.2.2",
+    "html2canvas": "^1.4.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-mui-scheduler": "^2.0.4"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

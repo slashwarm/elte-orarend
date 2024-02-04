@@ -1,0 +1,24 @@
+:root {
+  --fc-border-color: rgba(81, 81, 81, 1);
+  --fc-page-bg-color: transparent;
+  --fc-event-selected-overlay-color: transparent;
+}
+
+.fc th {
+  font-weight: 400;
+  text-transform: capitalize;
+}
+
+.fc-direction-ltr .fc-daygrid-event.fc-event-end,
+.fc-event-main-frame {
+  flex-direction: column;
+}
+
+.fc-event-desc,
+.fc-event-title {
+  white-space: break-spaces;
+}
+
+.fc-event {
+  cursor: pointer;
+}
