@@ -20,6 +20,7 @@ const Calendar = ({ tableData, onCalendarClick, own }) => {
     const open = Boolean(popoverInfo.anchorEl);
 
     const onEventClick = (info) => {
+        handlePopoverClose();
         return onCalendarClick(parseInt(info.event.id), own);
     };
 
