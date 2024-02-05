@@ -15,7 +15,7 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
       field: 'actions',
       type: 'actions',
       headerName: '',
-      width: 150,
+      width: 160,
       cellClassName: 'actions',
       sortable: false,
       renderCell: (params) => {
@@ -41,7 +41,7 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
     {
       field: 'code',
       headerName: 'Tárgykód',
-      width: 180
+      width: 150
     },
     {
       field: 'name',
@@ -84,12 +84,12 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
     {
       field: 'comment',
       headerName: 'Oktató / Megjegyzés',
-      width: 300
+      width: 250
     },
     {
       field: 'location',
       headerName: 'Helyszín',
-      width: 270
+      width: 230
     },
     {
       field: 'day',

@@ -1,6 +1,6 @@
 import CRC32 from 'crc-32';
 
-const regex = /[\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/g;
+const regex = /[\d!@#$%^&*()_+=[\]{};':"\\|,.<>/?]/g;
 
 const convertDataToTable = (data) => {
   const tableObject = data.map((subArray) => {

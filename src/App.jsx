@@ -148,7 +148,7 @@ const App = () => {
               alignContent="center"
             >
               <Grid item xs={12} sm={6} md={4} lg={3}>
-                <Paper sx={{ p: 2, maxWidth: 800, margin: 'auto', overflow: 'hidden' }}>
+                <Paper sx={{ p: 2, maxWidth: 1000, margin: 'auto', overflow: 'hidden' }}>
                   <Search
                     onDataFetch={handleDataFetch}
                     onLoadingStart={handleLoadingStart}
