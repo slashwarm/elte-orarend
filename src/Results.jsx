@@ -104,7 +104,7 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
   ];
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 'calc(100vw - 96px)' }}>
+    <Box sx={{ width: '100%', maxWidth: 'calc(100vw - 113px)' }}>
       <DataGrid
         autoHeight
         rows={tableData}
