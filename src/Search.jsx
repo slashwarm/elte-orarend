@@ -96,7 +96,7 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
     onLoadingStart();
 
     axios
-      .post("/server/data.php", formData)
+      .post("/orarend/server/data.php", formData)
       .then((response) => {
         onDataFetch(response.data);
       })
