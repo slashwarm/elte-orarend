@@ -1,23 +1,52 @@
 import CRC32 from 'crc-32';
 
+const regex = /[\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/g;
+
 const convertDataToTable = (data) => {
   const tableObject = data.map((subArray) => {
-    let time = subArray[2].split(' ');
+    let time = subArray[0].split(' ');
+    let lessonIdentifier = subArray[1].split(' ');
+    let courseCodeSplit = lessonIdentifier[0].split('-');
+    let lessonCode = courseCodeSplit.slice(0, courseCodeSplit.length - 1).join('-');
+    let courseCode = courseCodeSplit[courseCodeSplit.length - 1];
+    let lessonType = lessonIdentifier[1].replace('(', '').replace(')', '');
+    let lessonName = subArray[2];
+    let location = subArray[3];
+    let comment = subArray[5];
+    let teacher = "";
 
-    if (time[0] === "Hétfo") {
-      time[0] = "Hétfő";
+    if (comment && comment.trim() !== '') { // van megjegyzés / oktató
+      let teacherSplit = comment.replace("Dr. ", "").replace(" Dr.", "").replace(regex, "").split(' ');
+
+      if (teacherSplit.length >= 2) { // emberi név, tehát legalább 2 tagú
+        teacher = teacherSplit.slice(0, 2).join(' ');
+      }
+    }
+
+    if (time.length >= 4) { // van helyes időnk
+      if (time[0] === "Hétfo") {
+        time[0] = "Hétfő";
+      }
+
+      time = time.slice(0, 2);
+    } else { // helytelen adat van az időnél
+      time = ["", ""];
+    }
+
+    if (location === "-") {
+      location = "";
     }
 
     let newObject = {
-      name: subArray[0],
-      code: subArray[1],
+      name: lessonName,
+      code: lessonCode,
       day: time[0],
       time: time[1],
-      location: subArray[3],
-      comment: subArray[5],
-      type: subArray[6],
-      course: subArray[7],
-      teacher: subArray[11],
+      location: location,
+      type: lessonType,
+      course: courseCode,
+      teacher: teacher,
+      comment: comment,
     };
 
     const valuesOnly = Object.values(newObject);
@@ -43,15 +72,17 @@ const convertDataToCalendar = (data) => {
       const dayIndex = daysOfWeek.indexOf(subArray.day.toLowerCase());
       const targetDate = new Date();
       const diff = dayIndex - now.getDay();
-      targetDate.setDate(now.getDate() + (diff < 0 ? diff + 7 : diff) - 7);
+      targetDate.setDate(now.getDate() + diff);
       const location = subArray.location ? `\n${subArray.location}` : '';
 
       let newObject = {
         id: subArray.id,
-        title: `(#${subArray.course}) ${subArray.name} (${subArray.type})${location}\n${subArray.teacher}`,
+        title: `(#${subArray.course}) ${subArray.name} (${subArray.type})${location}\n${subArray.comment}`,
         start: new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), parseInt(startTime[0]), parseInt(startTime[1]), 0),
         end: new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), parseInt(endTime[0]), parseInt(endTime[1]), 0),
       };
+
+      console.log(newObject);
 
     return newObject;
   });

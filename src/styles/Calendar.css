@@ -2,6 +2,8 @@
   --fc-border-color: rgba(81, 81, 81, 1);
   --fc-page-bg-color: transparent;
   --fc-event-selected-overlay-color: transparent;
+  --fc-event-border-color: #3a3a3a;
+  --fc-today-bg-color: transparent;
 }
 
 .fc th {
@@ -21,4 +23,8 @@
 
 .fc-event {
   cursor: pointer;
+}
+
+thead {
+  background-color: #121212;
 }

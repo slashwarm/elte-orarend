@@ -1,5 +1,4 @@
 import { Fragment, useState } from 'react';
-import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
@@ -18,7 +17,7 @@ const labelOptions = {
   subjectName: 'Tárgy neve',
   subjectCode: 'Tárgy kódja',
   teacherName: 'Oktató neve',
-  teacherCode: 'Oktató Neptun kódja',
+  teacherCode: 'Oktató Neptun-kódja',
 };
 
 const labelIcons = {
@@ -28,8 +27,42 @@ const labelIcons = {
   teacherCode: <SwitchAccountIcon />,
 };
 
+const getSemesters = () => {
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth();
+  const semesters = [];
+  let prevSemester = 0;
+
+  if (currentMonth < 6) { // tavaszi félév
+    semesters.push(`${currentYear - 1}-${currentYear}-2`);
+    prevSemester = 1;
+  } else { // őszi félév
+    semesters.push(`${currentYear}-${currentYear + 1}-1`);
+    prevSemester = 2;
+  }
+
+  const len = semesters.length;
+  let year = currentYear;
+
+  // TODO: kispaghettizés
+  for (let i = 0; i < 3 - len; i++) { // kiegészítjük régebbi félévekkel
+    year--;
+
+    if (prevSemester === 1) {
+      semesters.push(`${year}-${year + 1}-1`);
+      prevSemester = 2;
+    } else {
+      semesters.push(`${year}-${year + 1}-2`);
+      prevSemester = 1;
+    }
+  }
+
+  return semesters;
+}
+
 const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
-  const [year, setYear] = useState('2023-2024-2');
+  const semesters = getSemesters();
+  const [year, setYear] = useState(semesters[0]);
   const [mode, setMode] = useState('subjectName');
   const [error, setError] = useState(false);
 
@@ -67,7 +100,7 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
     onLoadingStart();
 
     axios
-      .post("https://gernyimark.web.elte.hu/data.php", formData)
+      .post("/server/data.php", formData)
       .then((response) => {
         onDataFetch(response.data);
       })
@@ -110,18 +143,14 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
             onChange={changeYear}
             exclusive={true}
           >
-            <ToggleButton value="2023-2024-2" key="left">
-              2023-2024-2
-            </ToggleButton>
-            <ToggleButton value="2023-2024-1" key="center">
-              2023-2024-1
-            </ToggleButton>
-            <ToggleButton value="2022-2023-2" key="right">
-              2022-2023-2
-            </ToggleButton>
+            {semesters.map((semester) => (
+              <ToggleButton value={semester} key={semester}>
+                {semester}
+              </ToggleButton>
+            ))}
           </ToggleButtonGroup>
 
-          {year !== '2023-2024-2' && (
+          {year !== semesters[0] && (
             <Alert severity="warning">Figyelem! Nem az éppen aktuális félév van kiválasztva!</Alert>
           )}
 
@@ -141,7 +170,7 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
               Keresés oktató nevére
             </ToggleButton>
             <ToggleButton value="teacherCode" key="teacherCode">
-              Keresés oktató Neptun kódjára
+              Keresés oktató Neptun-kódjára
             </ToggleButton>
           </ToggleButtonGroup>
 

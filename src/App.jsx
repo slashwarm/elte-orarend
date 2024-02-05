@@ -10,6 +10,8 @@ import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
 import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 import DownloadIcon from '@mui/icons-material/Download';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import html2canvas from 'html2canvas';
@@ -17,6 +19,7 @@ import Search from './Search';
 import Results from './Results';
 import Calendar from './Calendar';
 import { convertDataToTable, convertDataToCalendar } from './Data';
+import { SafetyDivider } from '@mui/icons-material';
 
 function Copyright(props) {
   return (
@@ -58,6 +61,7 @@ const App = () => {
   const [loading, setLoading] = useState(false); // töltés
   const [searchResults, setSearchResults] = useState([]); // keresés találatok
   const [savedLessons, setSavedLessons] = useState(savedTimetable); // saját órarend
+  const [alertText, setAlertText] = useState(''); // alert szöveg
   const printRef = useRef();
 
   const handleDataFetch = (data) => {
@@ -77,12 +81,19 @@ const App = () => {
 
     if (existingLesson) {
       newLessons = savedLessons.filter(lesson => lesson.id !== data.id);
+      setAlertText('Óra eltávolítva az órarendből');
     } else {
       newLessons = [...savedLessons, data];
+      setAlertText('Óra hozzáadva a saját órarendhez');
     }
 
     window.localStorage.setItem('SAVE_TIMETABLE', JSON.stringify(newLessons));
     setSavedLessons(newLessons);
+  };
+
+  const handleCalendarClick = (id, own) => {
+    const lesson = (own ? savedLessons : searchResults).find(lesson => lesson.id === id);
+    handleLessonSave(lesson);
   };
 
   const handleLoadingStart = () => {
@@ -113,6 +124,14 @@ const App = () => {
     } else {
       window.open(data);
     }
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAlertText('');
   };
 
   return (
@@ -154,7 +173,8 @@ const App = () => {
                   <Paper sx={{ p: 2 }}>
                     <Calendar
                       tableData={convertDataToCalendar(searchResults)}
-                      onLessonSave={handleLessonSave}
+                      onCalendarClick={handleCalendarClick}
+                      own={false}
                     />
                   </Paper>
                 </Grid>
@@ -187,7 +207,8 @@ const App = () => {
 
                       <Calendar
                         tableData={convertDataToCalendar(savedLessons)}
-                        onLessonSave={handleLessonSave}
+                        onCalendarClick={handleCalendarClick}
+                        own={true}
                       />
                     </Paper>
                   </div>
@@ -201,6 +222,17 @@ const App = () => {
           </Box>
         </Box>
       </Box>
+
+      <Snackbar open={alertText !== ""} autoHideDuration={3000} onClose={handleClose}>
+        <Alert
+          severity="success"
+          variant="filled"
+          onClose={handleClose}
+          sx={{ width: '100%' }}
+        >
+          {alertText}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 };

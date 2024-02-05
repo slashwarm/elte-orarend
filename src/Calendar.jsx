@@ -4,9 +4,9 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import huLocale from '@fullcalendar/core/locales/hu';
 import './styles/Calendar.css';
 
-const Calendar = ({ tableData, onLessonSave }) => {
+const Calendar = ({ tableData, onCalendarClick, own }) => {
   const onEventClick = (info) => {
-    console.log(info);
+    return onCalendarClick(parseInt(info.event.id), own); // own = saját órarend vagy keresési találatok
   };
 
   return (
@@ -20,7 +20,8 @@ const Calendar = ({ tableData, onLessonSave }) => {
         allDaySlot={false}
         slotMinTime='08:00:00'
         slotMaxTime='22:00:00'
-        timeZone='Europe/Budapest'
+        //valamiért nem jó
+        //timeZone='Europe/Budapest'
         locale={huLocale}
         dayHeaderFormat={{ weekday: 'long' }}
         slotLabelFormat={{

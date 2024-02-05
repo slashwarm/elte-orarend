@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { DataGrid, huHU } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
@@ -61,8 +60,8 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
     },
     {
       field: 'teacher',
-      headerName: 'Oktató',
-      width: 250
+      headerName: 'Oktató neve',
+      width: 180
     },
     {
       field: 'reviews',
@@ -72,7 +71,9 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
       cellClassName: 'actions',
       sortable: false,
       renderCell: (params) => {
-        const teacherName = params.row.teacher.replace("Dr. ", "").replace(" Dr.", "");
+        if (params.row.teacher === "") return null;
+
+        const teacherName = params.row.teacher;
         const url = "https://www.markmyprofessor.com/kereses?q=" + encodeURI(teacherName);
 
         return (
@@ -82,8 +83,8 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
     },
     {
       field: 'comment',
-      headerName: 'Megjegyzés',
-      width: 110
+      headerName: 'Oktató / Megjegyzés',
+      width: 300
     },
     {
       field: 'location',
