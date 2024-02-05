@@ -19,7 +19,6 @@ import Search from './Search';
 import Results from './Results';
 import Calendar from './Calendar';
 import { convertDataToTable, convertDataToCalendar } from './Data';
-import { SafetyDivider } from '@mui/icons-material';
 
 function Copyright(props) {
   return (

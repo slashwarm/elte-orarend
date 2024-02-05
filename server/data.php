@@ -8,55 +8,68 @@
   $json = file_get_contents("php://input");
   $requestBody = json_decode($json);
 
-  $url = "https://tanrend.elte.hu/tanrendnavigation.php";
-  $searchMode = "keresnevre";
-
-  if ($requestBody->mode === "subjectName") {
-    $searchMode = "keresnevre";
-  } elseif ($requestBody->mode === "subjectCode") {
-    $searchMode = "keres_kod_azon";
-  } elseif ($requestBody->mode === "teacherName") {
-    $searchMode = "keres_okt";
-  } elseif ($requestBody->mode === "teacherCode") {
-    $searchMode = "keres_oktnk";
+  if ($requestBody === null) {
+    http_response_code(400);
+    echo json_encode(["error" => "Hibás paraméterek"]);
+    exit;
   }
 
-  $queryParams = [
-    "m" => $searchMode,
-    "f" => $requestBody->year,
-    "k" => $requestBody->name
-  ];
-  $url .= "?" . http_build_query($queryParams);
+  if (!isset($requestBody->mode) || !isset($requestBody->year) || !isset($requestBody->name)) {
+    http_response_code(400);
+    echo json_encode(["error" => "Hibás paraméterek"]);
+    exit;
+  }
 
-  $curl = curl_init();
-
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($curl, CURLOPT_URL, $url);
-  curl_setopt($curl, CURLOPT_FOLLOWLOCATION, false);
-
-  $resp = curl_exec($curl);
-  curl_close($curl);
-
-  $dom = new Dom;
-  $dom->setOptions(
-    (new Options())
-        ->setEnforceEncoding("utf-8")
-  );
-
-  $dom->loadStr($resp);
-  $result = $dom->find("tbody")->find("tr");
-
+  $url = "https://tanrend.elte.hu/tanrendnavigation.php";
+  $searchModes;
   $data = [];
 
-  foreach ($result as $row) {
-    $content = $row->find("td");
-    $rowData = [];
+  if ($requestBody->mode === "subject") {
+    $searchModes = ["keresnevre", "keres_kod_azon"];
+  } elseif ($requestBody->mode === "teacher") {
+    $searchModes = ["keres_okt", "keres_oktnk"];
+  }
 
-    foreach ($content as $cell) {
-      $rowData[] = $cell->text;
+  foreach ($searchModes as $mode) {
+    $queryParams = [
+      "m" => $mode,
+      "f" => $requestBody->year,
+      "k" => $requestBody->name
+    ];
+    $url .= "?" . http_build_query($queryParams);
+
+    $curl = curl_init();
+
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, false);
+
+    $resp = curl_exec($curl);
+    curl_close($curl);
+
+    $dom = new Dom;
+    $dom->setOptions(
+      (new Options())
+          ->setEnforceEncoding("utf-8")
+    );
+
+    $dom->loadStr($resp);
+    $result = $dom->find("tbody")->find("tr");
+
+    foreach ($result as $row) {
+      $content = $row->find("td");
+      $rowData = [];
+
+      foreach ($content as $cell) {
+        $rowData[] = $cell->text;
+      }
+
+      $data[] = $rowData;
     }
 
-    $data[] = $rowData;
+    if (count($data) > 0) {
+      break;
+    }
   }
 
   echo json_encode($data, JSON_UNESCAPED_UNICODE);

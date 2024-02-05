@@ -14,17 +14,13 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import axios from "axios";
 
 const labelOptions = {
-  subjectName: 'Tárgy neve',
-  subjectCode: 'Tárgy kódja',
-  teacherName: 'Oktató neve',
-  teacherCode: 'Oktató Neptun-kódja',
+  subject: 'Tárgy neve / kódja',
+  teacher: 'Oktató neve / Neptun-kódja',
 };
 
 const labelIcons = {
-  subjectName: <LibraryBooksIcon />,
-  subjectCode: <LibraryBooksIcon />,
-  teacherName: <SwitchAccountIcon />,
-  teacherCode: <SwitchAccountIcon />,
+  subject: <LibraryBooksIcon />,
+  teacher: <SwitchAccountIcon />,
 };
 
 const getSemesters = () => {
@@ -63,7 +59,7 @@ const getSemesters = () => {
 const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
   const semesters = getSemesters();
   const [year, setYear] = useState(semesters[0]);
-  const [mode, setMode] = useState('subjectName');
+  const [mode, setMode] = useState('subject');
   const [error, setError] = useState(false);
 
   const changeYear = (event, newAlignment) => {
@@ -113,6 +109,8 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
         } else {
           console.error(error);
         }
+
+        onDataFetch([]);
     });
   };
 
@@ -160,17 +158,11 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
             onChange={changeMode}
             exclusive={true}
           >
-            <ToggleButton value="subjectName" key="subjectName">
-              Keresés tárgynévre
+            <ToggleButton value="subject" key="subject">
+              Keresés tárgyra
             </ToggleButton>
-            <ToggleButton value="subjectCode" key="subjectCode">
-              Keresés tárgykódra
-            </ToggleButton>
-            <ToggleButton value="teacherName" key="teacherName">
-              Keresés oktató nevére
-            </ToggleButton>
-            <ToggleButton value="teacherCode" key="teacherCode">
-              Keresés oktató Neptun-kódjára
+            <ToggleButton value="teacher" key="teacher">
+              Keresés oktatóra
             </ToggleButton>
           </ToggleButtonGroup>
 
