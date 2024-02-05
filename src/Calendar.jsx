@@ -1,9 +1,9 @@
-import {useState} from 'react'
+import { useState } from 'react'
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import huLocale from '@fullcalendar/core/locales/hu';
 import './styles/Calendar.css';
-import {Popover} from "@mui/material";
+import { Popover } from "@mui/material";
 import Typography from "@mui/material/Typography";
 
 const Calendar = ({ tableData, onCalendarClick, own }) => {
@@ -44,7 +44,6 @@ const Calendar = ({ tableData, onCalendarClick, own }) => {
                 slotDuration='00:20:00'
                 eventClick={onEventClick}
                 eventContent={(eventInfo) => {
-                    console.log(eventInfo);
                     return (
                         <div
                             className="fc-event-main-frame"
