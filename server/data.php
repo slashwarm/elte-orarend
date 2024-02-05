@@ -36,12 +36,12 @@
       "f" => $requestBody->year,
       "k" => $requestBody->name
     ];
-    $url .= "?" . http_build_query($queryParams);
+    $uri = $url . "?" . http_build_query($queryParams);
 
     $curl = curl_init();
 
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_URL, $uri);
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, false);
 
     $resp = curl_exec($curl);
