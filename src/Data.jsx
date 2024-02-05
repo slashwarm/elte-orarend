@@ -77,7 +77,7 @@ const convertDataToCalendar = (data) => {
 
       let newObject = {
         id: subArray.id,
-        title: `(#${subArray.course}) ${subArray.name} (${subArray.type})${location}\n${subArray.comment}`,
+        title: `(#${subArray.course}) ${subArray.name}\r\n(${subArray.type})\r${location}\r\n${subArray.comment}`,
         start: new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), parseInt(startTime[0]), parseInt(startTime[1]), 0),
         end: new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), parseInt(endTime[0]), parseInt(endTime[1]), 0),
       };
