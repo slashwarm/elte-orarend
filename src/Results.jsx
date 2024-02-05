@@ -71,7 +71,7 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
       cellClassName: 'actions',
       sortable: false,
       renderCell: (params) => {
-        if (params.row.teacher === "") return null;
+        if (params.row.teacher === "") return "";
 
         const teacherName = params.row.teacher;
         const url = "https://www.markmyprofessor.com/kereses?q=" + encodeURI(teacherName);

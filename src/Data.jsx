@@ -82,8 +82,6 @@ const convertDataToCalendar = (data) => {
         end: new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), parseInt(endTime[0]), parseInt(endTime[1]), 0),
       };
 
-      console.log(newObject);
-
     return newObject;
   });
 
