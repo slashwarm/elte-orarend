@@ -1,11 +1,5 @@
 <?php
   header("Content-type: application/json; charset=utf-8");
-  header("Access-Control-Allow-Origin: *");
-  header("Access-Control-Allow-Methods: *");
-  header("Access-Control-Allow-Headers: *");
-
-  error_reporting(E_ALL); // TO REMOVE
-  ini_set("display_errors", 1); // TO REMOVE
 
   require "vendor/autoload.php";
   use PHPHtmlParser\Dom;
