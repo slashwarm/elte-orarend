@@ -4,6 +4,7 @@
   --fc-event-selected-overlay-color: transparent;
   --fc-event-border-color: #3a3a3a;
   --fc-today-bg-color: transparent;
+  --fc-event-bg-color: #3a3a3a;
 }
 
 .fc th {
@@ -16,8 +17,8 @@
   flex-direction: column;
 }
 
-.fc-event-desc,
-.fc-event-title {
+.fc-event-desc, .fc-event-title, .fc-event-time {
+  padding: 2px 5px;
   white-space: break-spaces;
 }
 
@@ -27,4 +28,14 @@
 
 thead {
   background-color: #121212;
+}
+
+.lecture {
+  border-color: rgb(76, 119, 199);
+  background-color: rgb(76, 119, 199);
+}
+
+.practice {
+  border-color: rgb(99, 79, 199);
+  background-color: rgb(99, 79, 199);
 }

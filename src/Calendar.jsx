@@ -47,7 +47,7 @@ const Calendar = ({ tableData, onCalendarClick, own }) => {
                 eventContent={(eventInfo) => {
                     return (
                         <div
-                            className="fc-event-main-frame"
+                            className={`fc-event-main-frame ${eventInfo.event.extendedProps.type === 'gyakorlat' ? 'practice' : 'lecture'}`}
                             onMouseEnter={(e) => handlePopoverOpen(e, eventInfo)}
                             onMouseLeave={handlePopoverClose}
                         >
