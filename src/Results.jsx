@@ -41,17 +41,17 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
     {
       field: 'code',
       headerName: 'Tárgykód',
-      width: 150
+      width: 140
     },
     {
       field: 'name',
       headerName: 'Tárgynév',
-      width: 300,
+      width: 280,
     },
     {
       field: 'type',
       headerName: 'Típus',
-      width: 120,
+      width: 100,
     },
     {
       field: 'course',
@@ -61,13 +61,13 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
     {
       field: 'teacher',
       headerName: 'Oktató neve',
-      width: 180
+      width: 140
     },
     {
       field: 'reviews',
       type: 'actions',
-      headerName: 'Oktató vélemények',
-      width: 150,
+      headerName: 'Vélemények',
+      width: 100,
       cellClassName: 'actions',
       sortable: false,
       renderCell: (params) => {

@@ -2,9 +2,10 @@
   --fc-border-color: rgba(81, 81, 81, 1);
   --fc-page-bg-color: transparent;
   --fc-event-selected-overlay-color: transparent;
-  --fc-event-border-color: #3a3a3a;
   --fc-today-bg-color: transparent;
-  --fc-event-bg-color: #3a3a3a;
+  --fc-event-border-color: #000;
+  --lecture-color: rgb(76, 119, 199);
+  --practice-color: rgb(99, 79, 199);
 }
 
 .fc th {
@@ -18,7 +19,7 @@
 }
 
 .fc-event-desc, .fc-event-title, .fc-event-time {
-  padding: 2px 5px;
+  padding-left: 2px;
   white-space: break-spaces;
 }
 
@@ -30,12 +31,10 @@ thead {
   background-color: #121212;
 }
 
-.lecture {
-  border-color: rgb(76, 119, 199);
-  background-color: rgb(76, 119, 199);
+a.fc-event:has(div.practice) {
+  background-color: var(--practice-color);
 }
 
-.practice {
-  border-color: rgb(99, 79, 199);
-  background-color: rgb(99, 79, 199);
+a.fc-event:has(div.lecture) {
+  background-color: var(--lecture-color);
 }
