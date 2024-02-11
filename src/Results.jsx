@@ -24,24 +24,25 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
           return onLessonSave(params.row);
         };
 
-        const isSaved = savedLessons && savedLessons.some(obj => obj.id === params.id);
+        const isSaved =
+          savedLessons && savedLessons.some((obj) => obj.id === params.id);
 
         return (
           <Button
-            variant="outlined"
+            variant='outlined'
             onClick={onClick}
-            color={!isSaved ? "success" : "error"}
+            color={!isSaved ? 'success' : 'error'}
             startIcon={!isSaved ? <BookmarkAddIcon /> : <BookmarkRemoveIcon />}
           >
-            {!isSaved ? "Mentés" : "Eltávolítás"}
+            {!isSaved ? 'Mentés' : 'Eltávolítás'}
           </Button>
         );
-      }
+      },
     },
     {
       field: 'code',
       headerName: 'Tárgykód',
-      width: 140
+      width: 140,
     },
     {
       field: 'name',
@@ -56,12 +57,12 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
     {
       field: 'course',
       headerName: 'Kurzus',
-      width: 70
+      width: 70,
     },
     {
       field: 'teacher',
       headerName: 'Oktató neve',
-      width: 140
+      width: 140,
     },
     {
       field: 'reviews',
@@ -71,35 +72,43 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
       cellClassName: 'actions',
       sortable: false,
       renderCell: (params) => {
-        if (params.row.teacher === "") return "";
+        if (params.row.teacher === '') return '';
 
         const teacherName = params.row.teacher;
-        const url = "https://www.markmyprofessor.com/kereses?q=" + encodeURI(teacherName);
+        const url =
+          'https://www.markmyprofessor.com/kereses?q=' + encodeURI(teacherName);
 
         return (
-          <Chip label="MMP" component={Link} variant="outlined" href={url} target="_blank" clickable />
+          <Chip
+            label='MMP'
+            component={Link}
+            variant='outlined'
+            href={url}
+            target='_blank'
+            clickable
+          />
         );
-      }
+      },
     },
     {
       field: 'comment',
       headerName: 'Oktató / Megjegyzés',
-      width: 250
+      width: 250,
     },
     {
       field: 'location',
       headerName: 'Helyszín',
-      width: 230
+      width: 230,
     },
     {
       field: 'day',
       headerName: 'Nap',
-      width: 85
+      width: 85,
     },
     {
       field: 'time',
       headerName: 'Időpont',
-      width: 100
+      width: 100,
     },
   ];
 
@@ -122,20 +131,20 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
         localeText={huHU.components.MuiDataGrid.defaultProps.localeText}
         slots={{
           noRowsOverlay: CustomNoRowsOverlay,
-          loadingOverlay: LinearProgress
+          loadingOverlay: LinearProgress,
         }}
         sx={{
           '--DataGrid-overlayHeight': '300px',
-          "& .MuiDataGrid-cellContent": {
-            whiteSpace: "normal",
-            lineHeight: "normal"
+          '& .MuiDataGrid-cellContent': {
+            whiteSpace: 'normal',
+            lineHeight: 'normal',
           },
         }}
         loading={isLoading}
       />
     </Box>
   );
-}
+};
 
 Results.propTypes = {
   savedLessons: PropTypes.array.isRequired,
