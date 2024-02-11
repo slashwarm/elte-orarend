@@ -1,23 +1,21 @@
 <?php
-// USE THIS FOR LOCAL DEVELOPMENT
-//     if (isset($_SERVER['HTTP_ORIGIN'])) {
-//         header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
-//         header('Access-Control-Allow-Credentials: true');
-//         header('Access-Control-Max-Age: 86400');
-//     }
-//
-//     if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-//
-//         if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
-//             header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-//
-//         if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
-//             header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
-//
-//         exit(0);
-//     }
+  /*header("Content-type: application/json; charset=utf-8");
 
-  header("Content-type: application/json; charset=utf-8");
+  header("Access-Control-Allow-Origin: *");
+  header('Access-Control-Allow-Methods: *');
+  header("Access-Control-Allow-Headers: *");
+
+  if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    // It's a preflight request. Respond successfully:
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: *'); // or specify `'POST, GET, OPTIONS'`, etc
+    header('Access-Control-Allow-Headers: *'); // or specify `'Content-Type, Authorization'`, etc
+    header('Access-Control-Max-Age: 86400'); // cache this preflight request for 1 day
+    exit;
+  }
+
+  error_reporting(E_ALL); // TO REMOVE
+  ini_set('display_errors', 1); // TO REMOVE*/
 
   require "vendor/autoload.php";
   use PHPHtmlParser\Dom;
@@ -39,50 +37,68 @@
   }
 
   $url = "https://tanrend.elte.hu/tanrendnavigation.php";
-  $searchModes;
+  $searchModes = [];
   $data = [];
 
   if ($requestBody->mode === "subject") {
     $searchModes = ["keresnevre", "keres_kod_azon"];
   } elseif ($requestBody->mode === "teacher") {
     $searchModes = ["keres_okt", "keres_oktnk"];
+  } elseif ($requestBody->mode === "course") {
+    $searchModes = ["keres_kod_azon"];
+  } else {
+    http_response_code(400);
+    echo json_encode(["error" => "Hibás paraméterek"]);
+    exit;
+  }
+
+  $searchFor = $requestBody->name;
+
+  if (is_string($searchFor)) {
+    $searchFor = array($searchFor);
+  } else if (!is_array($searchFor)) {
+    http_response_code(400);
+    echo json_encode(["error" => "Hibás paraméterek"]);
+    exit;
   }
 
   foreach ($searchModes as $mode) {
-    $queryParams = [
-      "m" => $mode,
-      "f" => $requestBody->year,
-      "k" => $requestBody->name
-    ];
-    $uri = $url . "?" . http_build_query($queryParams);
+    foreach ($searchFor as $name) {
+      $queryParams = [
+        "m" => $mode,
+        "f" => $requestBody->year,
+        "k" => $name,
+      ];
+      $uri = $url . "?" . http_build_query($queryParams);
 
-    $curl = curl_init();
+      $curl = curl_init();
 
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_URL, $uri);
-    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, false);
+      curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($curl, CURLOPT_URL, $uri);
+      curl_setopt($curl, CURLOPT_FOLLOWLOCATION, false);
 
-    $resp = curl_exec($curl);
-    curl_close($curl);
+      $resp = curl_exec($curl);
+      curl_close($curl);
 
-    $dom = new Dom;
-    $dom->setOptions(
-      (new Options())
-          ->setEnforceEncoding("utf-8")
-    );
+      $dom = new Dom;
+      $dom->setOptions(
+        (new Options())
+            ->setEnforceEncoding("utf-8")
+      );
 
-    $dom->loadStr($resp);
-    $result = $dom->find("tbody")->find("tr");
+      $dom->loadStr($resp);
+      $result = $dom->find("tbody")->find("tr");
 
-    foreach ($result as $row) {
-      $content = $row->find("td");
-      $rowData = [];
+      foreach ($result as $row) {
+        $content = $row->find("td");
+        $rowData = [];
 
-      foreach ($content as $cell) {
-        $rowData[] = $cell->text;
+        foreach ($content as $cell) {
+          $rowData[] = $cell->text;
+        }
+
+        $data[] = $rowData;
       }
-
-      $data[] = $rowData;
     }
 
     if (count($data) > 0) {
