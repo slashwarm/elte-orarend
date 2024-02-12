@@ -1,4 +1,5 @@
 import { Fragment, useState } from 'react';
+import { useTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
@@ -19,6 +20,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import LoadingButton from '@mui/lab/LoadingButton';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { fetchTimetable, getSemesters } from './Data';
 import { read, utils } from 'xlsx';
 
@@ -34,6 +36,8 @@ const labelIcons = {
 
 const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
   const semesters = getSemesters();
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [year, setYear] = useState(semesters[0]);
   const [mode, setMode] = useState('subject');
@@ -202,7 +206,7 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
 
           <Badge badgeContent='ÚJ' color='secondary'>
             <Button
-              variant='contained'
+              variant='outlined'
               startIcon={<CloudDownloadIcon />}
               onClick={handleClickOpen}
             >
@@ -217,12 +221,12 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
         <DialogContent>
           <Typography variant='body1'>
             <ol>
-              <li>Lépj be a Neptunfiókodba</li>
+              <li>Lépj be a Neptun fiókodba</li>
               <li>
-                Navigálj a <b>{'Tárgyak -> Felvett kurzusok'}</b> menübe
+                Navigálj a <b>{'Tárgyak → Felvett kurzusok'}</b> menübe
               </li>
               <li>
-                Válaszd ki az éppen <b>aktuális félévet</b>
+                Válassz ki egy félévet
               </li>
               <li>A táblázat ikonra kattintva töltsd le a kurzuslistát</li>
               <li>Tallózd be a fájlt, majd nyomd meg a Betöltés gombot:</li>
@@ -231,7 +235,7 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
 
           <Stack direction='column' spacing={2} alignItems='center'>
             <form>
-              <Stack direction='row' spacing={3}>
+              <Stack direction={isSmallScreen ? 'column' : 'row'} spacing={2}>
                 <TextField
                   type={'file'}
                   inputProps={{ accept: '.xlsx' }}
