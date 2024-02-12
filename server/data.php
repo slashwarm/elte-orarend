@@ -62,6 +62,12 @@
     exit;
   }
 
+  if (count($searchFor) === 0 || count($searchFor) > 20) {
+    http_response_code(400);
+    echo json_encode(["error" => "Hibás paraméterek"]);
+    exit;
+  }
+
   foreach ($searchModes as $mode) {
     foreach ($searchFor as $name) {
       $queryParams = [
