@@ -5,7 +5,7 @@ const regex = /[\d!@#$%^&*()_+=[\]{};':"\\|,.<>/?]/g;
 
 const fetchTimetable = async (formData) => {
   try {
-    const response = await axios.post('https://gernyimark.web.elte.hu/orarend/test/data.php', formData);
+    const response = await axios.post('/orarend/server/data.php', formData);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -66,7 +66,7 @@ const convertDataToTable = (data, courses) => {
       location = '';
     }
 
-    let newObject = {
+    const newObject = {
       name: lessonName,
       code: lessonCode,
       day: time[0],
@@ -78,8 +78,7 @@ const convertDataToTable = (data, courses) => {
       comment: comment,
     };
 
-    const valuesOnly = Object.values(newObject);
-    const uniqueId = CRC32.str(JSON.stringify(valuesOnly));
+    const uniqueId = generateUniqueId(newObject);
 
     return { ...newObject, id: uniqueId };
   });
@@ -195,9 +194,15 @@ const getSemesters = () => {
   return semesters;
 };
 
+const generateUniqueId = (data) => {
+  const valuesOnly = Object.values(data);
+  return CRC32.str(JSON.stringify(valuesOnly));
+}
+
 export {
   fetchTimetable,
   convertDataToCalendar,
   convertDataToTable,
   getSemesters,
+  generateUniqueId,
 };

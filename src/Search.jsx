@@ -11,7 +11,6 @@ import Stack from '@mui/material/Stack';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
-import Badge from '@mui/material/Badge';
 import Button from '@mui/material/Button';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import EventRepeatIcon from '@mui/icons-material/EventRepeat';
@@ -204,15 +203,13 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
             Keresés
           </LoadingButton>
 
-          <Badge badgeContent='ÚJ' color='secondary'>
-            <Button
-              variant='outlined'
-              startIcon={<CloudDownloadIcon />}
-              onClick={handleClickOpen}
-            >
-              Kurzusok importálása Neptunból
-            </Button>
-          </Badge>
+          <Button
+            variant='outlined'
+            startIcon={<CloudDownloadIcon />}
+            onClick={handleClickOpen}
+          >
+            Kurzusok importálása Neptunból
+          </Button>
         </Stack>
       </Box>
 
