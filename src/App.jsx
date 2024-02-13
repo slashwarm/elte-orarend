@@ -101,6 +101,27 @@ const App = () => {
     handleLessonSave(lesson);
   };
 
+  const handleCalendarChange = (data) => {
+    const existingLesson = savedLessons.find((lesson) => lesson.id === data.id);
+
+    if (existingLesson) {
+      const updatedLesson = {
+        ...existingLesson,
+        ...data
+      };
+
+      const updatedLessons = savedLessons.map((lesson) => {
+        if (lesson.id === data.id) {
+          return updatedLesson;
+        }
+        return lesson;
+      });
+      console.log(updatedLesson);
+      //console.log()
+      setSavedLessons(updatedLessons);
+    }
+  };
+
   const handleLoadingStart = () => {
     setLoading(true);
   };
@@ -226,6 +247,8 @@ const App = () => {
                       <Calendar
                         tableData={convertDataToCalendar(savedLessons)}
                         onCalendarClick={handleCalendarClick}
+                        savedLessons={savedLessons}
+                        onCalendarChange={handleCalendarChange}
                         own={true}
                       />
                     </Paper>

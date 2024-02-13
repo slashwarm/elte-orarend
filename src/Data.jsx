@@ -5,7 +5,7 @@ const regex = /[\d!@#$%^&*()_+=[\]{};':"\\|,.<>/?]/g;
 
 const fetchTimetable = async (formData) => {
   try {
-    const response = await axios.post('/orarend/server/data.php', formData);
+    const response = await axios.post('https://gernyimark.web.elte.hu/orarend/test/data.php', formData);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -133,7 +133,7 @@ const convertDataToCalendar = (data) => {
 
       let newObject = {
         id: subArray.id,
-        title: `(#${subArray.course}) ${subArray.name}\r\n(${subArray.type})\r${location}\r\n${subArray.comment}`,
+        title: `[#${subArray.course}] ${subArray.name}\r (${subArray.type})\r${location}\r\n${subArray.comment}`,
         start: new Date(
           targetDate.getFullYear(),
           targetDate.getMonth(),
