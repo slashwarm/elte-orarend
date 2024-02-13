@@ -278,38 +278,12 @@ const Calendar = ({ tableData, onCalendarClick, onCalendarChange, onImageDownloa
           <DialogContent>
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='hu'>
               <Grid container spacing={2} marginTop={1}>
-                <Grid item xs={8} md={9}>
+                <Grid item xs={9} md={10}>
                   <TextField
                     name='name'
                     label='Tárgy neve'
                     variant='outlined'
                     value={editEvent.name}
-                    onChange={handleChange}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={4} md={3}>
-                  <FormControl fullWidth>
-                    <InputLabel id="type-select-label">Típus</InputLabel>
-                    <Select
-                      labelId="type-select-label"
-                      name="type"
-                      value={editEvent.type}
-                      label="Típus"
-                      onChange={handleChange}
-                    >
-                      <MenuItem value={"gyakorlat"}>gyakorlat</MenuItem>
-                      <MenuItem value={"előadás"}>előadás</MenuItem>
-                      <MenuItem value={"elfoglaltság"}>elfoglaltság</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={9} md={10}>
-                  <TextField
-                    name='code'
-                    label='Tárgy kódja'
-                    variant='outlined'
-                    value={editEvent.code}
                     onChange={handleChange}
                     fullWidth
                   />
@@ -323,6 +297,33 @@ const Calendar = ({ tableData, onCalendarClick, onCalendarChange, onImageDownloa
                     onChange={handleChange}
                     fullWidth
                   />
+                </Grid>
+                <Grid item xs={7} md={8}>
+                  <TextField
+                    name='code'
+                    label='Tárgy kódja'
+                    variant='outlined'
+                    value={editEvent.code}
+                    onChange={handleChange}
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={5} md={4}>
+                  <FormControl fullWidth>
+                    <InputLabel id="type-select-label">Típus</InputLabel>
+                    <Select
+                      labelId="type-select-label"
+                      name="type"
+                      value={editEvent.type}
+                      label="Típus"
+                      onChange={handleChange}
+                    >
+                      <MenuItem value={"gyakorlat"}>gyakorlat</MenuItem>
+                      <MenuItem value={"előadás"}>előadás</MenuItem>
+                      <MenuItem value={"konzultáció"}>konzultáció</MenuItem>
+                      <MenuItem value={"elfoglaltság"}>elfoglaltság</MenuItem>
+                    </Select>
+                  </FormControl>
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
