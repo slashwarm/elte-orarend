@@ -197,7 +197,7 @@ const getSemesters = () => {
 const generateUniqueId = (data) => {
   const valuesOnly = Object.values(data);
   return CRC32.str(JSON.stringify(valuesOnly));
-}
+};
 
 export {
   fetchTimetable,

@@ -34,7 +34,14 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/hu';
 import { generateUniqueId } from './Data';
 
-const Calendar = ({ tableData, onCalendarClick, onCalendarChange, onImageDownload, savedLessons, own }) => {
+const Calendar = ({
+  tableData,
+  onCalendarClick,
+  onCalendarChange,
+  onImageDownload,
+  savedLessons,
+  own,
+}) => {
   // popover
   const [popoverInfo, setPopoverInfo] = useState({
     anchorEl: null,
@@ -130,7 +137,7 @@ const Calendar = ({ tableData, onCalendarClick, onCalendarChange, onImageDownloa
 
   const handlePrintClick = () => {
     setStickyHeader(false);
-  }
+  };
 
   useEffect(() => {
     if (!stickyHeader) {
@@ -155,11 +162,15 @@ const Calendar = ({ tableData, onCalendarClick, onCalendarChange, onImageDownloa
 
   const isEventInSaved = (eventId) => {
     return savedLessons.some((lesson) => lesson.id === parseInt(eventId));
-  }
+  };
 
   return (
     <>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} marginBottom={2}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={2}
+        marginBottom={2}
+      >
         <Button
           variant='outlined'
           startIcon={<DownloadIcon />}
@@ -168,7 +179,11 @@ const Calendar = ({ tableData, onCalendarClick, onCalendarChange, onImageDownloa
           Mentés képként
         </Button>
 
-        <Badge badgeContent='ÚJ' color='secondary' sx={{ visibility: { xs: 'hidden', sm: 'visible' } }}>
+        <Badge
+          badgeContent='ÚJ'
+          color='secondary'
+          sx={{ visibility: { xs: 'hidden', sm: 'visible' } }}
+        >
           <Button
             variant='outlined'
             color='success'
@@ -214,7 +229,9 @@ const Calendar = ({ tableData, onCalendarClick, onCalendarChange, onImageDownloa
                 onMouseEnter={(e) => handlePopoverOpen(e, eventInfo)}
                 onMouseLeave={handlePopoverClose}
               >
-                <div className='fc-event-time'><b>{eventInfo.timeText}</b></div>
+                <div className='fc-event-time'>
+                  <b>{eventInfo.timeText}</b>
+                </div>
                 <div className='fc-event-title-container'>
                   <div className='fc-event-title fc-sticky'>
                     {eventInfo.event.title}
@@ -255,8 +272,7 @@ const Calendar = ({ tableData, onCalendarClick, onCalendarChange, onImageDownloa
               marginTop={0.5}
             >
               <div>
-                {
-                own ? (
+                {own ? (
                   <EditCalendarIcon fontSize='small' />
                 ) : isEventInSaved(popoverInfo.event.event.id) ? (
                   <EventBusyIcon fontSize='small' />
@@ -267,7 +283,11 @@ const Calendar = ({ tableData, onCalendarClick, onCalendarChange, onImageDownloa
               <div>
                 {own
                   ? 'Kattints a szerkesztéshez'
-                  : `Kattints az ${isEventInSaved(popoverInfo.event.event.id) ? 'órarendből törléshez' : 'órarendbe adáshoz'}`}
+                  : `Kattints az ${
+                      isEventInSaved(popoverInfo.event.event.id)
+                        ? 'órarendből törléshez'
+                        : 'órarendbe adáshoz'
+                    }`}
               </div>
             </Stack>
           </Typography>
@@ -312,18 +332,18 @@ const Calendar = ({ tableData, onCalendarClick, onCalendarChange, onImageDownloa
                 </Grid>
                 <Grid item xs={5} md={4}>
                   <FormControl fullWidth>
-                    <InputLabel id="type-select-label">Típus</InputLabel>
+                    <InputLabel id='type-select-label'>Típus</InputLabel>
                     <Select
-                      labelId="type-select-label"
-                      name="type"
+                      labelId='type-select-label'
+                      name='type'
                       value={editEvent.type}
-                      label="Típus"
+                      label='Típus'
                       onChange={handleChange}
                     >
-                      <MenuItem value={"gyakorlat"}>gyakorlat</MenuItem>
-                      <MenuItem value={"előadás"}>előadás</MenuItem>
-                      <MenuItem value={"konzultáció"}>konzultáció</MenuItem>
-                      <MenuItem value={"elfoglaltság"}>elfoglaltság</MenuItem>
+                      <MenuItem value={'gyakorlat'}>gyakorlat</MenuItem>
+                      <MenuItem value={'előadás'}>előadás</MenuItem>
+                      <MenuItem value={'konzultáció'}>konzultáció</MenuItem>
+                      <MenuItem value={'elfoglaltság'}>elfoglaltság</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -352,7 +372,7 @@ const Calendar = ({ tableData, onCalendarClick, onCalendarChange, onImageDownloa
                   <TimePicker
                     name='start'
                     skipDisabled
-                    label="Kezdés"
+                    label='Kezdés'
                     minTime={dayjs('2024-01-01T08:00')}
                     maxTime={dayjs('2024-01-01T22:00')}
                     value={startTime}
@@ -366,7 +386,7 @@ const Calendar = ({ tableData, onCalendarClick, onCalendarChange, onImageDownloa
                   <TimePicker
                     name='end'
                     skipDisabled
-                    label="Vége"
+                    label='Vége'
                     minTime={startTime}
                     maxTime={dayjs('2024-01-01T22:00')}
                     value={endTime}
@@ -378,19 +398,19 @@ const Calendar = ({ tableData, onCalendarClick, onCalendarChange, onImageDownloa
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <FormControl fullWidth>
-                    <InputLabel id="day-select-label">Nap</InputLabel>
+                    <InputLabel id='day-select-label'>Nap</InputLabel>
                     <Select
-                      labelId="day-select-label"
-                      name="day"
+                      labelId='day-select-label'
+                      name='day'
                       value={editEvent.day}
-                      label="Nap"
+                      label='Nap'
                       onChange={handleChange}
                     >
-                      <MenuItem value={"Hétfő"}>Hétfő</MenuItem>
-                      <MenuItem value={"Kedd"}>Kedd</MenuItem>
-                      <MenuItem value={"Szerda"}>Szerda</MenuItem>
-                      <MenuItem value={"Csütörtök"}>Csütörtök</MenuItem>
-                      <MenuItem value={"Péntek"}>Péntek</MenuItem>
+                      <MenuItem value={'Hétfő'}>Hétfő</MenuItem>
+                      <MenuItem value={'Kedd'}>Kedd</MenuItem>
+                      <MenuItem value={'Szerda'}>Szerda</MenuItem>
+                      <MenuItem value={'Csütörtök'}>Csütörtök</MenuItem>
+                      <MenuItem value={'Péntek'}>Péntek</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>

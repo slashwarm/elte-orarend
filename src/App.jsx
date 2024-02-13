@@ -62,7 +62,7 @@ const App = () => {
   const [searchResults, setSearchResults] = useState([]); // keresés találatok
   const [savedLessons, setSavedLessons] = useState(savedTimetable); // saját órarend
   const [alertText, setAlertText] = useState(''); // alert szöveg
- //const printRef = useRef();
+  //const printRef = useRef();
 
   // ha van courses akkor minden sor data-hoz csekkeli h az ahhoz tartozó code benne van-e
   const handleDataFetch = (data, courses) => {
@@ -103,12 +103,14 @@ const App = () => {
     if (toDelete) {
       handleLessonSave(data);
     } else {
-      const existingLesson = savedLessons.find((lesson) => lesson.id === data.id);
+      const existingLesson = savedLessons.find(
+        (lesson) => lesson.id === data.id
+      );
 
       if (existingLesson) {
         const updatedLesson = {
           ...existingLesson,
-          ...data
+          ...data,
         };
 
         const updatedLessons = savedLessons.map((lesson) => {
@@ -231,17 +233,17 @@ const App = () => {
               </Grid>
               {savedLessons.length > 0 && (
                 <Grid item xs={12}>
-                 {/*<div ref={printRef}>*/}
-                    <Paper sx={{ p: 2 }}>
-                      <Calendar
-                        tableData={convertDataToCalendar(savedLessons)}
-                        onCalendarClick={handleCalendarClick}
-                        onImageDownload={handleDownloadImage}
-                        savedLessons={savedLessons}
-                        onCalendarChange={handleCalendarChange}
-                        own={true}
-                      />
-                    </Paper>
+                  {/*<div ref={printRef}>*/}
+                  <Paper sx={{ p: 2 }}>
+                    <Calendar
+                      tableData={convertDataToCalendar(savedLessons)}
+                      onCalendarClick={handleCalendarClick}
+                      onImageDownload={handleDownloadImage}
+                      savedLessons={savedLessons}
+                      onCalendarChange={handleCalendarChange}
+                      own={true}
+                    />
+                  </Paper>
                   {/*</div>*/}
                 </Grid>
               )}

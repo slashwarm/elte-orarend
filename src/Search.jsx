@@ -218,9 +218,7 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
               <li>
                 Navigálj a <b>{'Tárgyak → Felvett kurzusok'}</b> menübe
               </li>
-              <li>
-                Válassz ki egy félévet
-              </li>
+              <li>Válassz ki egy félévet</li>
               <li>A táblázat ikonra kattintva töltsd le a kurzuslistát</li>
               <li>Tallózd be a fájlt, majd nyomd meg a Betöltés gombot:</li>
             </ol>
