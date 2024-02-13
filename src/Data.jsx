@@ -66,7 +66,7 @@ const convertDataToTable = (data, courses) => {
       location = '';
     }
 
-    let newObject = {
+    const newObject = {
       name: lessonName,
       code: lessonCode,
       day: time[0],
@@ -78,8 +78,7 @@ const convertDataToTable = (data, courses) => {
       comment: comment,
     };
 
-    const valuesOnly = Object.values(newObject);
-    const uniqueId = CRC32.str(JSON.stringify(valuesOnly));
+    const uniqueId = generateUniqueId(newObject);
 
     return { ...newObject, id: uniqueId };
   });
@@ -133,7 +132,7 @@ const convertDataToCalendar = (data) => {
 
       let newObject = {
         id: subArray.id,
-        title: `(#${subArray.course}) ${subArray.name}\r\n(${subArray.type})\r${location}\r\n${subArray.comment}`,
+        title: `[#${subArray.course}] ${subArray.name}\r (${subArray.type})\r${location}\r\n${subArray.comment}`,
         start: new Date(
           targetDate.getFullYear(),
           targetDate.getMonth(),
@@ -195,9 +194,15 @@ const getSemesters = () => {
   return semesters;
 };
 
+const generateUniqueId = (data) => {
+  const valuesOnly = Object.values(data);
+  return CRC32.str(JSON.stringify(valuesOnly));
+}
+
 export {
   fetchTimetable,
   convertDataToCalendar,
   convertDataToTable,
   getSemesters,
+  generateUniqueId,
 };

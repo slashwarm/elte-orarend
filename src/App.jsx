@@ -1,5 +1,5 @@
 // App.jsx
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { huHU } from '@mui/material/locale';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -8,10 +8,8 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
-import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
-import DownloadIcon from '@mui/icons-material/Download';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import html2canvas from 'html2canvas';
 import Search from './Search';
@@ -64,7 +62,7 @@ const App = () => {
   const [searchResults, setSearchResults] = useState([]); // keresés találatok
   const [savedLessons, setSavedLessons] = useState(savedTimetable); // saját órarend
   const [alertText, setAlertText] = useState(''); // alert szöveg
-  const printRef = useRef();
+ //const printRef = useRef();
 
   // ha van courses akkor minden sor data-hoz csekkeli h az ahhoz tartozó code benne van-e
   const handleDataFetch = (data, courses) => {
@@ -84,10 +82,10 @@ const App = () => {
 
     if (existingLesson) {
       newLessons = savedLessons.filter((lesson) => lesson.id !== data.id);
-      setAlertText('Óra eltávolítva az órarendből');
+      setAlertText('Kurzus eltávolítva az órarendből');
     } else {
       newLessons = [...savedLessons, data];
-      setAlertText('Óra hozzáadva a saját órarendhez');
+      setAlertText('Kurzus hozzáadva a saját órarendhez');
     }
 
     window.localStorage.setItem('SAVE_TIMETABLE', JSON.stringify(newLessons));
@@ -101,19 +99,41 @@ const App = () => {
     handleLessonSave(lesson);
   };
 
+  const handleCalendarChange = (data, toDelete) => {
+    if (toDelete) {
+      handleLessonSave(data);
+    } else {
+      const existingLesson = savedLessons.find((lesson) => lesson.id === data.id);
+
+      if (existingLesson) {
+        const updatedLesson = {
+          ...existingLesson,
+          ...data
+        };
+
+        const updatedLessons = savedLessons.map((lesson) => {
+          if (lesson.id === data.id) {
+            return updatedLesson;
+          }
+          return lesson;
+        });
+
+        setSavedLessons(updatedLessons);
+      } else {
+        handleLessonSave(data);
+      }
+    }
+  };
+
   const handleLoadingStart = () => {
     setLoading(true);
   };
 
-  const handleDownloadImage = async () => {
-    const element = printRef.current;
+  const handleDownloadImage = async (ref) => {
+    const backgroundColor = defaultTheme.palette.background.default;
+    const element = ref.current;
     const canvas = await html2canvas(element, {
-      ignoreElements: (element) => {
-        if (element.tagName === 'BUTTON') {
-          return true;
-        }
-      },
-      backgroundColor: null,
+      backgroundColor: backgroundColor,
     });
 
     const data = canvas.toDataURL('image/png');
@@ -186,6 +206,7 @@ const App = () => {
                     <Calendar
                       tableData={convertDataToCalendar(searchResults)}
                       onCalendarClick={handleCalendarClick}
+                      savedLessons={savedLessons}
                       own={false}
                     />
                   </Paper>
@@ -210,26 +231,18 @@ const App = () => {
               </Grid>
               {savedLessons.length > 0 && (
                 <Grid item xs={12}>
-                  <div ref={printRef}>
+                 {/*<div ref={printRef}>*/}
                     <Paper sx={{ p: 2 }}>
-                      <div>
-                        <Button
-                          variant='outlined'
-                          startIcon={<DownloadIcon />}
-                          sx={{ mb: 2 }}
-                          onClick={handleDownloadImage}
-                        >
-                          Mentés képként
-                        </Button>
-                      </div>
-
                       <Calendar
                         tableData={convertDataToCalendar(savedLessons)}
                         onCalendarClick={handleCalendarClick}
+                        onImageDownload={handleDownloadImage}
+                        savedLessons={savedLessons}
+                        onCalendarChange={handleCalendarChange}
                         own={true}
                       />
                     </Paper>
-                  </div>
+                  {/*</div>*/}
                 </Grid>
               )}
             </Grid>
