@@ -1,5 +1,4 @@
 import { Fragment, useState } from 'react';
-import { useTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
@@ -19,7 +18,6 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import LoadingButton from '@mui/lab/LoadingButton';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import { fetchTimetable, getSemesters } from './Data';
 import { read, utils } from 'xlsx';
 
@@ -35,8 +33,6 @@ const labelIcons = {
 
 const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
   const semesters = getSemesters();
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [year, setYear] = useState(semesters[0]);
   const [mode, setMode] = useState('subject');
@@ -232,7 +228,7 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
 
           <Stack direction='column' spacing={2} alignItems='center'>
             <form>
-              <Stack direction={isSmallScreen ? 'column' : 'row'} spacing={2}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
                   type={'file'}
                   inputProps={{ accept: '.xlsx' }}

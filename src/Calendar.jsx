@@ -159,7 +159,7 @@ const Calendar = ({ tableData, onCalendarClick, onCalendarChange, onImageDownloa
 
   return (
     <>
-      <Stack direction='row' spacing={2} sx={{ mb: 2 }}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} marginBottom={2}>
         <Button
           variant='outlined'
           startIcon={<DownloadIcon />}
@@ -168,12 +168,14 @@ const Calendar = ({ tableData, onCalendarClick, onCalendarChange, onImageDownloa
           Mentés képként
         </Button>
 
-        <Badge badgeContent='ÚJ' color='secondary'>
+        <Badge badgeContent='ÚJ' color='secondary' sx={{ visibility: { xs: 'hidden', sm: 'visible' } }}>
           <Button
             variant='outlined'
             color='success'
             startIcon={<AddIcon />}
             onClick={() => handleEditOpen(null)}
+            sx={{ visibility: 'visible' }}
+            fullWidth
           >
             Saját kurzus hozzáadása
           </Button>
