@@ -119,6 +119,7 @@ const App = () => {
           return lesson;
         });
 
+        window.localStorage.setItem('SAVE_TIMETABLE', JSON.stringify(updatedLessons));
         setSavedLessons(updatedLessons);
       } else {
         handleLessonSave(data);
