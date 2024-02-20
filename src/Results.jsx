@@ -4,12 +4,17 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Link from '@mui/material/Link';
+import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
+import Tooltip from '@mui/material/Tooltip';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import BookmarkRemoveIcon from '@mui/icons-material/BookmarkRemove';
+import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import CustomNoRowsOverlay from './Overlay';
 
-const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
+const Results = ({ tableData, onLessonSave, savedLessons, onEventEdit, onEventChange, isLoading, own }) => {
   const columns = [
     {
       field: 'actions',
@@ -19,24 +24,53 @@ const Results = ({ tableData, onLessonSave, savedLessons, isLoading }) => {
       cellClassName: 'actions',
       sortable: false,
       renderCell: (params) => {
-        const onClick = (e) => {
+        const onDeleteClick = (e) => {
           e.stopPropagation();
           return onLessonSave(params.row);
         };
 
-        const isSaved =
+        if (own) {
+          const isHidden = savedLessons && savedLessons.some((obj) => obj.id === params.id && obj.hidden);
+
+          const onHideClick = (e) => {
+            e.stopPropagation();
+            return onEventChange({id: params.id, hidden: !isHidden});
+          };
+
+          return (
+            <>
+              <Tooltip title="Eltávolítás">
+                <IconButton color="error" onClick={onDeleteClick}>
+                  <BookmarkRemoveIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Szerkesztés">
+                <IconButton onClick={() => onEventEdit(params.id)}>
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={isHidden ? 'Megjelenítés a naptárban' : 'Elrejtés a naptárból'}>
+                <IconButton color={isHidden ? 'secondary' : 'primary'} onClick={onHideClick}>
+                  {isHidden ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                </IconButton>
+              </Tooltip>
+            </>
+          );
+        } else {
+          const isSaved =
           savedLessons && savedLessons.some((obj) => obj.id === params.id);
 
-        return (
-          <Button
-            variant='outlined'
-            onClick={onClick}
-            color={!isSaved ? 'success' : 'error'}
-            startIcon={!isSaved ? <BookmarkAddIcon /> : <BookmarkRemoveIcon />}
-          >
-            {!isSaved ? 'Mentés' : 'Eltávolítás'}
-          </Button>
-        );
+          return (
+            <Button
+              variant='outlined'
+              onClick={onDeleteClick}
+              color={!isSaved ? 'success' : 'error'}
+              startIcon={!isSaved ? <BookmarkAddIcon /> : <BookmarkRemoveIcon />}
+            >
+              {!isSaved ? 'Mentés' : 'Eltávolítás'}
+            </Button>
+          );
+        };
       },
     },
     {

@@ -15,6 +15,7 @@ import html2canvas from 'html2canvas';
 import Search from './Search';
 import Results from './Results';
 import Calendar from './Calendar';
+import EditEvent from './EditEvent';
 import Divider from '@mui/material/Divider';
 import { convertDataToTable, convertDataToCalendar } from './Data';
 
@@ -62,6 +63,8 @@ const App = () => {
   const [searchResults, setSearchResults] = useState([]); // keresés találatok
   const [savedLessons, setSavedLessons] = useState(savedTimetable); // saját órarend
   const [alertText, setAlertText] = useState(''); // alert szöveg
+  const [editEvent, setEditEvent] = useState(null); // szerkesztendő esemény
+  const [hiddenEvents, setHiddenEvents] = useState([]); // rejtett események
 
   // ha van courses akkor minden sor data-hoz csekkeli h az ahhoz tartozó code benne van-e
   const handleDataFetch = (data, courses) => {
@@ -98,7 +101,7 @@ const App = () => {
     handleLessonSave(lesson);
   };
 
-  const handleCalendarChange = (data, toDelete) => {
+  const handleEventChange = (data, toDelete) => {
     if (toDelete) {
       handleLessonSave(data);
     } else {
@@ -198,6 +201,7 @@ const App = () => {
                       onLessonSave={handleLessonSave}
                       savedLessons={savedLessons}
                       isLoading={loading}
+                      own={false}
                     />
                   </Paper>
                 </Grid>
@@ -228,6 +232,9 @@ const App = () => {
                     onLessonSave={handleLessonSave}
                     savedLessons={savedLessons}
                     isLoading={loading}
+                    onEventEdit={setEditEvent}
+                    onEventChange={handleEventChange}
+                    own={true}
                   />
                 </Paper>
               </Grid>
@@ -239,7 +246,7 @@ const App = () => {
                       onCalendarClick={handleCalendarClick}
                       onImageDownload={handleDownloadImage}
                       savedLessons={savedLessons}
-                      onCalendarChange={handleCalendarChange}
+                      onEventEdit={setEditEvent}
                       own={true}
                     />
                   </Paper>
@@ -247,6 +254,15 @@ const App = () => {
               )}
             </Grid>
           </Box>
+
+          {editEvent && (
+            <EditEvent
+              eventId={editEvent}
+              savedLessons={savedLessons}
+              onEventChange={handleEventChange}
+              onEventEdit={setEditEvent}
+            />
+          )}
 
           <Box component='footer' sx={{ p: 2 }}>
             <Copyright />

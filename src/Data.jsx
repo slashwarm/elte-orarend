@@ -3,6 +3,16 @@ import axios from 'axios';
 
 const regex = /[\d!@#$%^&*()_+=[\]{};':"\\|,.<>/?]/g;
 
+const daysOfWeek = [
+  'hétfő',
+  'kedd',
+  'szerda',
+  'csütörtök',
+  'péntek',
+  'szombat',
+  'vasárnap',
+];
+
 const fetchTimetable = async (formData) => {
   try {
     const response = await axios.post('/orarend/server/data.php', formData);
@@ -106,18 +116,8 @@ const convertDataToTable = (data, courses) => {
 };
 
 const convertDataToCalendar = (data) => {
-  const daysOfWeek = [
-    'hétfő',
-    'kedd',
-    'szerda',
-    'csütörtök',
-    'péntek',
-    'szombat',
-    'vasárnap',
-  ];
-
   const calendarObject = data
-    .filter((subArray) => subArray.time && subArray.time.trim() !== '') // Only process objects with a 'time' property
+    .filter((subArray) => subArray.time && subArray.time.trim() !== '' && !subArray.hidden)
     .map((subArray) => {
       const time = subArray.time.split('-');
       const startTime = time[0].split(':');
