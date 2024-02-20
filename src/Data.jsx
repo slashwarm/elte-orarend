@@ -117,7 +117,10 @@ const convertDataToTable = (data, courses) => {
 
 const convertDataToCalendar = (data) => {
   const calendarObject = data
-    .filter((subArray) => subArray.time && subArray.time.trim() !== '' && !subArray.hidden)
+    .filter(
+      (subArray) =>
+        subArray.time && subArray.time.trim() !== '' && !subArray.hidden
+    )
     .map((subArray) => {
       const time = subArray.time.split('-');
       const startTime = time[0].split(':');

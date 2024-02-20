@@ -250,6 +250,6 @@ const EditEvent = ({ savedLessons, onEventChange, onEventEdit, eventId }) => {
       </DialogActions>
     </Dialog>
   );
-}
+};
 
 export default EditEvent;
