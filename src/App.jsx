@@ -64,7 +64,6 @@ const App = () => {
   const [savedLessons, setSavedLessons] = useState(savedTimetable); // saját órarend
   const [alertText, setAlertText] = useState(''); // alert szöveg
   const [editEvent, setEditEvent] = useState(null); // szerkesztendő esemény
-  const [hiddenEvents, setHiddenEvents] = useState([]); // rejtett események
 
   // ha van courses akkor minden sor data-hoz csekkeli h az ahhoz tartozó code benne van-e
   const handleDataFetch = (data, courses) => {

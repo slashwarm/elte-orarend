@@ -49,12 +49,12 @@ const Results = ({
 
           return (
             <>
-              <Tooltip title='Eltávolítás'>
+              <Tooltip title='Eltávolítás' placement='top' disableInteractive>
                 <IconButton color='error' onClick={onDeleteClick}>
                   <BookmarkRemoveIcon />
                 </IconButton>
               </Tooltip>
-              <Tooltip title='Szerkesztés'>
+              <Tooltip title='Szerkesztés' placement='top' disableInteractive>
                 <IconButton onClick={() => onEventEdit(params.id)}>
                   <EditIcon />
                 </IconButton>
@@ -63,6 +63,8 @@ const Results = ({
                 title={
                   isHidden ? 'Megjelenítés a naptárban' : 'Elrejtés a naptárból'
                 }
+                placement='top'
+                disableInteractive
               >
                 <IconButton
                   color={isHidden ? 'secondary' : 'primary'}

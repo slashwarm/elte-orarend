@@ -83,6 +83,7 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
   };
 
   const handleClose = () => {
+    setFile(null); // reset file
     setOpen(false);
   };
 
@@ -109,7 +110,7 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
   };
 
   const searchImportedData = async (data) => {
-    if (data.length < 3) {
+    if (data.length <= 1) { // ha nincs kurzus
       onDataFetch([]);
       handleClose();
       return;
