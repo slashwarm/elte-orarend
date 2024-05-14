@@ -1,51 +1,50 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import './styles/Calendar.css';
-import Grid from '@mui/material/Grid';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import MenuItem from '@mui/material/MenuItem';
-import SaveIcon from '@mui/icons-material/Save';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
-import 'dayjs/locale/hu';
-import { generateUniqueId } from './Data';
+import { useEffect, useState } from "react";
+import "./styles/Calendar.css";
+import Grid from "@mui/material/Grid";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Select from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import MenuItem from "@mui/material/MenuItem";
+import SaveIcon from "@mui/icons-material/Save";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import "dayjs/locale/hu";
+import { generateUniqueId } from "./utils/Data.jsx";
 
 const EditEvent = ({ savedLessons, onEventChange, onEventEdit, eventId }) => {
   useEffect(() => {
     if (eventId !== -1) {
       const lesson = savedLessons.find((lesson) => lesson.id === eventId);
-      const [start, end] = lesson.time.split('-');
-      const [startHour, startMinute] = start.split(':');
-      const [endHour, endMinute] = end.split(':');
+      const [start, end] = lesson.time.split("-");
+      const [startHour, startMinute] = start.split(":");
+      const [endHour, endMinute] = end.split(":");
 
       setStartTime(dayjs().hour(startHour).minute(startMinute).second(0));
       setEndTime(dayjs().hour(endHour).minute(endMinute).second(0));
 
       setEditEvent(lesson);
     } else {
-      setStartTime(dayjs('2024-01-01T08:00'));
-      setEndTime(dayjs('2024-01-01T10:00'));
+      setStartTime(dayjs("2024-01-01T08:00"));
+      setEndTime(dayjs("2024-01-01T10:00"));
 
       setEditEvent({
-        code: '',
-        name: '',
-        course: '',
-        comment: '',
-        day: 'Hétfő',
-        location: '',
-        teacher: '',
-        type: 'gyakorlat',
+        code: "",
+        name: "",
+        course: "",
+        comment: "",
+        day: "Hétfő",
+        location: "",
+        teacher: "",
+        type: "gyakorlat",
       });
     }
   }, [eventId, savedLessons]);
@@ -75,8 +74,8 @@ const EditEvent = ({ savedLessons, onEventChange, onEventEdit, eventId }) => {
   const handleSaveClick = (event) => {
     event.preventDefault();
 
-    const newStart = dayjs(startTime).format('HH:mm');
-    const newEnd = dayjs(endTime).format('HH:mm');
+    const newStart = dayjs(startTime).format("HH:mm");
+    const newEnd = dayjs(endTime).format("HH:mm");
     const newTime = `${newStart}-${newEnd}`;
 
     const newData = {
@@ -105,13 +104,13 @@ const EditEvent = ({ savedLessons, onEventChange, onEventEdit, eventId }) => {
     <Dialog open={true} onClose={handleEditClose}>
       <DialogTitle>Kurzus módosítása</DialogTitle>
       <DialogContent>
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='hu'>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="hu">
           <Grid container spacing={2} marginTop={1}>
             <Grid item xs={9} md={10}>
               <TextField
-                name='name'
-                label='Tárgy neve'
-                variant='outlined'
+                name="name"
+                label="Tárgy neve"
+                variant="outlined"
                 value={editEvent.name}
                 onChange={handleChange}
                 fullWidth
@@ -119,9 +118,9 @@ const EditEvent = ({ savedLessons, onEventChange, onEventEdit, eventId }) => {
             </Grid>
             <Grid item xs={3} md={2}>
               <TextField
-                name='course'
-                label='Kurzus'
-                variant='outlined'
+                name="course"
+                label="Kurzus"
+                variant="outlined"
                 value={editEvent.course}
                 onChange={handleChange}
                 fullWidth
@@ -129,9 +128,9 @@ const EditEvent = ({ savedLessons, onEventChange, onEventEdit, eventId }) => {
             </Grid>
             <Grid item xs={7} md={8}>
               <TextField
-                name='code'
-                label='Tárgy kódja'
-                variant='outlined'
+                name="code"
+                label="Tárgy kódja"
+                variant="outlined"
                 value={editEvent.code}
                 onChange={handleChange}
                 fullWidth
@@ -139,26 +138,26 @@ const EditEvent = ({ savedLessons, onEventChange, onEventEdit, eventId }) => {
             </Grid>
             <Grid item xs={5} md={4}>
               <FormControl fullWidth>
-                <InputLabel id='type-select-label'>Típus</InputLabel>
+                <InputLabel id="type-select-label">Típus</InputLabel>
                 <Select
-                  labelId='type-select-label'
-                  name='type'
+                  labelId="type-select-label"
+                  name="type"
                   value={editEvent.type}
-                  label='Típus'
+                  label="Típus"
                   onChange={handleChange}
                 >
-                  <MenuItem value={'gyakorlat'}>gyakorlat</MenuItem>
-                  <MenuItem value={'előadás'}>előadás</MenuItem>
-                  <MenuItem value={'konzultáció'}>konzultáció</MenuItem>
-                  <MenuItem value={'elfoglaltság'}>elfoglaltság</MenuItem>
+                  <MenuItem value={"gyakorlat"}>gyakorlat</MenuItem>
+                  <MenuItem value={"előadás"}>előadás</MenuItem>
+                  <MenuItem value={"konzultáció"}>konzultáció</MenuItem>
+                  <MenuItem value={"elfoglaltság"}>elfoglaltság</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12}>
               <TextField
-                name='location'
-                label='Helyszín'
-                variant='outlined'
+                name="location"
+                label="Helyszín"
+                variant="outlined"
                 value={editEvent.location}
                 onChange={handleChange}
                 fullWidth
@@ -166,8 +165,8 @@ const EditEvent = ({ savedLessons, onEventChange, onEventEdit, eventId }) => {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                name='comment'
-                label='Oktató / Megjegyzés'
+                name="comment"
+                label="Oktató / Megjegyzés"
                 multiline
                 maxRows={2}
                 value={editEvent.comment}
@@ -177,11 +176,11 @@ const EditEvent = ({ savedLessons, onEventChange, onEventEdit, eventId }) => {
             </Grid>
             <Grid item xs={6} md={3}>
               <TimePicker
-                name='start'
+                name="start"
                 skipDisabled
-                label='Kezdés'
-                minTime={dayjs('2024-01-01T08:00')}
-                maxTime={dayjs('2024-01-01T22:00')}
+                label="Kezdés"
+                minTime={dayjs("2024-01-01T08:00")}
+                maxTime={dayjs("2024-01-01T22:00")}
                 value={startTime}
                 onChange={(newValue) => {
                   setStartTime(newValue);
@@ -191,11 +190,11 @@ const EditEvent = ({ savedLessons, onEventChange, onEventEdit, eventId }) => {
             </Grid>
             <Grid item xs={6} md={3}>
               <TimePicker
-                name='end'
+                name="end"
                 skipDisabled
-                label='Vége'
+                label="Vége"
                 minTime={startTime}
-                maxTime={dayjs('2024-01-01T22:00')}
+                maxTime={dayjs("2024-01-01T22:00")}
                 value={endTime}
                 onChange={(newValue) => {
                   setEndTime(newValue);
@@ -205,19 +204,19 @@ const EditEvent = ({ savedLessons, onEventChange, onEventEdit, eventId }) => {
             </Grid>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel id='day-select-label'>Nap</InputLabel>
+                <InputLabel id="day-select-label">Nap</InputLabel>
                 <Select
-                  labelId='day-select-label'
-                  name='day'
+                  labelId="day-select-label"
+                  name="day"
                   value={editEvent.day}
-                  label='Nap'
+                  label="Nap"
                   onChange={handleChange}
                 >
-                  <MenuItem value={'Hétfő'}>Hétfő</MenuItem>
-                  <MenuItem value={'Kedd'}>Kedd</MenuItem>
-                  <MenuItem value={'Szerda'}>Szerda</MenuItem>
-                  <MenuItem value={'Csütörtök'}>Csütörtök</MenuItem>
-                  <MenuItem value={'Péntek'}>Péntek</MenuItem>
+                  <MenuItem value={"Hétfő"}>Hétfő</MenuItem>
+                  <MenuItem value={"Kedd"}>Kedd</MenuItem>
+                  <MenuItem value={"Szerda"}>Szerda</MenuItem>
+                  <MenuItem value={"Csütörtök"}>Csütörtök</MenuItem>
+                  <MenuItem value={"Péntek"}>Péntek</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -228,20 +227,20 @@ const EditEvent = ({ savedLessons, onEventChange, onEventEdit, eventId }) => {
         {editEvent.id && (
           <Button
             startIcon={<DeleteIcon />}
-            variant='contained'
-            color='error'
+            variant="contained"
+            color="error"
             onClick={handleDeleteClick}
           >
             Törlés
           </Button>
         )}
         <Button
-          id='save-button'
+          id="save-button"
           startIcon={<SaveIcon />}
-          variant='contained'
-          color='success'
-          style={{ color: 'white' }}
-          type='submit'
+          variant="contained"
+          color="success"
+          style={{ color: "white" }}
+          type="submit"
           onClick={handleSaveClick}
         >
           Mentés

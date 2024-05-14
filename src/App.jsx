@@ -1,39 +1,38 @@
 // App.jsx
-import { useState } from 'react';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { huHU } from '@mui/material/locale';
-import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import IconButton from '@mui/material/IconButton';
-import Alert from '@mui/material/Alert';
-import Snackbar from '@mui/material/Snackbar';
-import GitHubIcon from '@mui/icons-material/GitHub';
-import html2canvas from 'html2canvas';
-import Search from './Search';
-import Results from './Results';
-import Calendar from './Calendar';
-import EditEvent from './EditEvent';
-import Divider from '@mui/material/Divider';
-import { convertDataToTable, convertDataToCalendar } from './Data';
+import { useState } from "react";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { huHU } from "@mui/material/locale";
+import CssBaseline from "@mui/material/CssBaseline";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import IconButton from "@mui/material/IconButton";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import html2canvas from "html2canvas";
+import Search from "./Search";
+import Results from "./Results";
+import Calendar from "./Calendar";
+import EditEvent from "./EditEvent";
+import Alert from "./utils/Alert.jsx";
+import Divider from "@mui/material/Divider";
+import { convertDataToTable, convertDataToCalendar } from "./utils/Data.jsx";
 
 function Copyright(props) {
   return (
-    <Box display='flex' flexDirection='column' alignItems='center' gap='8px'>
+    <Box display="flex" flexDirection="column" alignItems="center" gap="8px">
       <Typography
-        variant='body2'
-        color='text.secondary'
-        align='center'
+        variant="body2"
+        color="text.secondary"
+        align="center"
         {...props}
       >
         Készült ❤️-el és sok ☕-al az ELTE-n.
       </Typography>
 
       <IconButton
-        aria-label='github'
-        href='https://github.com/slashwarm/elte-orarend'
+        aria-label="github"
+        href="https://github.com/slashwarm/elte-orarend"
       >
         <GitHubIcon />
       </IconButton>
@@ -43,7 +42,7 @@ function Copyright(props) {
 
 const defaultTheme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: "dark",
   },
   typography: {
     button: {
@@ -55,14 +54,14 @@ const defaultTheme = createTheme({
 });
 
 const App = () => {
-  const storageTimetable = window.localStorage.getItem('SAVE_TIMETABLE');
+  const storageTimetable = window.localStorage.getItem("SAVE_TIMETABLE");
   const savedTimetable = storageTimetable ? JSON.parse(storageTimetable) : [];
 
   const [firstSearchDone, setFirstSearchDone] = useState(false); // első keresés
   const [loading, setLoading] = useState(false); // töltés
   const [searchResults, setSearchResults] = useState([]); // keresés találatok
   const [savedLessons, setSavedLessons] = useState(savedTimetable); // saját órarend
-  const [alertText, setAlertText] = useState(''); // alert szöveg
+  const [alertText, setAlertText] = useState(""); // alert szöveg
   const [editEvent, setEditEvent] = useState(null); // szerkesztendő esemény
 
   // ha van courses akkor minden sor data-hoz csekkeli h az ahhoz tartozó code benne van-e
@@ -79,23 +78,23 @@ const App = () => {
 
   const handleLessonSave = (data) => {
     const existingLesson = savedLessons.find((lesson) => lesson.id === data.id);
-    let newLessons = savedLessons;
+    let newLessons;
 
     if (existingLesson) {
       newLessons = savedLessons.filter((lesson) => lesson.id !== data.id);
-      setAlertText('Kurzus eltávolítva az órarendből');
+      setAlertText("Kurzus eltávolítva az órarendből");
     } else {
       newLessons = [...savedLessons, data];
-      setAlertText('Kurzus hozzáadva a saját órarendhez');
+      setAlertText("Kurzus hozzáadva a saját órarendhez");
     }
 
-    window.localStorage.setItem('SAVE_TIMETABLE', JSON.stringify(newLessons));
+    window.localStorage.setItem("SAVE_TIMETABLE", JSON.stringify(newLessons));
     setSavedLessons(newLessons);
   };
 
   const handleCalendarClick = (id, own) => {
     const lesson = (own ? savedLessons : searchResults).find(
-      (lesson) => lesson.id === id
+      (lesson) => lesson.id === id,
     );
     handleLessonSave(lesson);
   };
@@ -105,7 +104,7 @@ const App = () => {
       handleLessonSave(data);
     } else {
       const existingLesson = savedLessons.find(
-        (lesson) => lesson.id === data.id
+        (lesson) => lesson.id === data.id,
       );
 
       if (existingLesson) {
@@ -122,8 +121,8 @@ const App = () => {
         });
 
         window.localStorage.setItem(
-          'SAVE_TIMETABLE',
-          JSON.stringify(updatedLessons)
+          "SAVE_TIMETABLE",
+          JSON.stringify(updatedLessons),
         );
         setSavedLessons(updatedLessons);
       } else {
@@ -143,12 +142,12 @@ const App = () => {
       backgroundColor: backgroundColor,
     });
 
-    const data = canvas.toDataURL('image/png');
-    const link = document.createElement('a');
+    const data = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
 
-    if (typeof link.download === 'string') {
+    if (typeof link.download === "string") {
       link.href = data;
-      link.download = 'orarend.png';
+      link.download = "orarend.png";
 
       document.body.appendChild(link);
       link.click();
@@ -159,33 +158,33 @@ const App = () => {
   };
 
   const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
 
-    setAlertText('');
+    setAlertText("");
   };
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Box display='flex' minHeight='100vh'>
+      <Box display="flex" minHeight="100vh">
         <CssBaseline />
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <Box component='main' sx={{ flex: 1, py: 4, px: 4 }}>
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <Box component="main" sx={{ flex: 1 }} p={{ xs: 1, sm: 2, md: 4 }}>
             <Grid
               container
-              direction='column' // Set direction to "column"
+              direction="column"
               spacing={2}
-              justify='center'
-              alignContent='center'
+              justify="center"
+              alignContent="center"
             >
               <Grid item xs={12} sm={6} md={4} lg={3}>
                 <Paper
                   sx={{
                     p: 2,
                     maxWidth: 1000,
-                    margin: 'auto',
-                    overflow: 'hidden',
+                    margin: "auto",
+                    overflow: "hidden",
                   }}
                 >
                   <Search
@@ -196,7 +195,7 @@ const App = () => {
                 </Paper>
               </Grid>
               {firstSearchDone && (
-                <Grid item xs={12}>
+                <Grid item xs={12} maxWidth="100vw !important">
                   <Paper sx={{ p: 2 }}>
                     <Results
                       tableData={searchResults}
@@ -221,13 +220,13 @@ const App = () => {
                 </Grid>
               )}
               <Grid item xs={12}>
-                <Typography variant='h5' component='h2'>
+                <Typography variant="h5" component="h2">
                   Saját órarendem
                 </Typography>
 
                 <Divider />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} maxWidth="100vw !important">
                 <Paper sx={{ p: 2 }}>
                   <Results
                     tableData={savedLessons}
@@ -257,7 +256,7 @@ const App = () => {
             </Grid>
           </Box>
 
-          {editEvent && (
+          {!!editEvent && (
             <EditEvent
               eventId={editEvent}
               savedLessons={savedLessons}
@@ -266,26 +265,13 @@ const App = () => {
             />
           )}
 
-          <Box component='footer' sx={{ p: 2 }}>
+          <Box component="footer" sx={{ p: 2 }}>
             <Copyright />
           </Box>
         </Box>
       </Box>
 
-      <Snackbar
-        open={alertText !== ''}
-        autoHideDuration={3000}
-        onClose={handleClose}
-      >
-        <Alert
-          severity='success'
-          variant='filled'
-          onClose={handleClose}
-          sx={{ width: '100%' }}
-        >
-          {alertText}
-        </Alert>
-      </Snackbar>
+      {!!alertText && <Alert alertText={alertText} handleClose={handleClose} />}
     </ThemeProvider>
   );
 };

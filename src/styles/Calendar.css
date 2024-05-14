@@ -1,40 +1,43 @@
 :root {
-  --fc-border-color: rgba(81, 81, 81, 1);
-  --fc-page-bg-color: transparent;
-  --fc-event-selected-overlay-color: transparent;
-  --fc-today-bg-color: transparent;
-  --fc-event-border-color: #000;
-  --lecture-color: rgb(76, 119, 199);
-  --practice-color: rgb(99, 79, 199);
+    --fc-border-color: rgba(81, 81, 81, 1);
+    --fc-page-bg-color: transparent;
+    --fc-event-selected-overlay-color: transparent;
+    --fc-today-bg-color: transparent;
+    --fc-event-border-color: #000;
+    --lecture-color: rgb(76, 119, 199);
+    --practice-color: rgb(99, 79, 199);
 }
 
 .fc th {
-  font-weight: 400;
-  text-transform: capitalize;
+    font-weight: 400;
+    text-transform: capitalize;
+    overflow: clip;
 }
 
 .fc-direction-ltr .fc-daygrid-event.fc-event-end,
 .fc-event-main-frame {
-  flex-direction: column;
+    flex-direction: column;
 }
 
-.fc-event-desc, .fc-event-title, .fc-event-time {
-  padding-left: 2px;
-  white-space: break-spaces;
+.fc-event-desc,
+.fc-event-title,
+.fc-event-time {
+    padding-left: 2px;
+    white-space: break-spaces;
 }
 
 .fc-event {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 thead {
-  background-color: #121212;
+    background-color: #121212;
 }
 
 a.fc-event:has(div.practice) {
-  background-color: var(--practice-color);
+    background-color: var(--practice-color);
 }
 
 a.fc-event:has(div.lecture) {
-  background-color: var(--lecture-color);
+    background-color: var(--lecture-color);
 }
