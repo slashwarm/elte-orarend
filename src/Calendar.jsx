@@ -72,36 +72,38 @@ const Calendar = ({
 
   return (
     <>
-      <Stack
-        direction={{ xs: "column", sm: "row" }}
-        spacing={2}
-        marginBottom={2}
-      >
-        <Button
-          variant="outlined"
-          startIcon={<DownloadIcon />}
-          onClick={handlePrintClick}
-        >
-          Mentés képként
-        </Button>
-
-        <Badge
-          badgeContent="ÚJ"
-          color="secondary"
-          sx={{ visibility: { xs: "hidden", sm: "visible" } }}
+      {own && (
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          marginBottom={2}
         >
           <Button
             variant="outlined"
-            color="success"
-            startIcon={<AddIcon />}
-            onClick={() => onEventEdit(-1)}
-            sx={{ visibility: "visible" }}
-            fullWidth
+            startIcon={<DownloadIcon />}
+            onClick={handlePrintClick}
           >
-            Saját kurzus hozzáadása
+            Mentés képként
           </Button>
-        </Badge>
-      </Stack>
+
+          <Badge
+            badgeContent="ÚJ"
+            color="secondary"
+            sx={{ visibility: { xs: "hidden", sm: "visible" } }}
+          >
+            <Button
+              variant="outlined"
+              color="success"
+              startIcon={<AddIcon />}
+              onClick={() => onEventEdit(-1)}
+              sx={{ visibility: "visible" }}
+              fullWidth
+            >
+              Saját kurzus hozzáadása
+            </Button>
+          </Badge>
+        </Stack>
+      )}
 
       <div ref={printRef}>
         <FullCalendar
