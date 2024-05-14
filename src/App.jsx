@@ -49,6 +49,16 @@ const defaultTheme = createTheme({
       fontWeight: 600,
     },
   },
+  components: {
+    MuiGrid: {
+      styleOverrides: {
+        item: {
+          width: "100%",
+          maxWidth: "100vw !important",
+        },
+      },
+    },
+  },
   huHU,
 });
 
@@ -194,7 +204,7 @@ const App = () => {
                 </Paper>
               </Grid>
               {firstSearchDone && (
-                <Grid item xs={12} maxWidth="100vw !important">
+                <Grid item xs={12}>
                   <Paper sx={{ p: 2 }}>
                     <Results
                       tableData={searchResults}
@@ -225,7 +235,7 @@ const App = () => {
 
                 <Divider />
               </Grid>
-              <Grid item xs={12} maxWidth="100vw !important">
+              <Grid item xs={12}>
                 <Paper sx={{ p: 2 }}>
                   <Results
                     tableData={savedLessons}
