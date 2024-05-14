@@ -11,7 +11,7 @@ import BookmarkRemoveIcon from "@mui/icons-material/BookmarkRemove";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import CustomNoRowsOverlay from "./utils/Overlay.jsx";
+import CustomNoRowsOverlay from "./utils/EmptyListOverlay.jsx";
 
 const Results = ({
   tableData,

@@ -4,7 +4,7 @@ import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import huLocale from "@fullcalendar/core/locales/hu";
 import "./styles/Calendar.css";
-import { Popover } from "@mui/material";
+import Popover from "@mui/material/Popover";
 import Badge from "@mui/material/Badge";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";

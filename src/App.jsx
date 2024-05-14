@@ -1,4 +1,3 @@
-// App.jsx
 import { useState } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { huHU } from "@mui/material/locale";
