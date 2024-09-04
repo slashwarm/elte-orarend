@@ -1,28 +1,32 @@
-import { useState, useRef, useEffect } from "react";
-import PropTypes from "prop-types";
+import huLocale from "@fullcalendar/core/locales/hu";
+import momentTimezonePlugin from "@fullcalendar/moment-timezone";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import huLocale from "@fullcalendar/core/locales/hu";
-import "./styles/Calendar.css";
-import Popover from "@mui/material/Popover";
-import Badge from "@mui/material/Badge";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import DownloadIcon from "@mui/icons-material/Download";
 import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import EventBusyIcon from "@mui/icons-material/EventBusy";
-import DownloadIcon from "@mui/icons-material/Download";
-import AddIcon from "@mui/icons-material/Add";
-import momentTimezonePlugin from "@fullcalendar/moment-timezone";
+import LinkIcon from '@mui/icons-material/Link';
+import Badge from "@mui/material/Badge";
+import Button from "@mui/material/Button";
+import Popover from "@mui/material/Popover";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import PropTypes from "prop-types";
+import { useEffect, useRef, useState } from "react";
+import "./styles/Calendar.css";
 
 const Calendar = ({
   tableData,
   onCalendarClick,
   onEventEdit,
   onImageDownload,
+  onURLExport,
   savedLessons,
   own,
+  viewOnly,
 }) => {
   // popover
   const [popoverInfo, setPopoverInfo] = useState({
@@ -53,10 +57,28 @@ const Calendar = ({
     }
   }, [stickyHeader, onImageDownload]);
 
+  // URL export
+  const handleURLCopy = async () => {
+    await onURLExport();
+  }
+
+  // Más órarendjének mentése sajátként
+  const handleTimetableSave = () => {
+      const url = new URL(window.location);
+      url.searchParams.delete("lessons");
+
+      window.location = url;
+      window.localStorage.setItem("SAVE_TIMETABLE", JSON.stringify(savedLessons));
+  }
+
   // egyéb
   const isPopoverOpen = Boolean(popoverInfo.anchorEl);
 
   const onEventClick = (eventInfo) => {
+    if (viewOnly){
+      return;
+    }
+
     handlePopoverClose();
 
     if (own) {
@@ -92,6 +114,21 @@ const Calendar = ({
             sx={{ visibility: { xs: "hidden", sm: "visible" } }}
           >
             <Button
+            variant="outlined"
+            startIcon={<LinkIcon />}
+            onClick={handleURLCopy}
+          >
+            Mentés hivatkozásként
+          </Button>
+
+          </Badge>
+
+          {!viewOnly && <Badge
+            badgeContent="ÚJ"
+            color="secondary"
+            sx={{ visibility: { xs: "hidden", sm: "visible" } }}
+          >
+            <Button
               variant="outlined"
               color="success"
               startIcon={<AddIcon />}
@@ -101,7 +138,17 @@ const Calendar = ({
             >
               Saját kurzus hozzáadása
             </Button>
-          </Badge>
+          </Badge>}
+
+          {viewOnly && <Button
+              variant="outlined"
+              color="success"
+              startIcon={<BookmarkBorderIcon />}
+              onClick={handleTimetableSave}
+              sx={{ visibility: "visible" }}
+            >
+              Beállítás saját órarendként
+            </Button>}
         </Stack>
       )}
 
@@ -133,7 +180,7 @@ const Calendar = ({
                   eventInfo.event.extendedProps.type === "gyakorlat"
                     ? "practice"
                     : "lecture"
-                }`}
+                } ${viewOnly ? "view-only" : ""}`}
                 onMouseEnter={(e) => handlePopoverOpen(e, eventInfo)}
                 onMouseLeave={handlePopoverClose}
               >
@@ -173,6 +220,7 @@ const Calendar = ({
             {popoverInfo.event.event.title.split("\r").map((item, ind) => {
               return <div key={ind}>{item}</div>;
             })}
+            {!viewOnly &&
             <Stack
               direction="row"
               spacing={0.5}
@@ -197,7 +245,7 @@ const Calendar = ({
                         : "órarendbe adáshoz"
                     }`}
               </div>
-            </Stack>
+            </Stack>}
           </Typography>
         </Popover>
       )}

@@ -41,3 +41,7 @@ a.fc-event:has(div.practice) {
 a.fc-event:has(div.lecture) {
     background-color: var(--lecture-color);
 }
+
+a.fc-event:has(div.view-only) {
+    cursor: auto;
+}

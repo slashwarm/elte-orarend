@@ -1,5 +1,5 @@
-import CRC32 from "crc-32";
 import axios from "axios";
+import CRC32 from "crc-32";
 
 const regex = /[\d!@#$%^&*()_+=[\]{};':"\\|,.<>/?]/g;
 
@@ -31,6 +31,25 @@ const fetchTimetable = async (formData) => {
   }
 };
 
+export const getTeacherFromComment = (comment) => {
+  let teacher = "";
+
+  if (comment && comment.trim() !== "") {
+    // van megjegyzés / oktató
+    let teacherSplit = comment
+      .replace("Dr. ", "")
+      .replace(" Dr.", "")
+      .replace(regex, "")
+      .split(" ");
+
+    if (teacherSplit.length >= 2) {
+      // emberi név, tehát legalább 2 tagú
+      teacher = teacherSplit.slice(0, 2).join(" ");
+    }
+  }
+  return teacher;
+}
+
 const convertDataToTable = (data, courses) => {
   let tableObject = data.map((subArray) => {
     let time = subArray[0].split(" ");
@@ -44,21 +63,8 @@ const convertDataToTable = (data, courses) => {
     let lessonName = subArray[2];
     let location = subArray[3];
     let comment = subArray[5];
-    let teacher = "";
-
-    if (comment && comment.trim() !== "") {
-      // van megjegyzés / oktató
-      let teacherSplit = comment
-        .replace("Dr. ", "")
-        .replace(" Dr.", "")
-        .replace(regex, "")
-        .split(" ");
-
-      if (teacherSplit.length >= 2) {
-        // emberi név, tehát legalább 2 tagú
-        teacher = teacherSplit.slice(0, 2).join(" ");
-      }
-    }
+    let teacher = getTeacherFromComment(comment);
+    
 
     if (time.length >= 4) {
       // van helyes időnk
@@ -199,9 +205,7 @@ const generateUniqueId = (data) => {
 };
 
 export {
-  fetchTimetable,
   convertDataToCalendar,
-  convertDataToTable,
-  getSemesters,
-  generateUniqueId,
+  convertDataToTable, fetchTimetable, generateUniqueId, getSemesters
 };
+
