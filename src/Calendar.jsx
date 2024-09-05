@@ -2,6 +2,7 @@ import huLocale from "@fullcalendar/core/locales/hu";
 import momentTimezonePlugin from "@fullcalendar/moment-timezone";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import DownloadIcon from "@mui/icons-material/Download";
@@ -15,8 +16,10 @@ import Popover from "@mui/material/Popover";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import PropTypes from "prop-types";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./styles/Calendar.css";
+import { convertDataToCalendar } from "./utils/Data";
+
 
 const Calendar = ({
   tableData,
@@ -33,6 +36,16 @@ const Calendar = ({
     anchorEl: null,
     event: null,
   });
+
+  const [showOwnSubjects, setShowOwnSubjects] = useState(false);
+  const data = useMemo(() => {
+    if (showOwnSubjects) {
+      return [...tableData, ...convertDataToCalendar(savedLessons)];
+    }
+    else {
+      return tableData;
+    }
+  }, [tableData, showOwnSubjects, savedLessons]);
 
   const handlePopoverOpen = (event, eventInfo) => {
     setPopoverInfo({ anchorEl: event.currentTarget, event: eventInfo });
@@ -56,7 +69,7 @@ const Calendar = ({
       setStickyHeader(true);
     }
   }, [stickyHeader, onImageDownload]);
-
+  
   // URL export
   const handleURLCopy = async () => {
     await onURLExport();
@@ -70,7 +83,6 @@ const Calendar = ({
       window.location = url;
       window.localStorage.setItem("SAVE_TIMETABLE", JSON.stringify(savedLessons));
   }
-
   // egyéb
   const isPopoverOpen = Boolean(popoverInfo.anchorEl);
 
@@ -91,6 +103,7 @@ const Calendar = ({
   const isEventInSaved = (eventId) => {
     return savedLessons.some((lesson) => lesson.id === parseInt(eventId));
   };
+
 
   return (
     <>
@@ -147,13 +160,31 @@ const Calendar = ({
         </Stack>
       )}
 
+      {
+        !own && (
+          <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          marginBottom={2}
+        >
+          <Button
+            variant="outlined"
+            startIcon={showOwnSubjects ? <VisibilityOff /> : <Visibility />}
+            onClick={() => setShowOwnSubjects(!showOwnSubjects)}
+          >
+            {showOwnSubjects ? "Saját tárgyak elrejtése" : "Saját tárgyak mutatása"}
+          </Button>
+        </Stack>
+        )
+      }
+
       <div ref={printRef}>
         <FullCalendar
           plugins={[timeGridPlugin, momentTimezonePlugin]}
           initialView="timeGridWeek"
           weekends={false}
           stickyHeaderDates={stickyHeader}
-          events={tableData}
+          events={data}
           headerToolbar={false}
           allDaySlot={false}
           slotMinTime="08:00:00"
@@ -178,6 +209,10 @@ const Calendar = ({
                 } ${viewOnly ? "view-only" : ""}`}
                 onMouseEnter={(e) => handlePopoverOpen(e, eventInfo)}
                 onMouseLeave={handlePopoverClose}
+                style={{
+                  opacity: isEventInSaved(eventInfo.event.id) && !own ? 0.6 : 1,
+                  backgroundColor: isEventInSaved(eventInfo.event.id) && !own ? "gray" : "",
+                }}
               >
                 <div className="fc-event-time">
                   <b>{eventInfo.timeText}</b>
