@@ -22,8 +22,13 @@ jobs:
       with:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           ARGS: "-avzr --delete"
-          SOURCE: "dist/"
+          SOURCE: "dist/ server/"
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           TARGET: ${{ secrets.REMOTE_TARGET }}
           EXCLUDE: "/dist/, /node_modules/"
+          SCRIPT_AFTER: |
+            ./server/install-composer.sh
+            echo $RSYNC_STDOUT
+          SCRIPT_AFTER_REQUIRED: true
+
