@@ -44,9 +44,11 @@ jobs:
           remoteDir: ${{ secrets.SFTP_DIR }}
           reverse: true
           ignoreFile: '.lftp_ignore'
-          options: '--verbose --delete'
+          options: '--verbose --delete --exclude-glob vendor/'
 
       - name: Install Composer dependencies on the server
         run: |
-          ssh -o StrictHostKeyChecking=accept-new -p ${{ secrets.SFTP_PORT }} ${{ secrets.SFTP_USER }}@${{ secrets.SFTP_HOST }} \
-          'cd ${{ secrets.SFTP_DIR }}/server && bash install-composer.sh'
+          sshpass -p "${{ secrets.SFTP_PASS }}"
+          ssh -o StrictHostKeyChecking=accept-new -p ${{ secrets.SFTP_PORT }} ${{ secrets.SFTP_USER }}@${{ secrets.SFTP_HOST }}
+          cd ${{ secrets.SFTP_DIR }}/server
+          bash install-composer.sh
