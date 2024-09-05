@@ -66,17 +66,26 @@ export function decodeLessonsFromSearchParam(param) {
             case 'k':
                 lesson.type = 'konzultáció';
                 break;
-            case 't':
-                lesson.type = 'tereptan';
+            case 's':
+                lesson.type = 'szeminárium';
                 break;
-            case 'tr':
-                lesson.type = 'tréning';
+            case 'v':
+                lesson.type = 'vizsgakurzus';
+                break;
+            case 'h':
+                lesson.type = 'házidolgozat';
+                break;
+            case 'l':
+                lesson.type = 'labor';
+                break;
+            case 'sz':
+                lesson.type = 'szakmai gyakorlat';
                 break;
             case 'el':
                 lesson.type = 'elfoglaltság';
                 break;
             default:
-                lesson.type = 'egyéb';
+                lesson.type = parts[i + 7];
         }
 
         lesson.id = generateUniqueId(lesson);
@@ -132,14 +141,21 @@ export function encodeLessonsToSearchParam(lessons) {
         parts.push(`${time.slice(0, 2)}${time.slice(3, 5)}${time.slice(6, 8)}${time.slice(9)}`);
 
         switch (lesson.type) {
-            case 'elfoglaltság':
-                parts.push('el');
+            case 'előadás':
+            case 'gyakorlat':
+            case 'konzultáció':
+            case 'szeminárium':
+            case 'vizsgakurzus':
+            case 'labor':
+            case 'házidolgozat':
+                parts.push(lesson.type[0]);
                 break;
-            case 'tréning':
-                parts.push('tr');
+            case 'elfoglaltság':
+            case 'szakmai gyakorlat':
+                parts.push(lesson.type[0] + lesson.type[1]);
                 break;
             default:
-                parts.push(lesson.type[0]);
+                parts.push(lesson.type);
         }
     }
 
