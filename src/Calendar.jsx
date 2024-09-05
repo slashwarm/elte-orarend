@@ -111,34 +111,29 @@ const Calendar = ({
           <Badge
             badgeContent="ÚJ"
             color="secondary"
-            sx={{ visibility: { xs: "hidden", sm: "visible" } }}
           >
             <Button
             variant="outlined"
             startIcon={<LinkIcon />}
             onClick={handleURLCopy}
+            fullWidth
           >
             Mentés hivatkozásként
           </Button>
 
           </Badge>
 
-          {!viewOnly && <Badge
-            badgeContent="ÚJ"
-            color="secondary"
-            sx={{ visibility: { xs: "hidden", sm: "visible" } }}
-          >
+          {!viewOnly &&
             <Button
               variant="outlined"
               color="success"
               startIcon={<AddIcon />}
               onClick={() => onEventEdit(-1)}
               sx={{ visibility: "visible" }}
-              fullWidth
             >
               Saját kurzus hozzáadása
             </Button>
-          </Badge>}
+          }
 
           {viewOnly && <Button
               variant="outlined"
