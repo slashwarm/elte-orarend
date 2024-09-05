@@ -165,7 +165,6 @@ Sessionx.vim
 
 # Temporary
 .netrwhist
-*~
 # Auto-generated tag files
 tags
 # Persistent undo
@@ -173,7 +172,6 @@ tags
 
 ##### Emacs
 # -*- mode: gitignore; -*-
-*~
 \#*\#
 /.emacs.desktop
 /.emacs.desktop.lock
@@ -254,10 +252,6 @@ bh_unicode_properties.cache
 # https://packagecontrol.io/packages/sublime-github
 GitHub.sublime-settings
 
-##### Notepad++
-# Notepad++ backups #
-*.bak
-
 ##### TextMate
 *.tmproj
 *.tmproject
@@ -280,7 +274,6 @@ tmtags
 **/nbproject/Package-*.bash
 build/
 nbbuild/
-dist/
 nbdist/
 .nb-gradle/
 
@@ -361,8 +354,6 @@ fabric.properties
 .metadata
 bin/
 tmp/
-*.tmp
-*.bak
 *.swp
 *~.nib
 local.properties
@@ -454,10 +445,6 @@ gradle-app.setting
 ##### Composer
 composer.phar
 /vendor/
-
-# Commit your application's lock file https://getcomposer.org/doc/01-basic-usage.md#commit-your-composer-lock-file-to-version-control
-# You may choose to ignore a library lock file http://getcomposer.org/doc/02-libraries.md#lock-file
-composer.lock
 
 ##### PHP CodeSniffer
 # gitignore for the PHP Codesniffer framework
