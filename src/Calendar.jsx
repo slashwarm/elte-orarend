@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -33,7 +33,14 @@ const Calendar = ({
   });
 
   const [showOwnSubjects, setShowOwnSubjects] = useState(false);
-  const [data, setData] = useState(tableData);
+  const data = useMemo(() => {
+    if (showOwnSubjects) {
+      return [...tableData, ...convertDataToCalendar(savedLessons)];
+    }
+    else {
+      return tableData;
+    }
+  }, [tableData, showOwnSubjects, savedLessons]);
 
   const handlePopoverOpen = (event, eventInfo) => {
     setPopoverInfo({ anchorEl: event.currentTarget, event: eventInfo });
@@ -58,15 +65,7 @@ const Calendar = ({
     }
   }, [stickyHeader, onImageDownload]);
 
-  useEffect(() => {
-    if (showOwnSubjects) {
-      setData([...tableData, ...convertDataToCalendar(savedLessons)]);
-    }
-    else {
-      setData(tableData);
-    }
-  }, [tableData, showOwnSubjects, savedLessons]);
-
+  
   // egyéb
   const isPopoverOpen = Boolean(popoverInfo.anchorEl);
 
@@ -129,10 +128,10 @@ const Calendar = ({
         >
           <Button
             variant="outlined"
-            startIcon={showOwnSubjects ? <Visibility /> : <VisibilityOff />}
+            startIcon={showOwnSubjects ? <VisibilityOff /> : <Visibility />}
             onClick={() => setShowOwnSubjects(!showOwnSubjects)}
           >
-            Saját tárgyak mutatása
+            {showOwnSubjects ? "Saját tárgyak elrejtése" : "Saját tárgyak mutatása"}
           </Button>
         </Stack>
         )
