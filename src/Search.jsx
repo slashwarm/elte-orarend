@@ -56,8 +56,12 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
     event.preventDefault();
 
     const data = new FormData(event.currentTarget);
+
+    const name = data.get("name").trim();
+    
+    
     const formData = {
-      name: data.get("name"),
+      name: name,
       year: year,
       mode: mode,
     };

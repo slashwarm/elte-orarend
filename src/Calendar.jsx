@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -15,6 +15,8 @@ import EventBusyIcon from "@mui/icons-material/EventBusy";
 import DownloadIcon from "@mui/icons-material/Download";
 import AddIcon from "@mui/icons-material/Add";
 import momentTimezonePlugin from "@fullcalendar/moment-timezone";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { convertDataToCalendar } from "./utils/Data";
 
 const Calendar = ({
   tableData,
@@ -29,6 +31,16 @@ const Calendar = ({
     anchorEl: null,
     event: null,
   });
+
+  const [showOwnSubjects, setShowOwnSubjects] = useState(false);
+  const data = useMemo(() => {
+    if (showOwnSubjects) {
+      return [...tableData, ...convertDataToCalendar(savedLessons)];
+    }
+    else {
+      return tableData;
+    }
+  }, [tableData, showOwnSubjects, savedLessons]);
 
   const handlePopoverOpen = (event, eventInfo) => {
     setPopoverInfo({ anchorEl: event.currentTarget, event: eventInfo });
@@ -53,6 +65,7 @@ const Calendar = ({
     }
   }, [stickyHeader, onImageDownload]);
 
+  
   // egyéb
   const isPopoverOpen = Boolean(popoverInfo.anchorEl);
 
@@ -69,6 +82,7 @@ const Calendar = ({
   const isEventInSaved = (eventId) => {
     return savedLessons.some((lesson) => lesson.id === parseInt(eventId));
   };
+
 
   return (
     <>
@@ -105,13 +119,31 @@ const Calendar = ({
         </Stack>
       )}
 
+      {
+        !own && (
+          <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          marginBottom={2}
+        >
+          <Button
+            variant="outlined"
+            startIcon={showOwnSubjects ? <VisibilityOff /> : <Visibility />}
+            onClick={() => setShowOwnSubjects(!showOwnSubjects)}
+          >
+            {showOwnSubjects ? "Saját tárgyak elrejtése" : "Saját tárgyak mutatása"}
+          </Button>
+        </Stack>
+        )
+      }
+
       <div ref={printRef}>
         <FullCalendar
           plugins={[timeGridPlugin, momentTimezonePlugin]}
           initialView="timeGridWeek"
           weekends={false}
           stickyHeaderDates={stickyHeader}
-          events={tableData}
+          events={data}
           headerToolbar={false}
           allDaySlot={false}
           slotMinTime="08:00:00"
@@ -136,6 +168,10 @@ const Calendar = ({
                 }`}
                 onMouseEnter={(e) => handlePopoverOpen(e, eventInfo)}
                 onMouseLeave={handlePopoverClose}
+                style={{
+                  opacity: isEventInSaved(eventInfo.event.id) && !own ? 0.6 : 1,
+                  backgroundColor: isEventInSaved(eventInfo.event.id) && !own ? "gray" : "",
+                }}
               >
                 <div className="fc-event-time">
                   <b>{eventInfo.timeText}</b>

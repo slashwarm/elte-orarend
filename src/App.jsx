@@ -174,60 +174,27 @@ const App = () => {
     setAlertText("");
   };
 
-  return (
-    <ThemeProvider theme={defaultTheme}>
+  return <ThemeProvider theme={defaultTheme}>
       <Box display="flex" minHeight="100vh">
         <CssBaseline />
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
           <Box component="main" sx={{ flex: 1 }} p={{ xs: 1, sm: 2, md: 4 }}>
-            <Grid
-              container
-              direction="column"
-              spacing={2}
-              justify="center"
-              alignContent="center"
-            >
+            <Grid container direction="column" spacing={2} justify="center" alignContent="center">
               <Grid item xs={12} sm={6} md={4} lg={3}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    maxWidth: 1000,
-                    margin: "auto",
-                    overflow: "hidden",
-                  }}
-                >
-                  <Search
-                    onDataFetch={handleDataFetch}
-                    onLoadingStart={handleLoadingStart}
-                    isLoading={loading}
-                  />
+                <Paper sx={{ p: 2, maxWidth: 1000, margin: "auto", overflow: "hidden" }}>
+                  <Search onDataFetch={handleDataFetch} onLoadingStart={handleLoadingStart} isLoading={loading} />
                 </Paper>
               </Grid>
-              {firstSearchDone && (
-                <Grid item xs={12}>
+              {firstSearchDone && <Grid item xs={12}>
                   <Paper sx={{ p: 2 }}>
-                    <Results
-                      tableData={searchResults}
-                      onLessonSave={handleLessonSave}
-                      savedLessons={savedLessons}
-                      isLoading={loading}
-                      own={false}
-                    />
+                    <Results tableData={searchResults} onLessonSave={handleLessonSave} savedLessons={savedLessons} isLoading={loading} own={false} />
                   </Paper>
-                </Grid>
-              )}
-              {firstSearchDone && (
-                <Grid item xs={12}>
+                </Grid>}
+              {firstSearchDone && <Grid item xs={12}>
                   <Paper sx={{ p: 2 }}>
-                    <Calendar
-                      tableData={convertDataToCalendar(searchResults)}
-                      onCalendarClick={handleCalendarClick}
-                      savedLessons={savedLessons}
-                      own={false}
-                    />
+                    <Calendar tableData={convertDataToCalendar(searchResults)} onCalendarClick={handleCalendarClick} savedLessons={savedLessons} own={false} />
                   </Paper>
-                </Grid>
-              )}
+                </Grid>}
               <Grid item xs={12}>
                 <Typography variant="h5" component="h2">
                   Saját órarendem
@@ -237,42 +204,18 @@ const App = () => {
               </Grid>
               <Grid item xs={12}>
                 <Paper sx={{ p: 2 }}>
-                  <Results
-                    tableData={savedLessons}
-                    onLessonSave={handleLessonSave}
-                    savedLessons={savedLessons}
-                    isLoading={loading}
-                    onEventEdit={setEditEvent}
-                    onEventChange={handleEventChange}
-                    own={true}
-                  />
+                  <Results tableData={savedLessons} onLessonSave={handleLessonSave} savedLessons={savedLessons} isLoading={loading} onEventEdit={setEditEvent} onEventChange={handleEventChange} own={true} />
                 </Paper>
               </Grid>
-              {savedLessons.length > 0 && (
-                <Grid item xs={12}>
+              {savedLessons.length > 0 && <Grid item xs={12}>
                   <Paper sx={{ p: 2 }}>
-                    <Calendar
-                      tableData={convertDataToCalendar(savedLessons)}
-                      onCalendarClick={handleCalendarClick}
-                      onImageDownload={handleDownloadImage}
-                      savedLessons={savedLessons}
-                      onEventEdit={setEditEvent}
-                      own={true}
-                    />
+                    <Calendar tableData={convertDataToCalendar(savedLessons)} onCalendarClick={handleCalendarClick} onImageDownload={handleDownloadImage} savedLessons={savedLessons} onEventEdit={setEditEvent} own={true} />
                   </Paper>
-                </Grid>
-              )}
+                </Grid>}
             </Grid>
           </Box>
 
-          {!!editEvent && (
-            <EditEvent
-              eventId={editEvent}
-              savedLessons={savedLessons}
-              onEventChange={handleEventChange}
-              onEventEdit={setEditEvent}
-            />
-          )}
+          {!!editEvent && <EditEvent eventId={editEvent} savedLessons={savedLessons} onEventChange={handleEventChange} onEventEdit={setEditEvent} />}
 
           <Box component="footer" sx={{ p: 2 }}>
             <Copyright />
@@ -281,8 +224,7 @@ const App = () => {
       </Box>
 
       {!!alertText && <Alert alertText={alertText} handleClose={handleClose} />}
-    </ThemeProvider>
-  );
+    </ThemeProvider>;
 };
 
 export default App;
