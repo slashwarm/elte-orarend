@@ -47,8 +47,9 @@ jobs:
           options: '--verbose --delete --exclude-glob vendor/'
 
       - name: Install Composer dependencies on the server
+        env:
+          SSHPASS: ${{ secrets.SFTP_PASS }}
         run: |
-          sshpass -p "${{ secrets.SFTP_PASS }}"
+          sshpass -e
           ssh -o StrictHostKeyChecking=accept-new -p ${{ secrets.SFTP_PORT }} ${{ secrets.SFTP_USER }}@${{ secrets.SFTP_HOST }}
-          cd ${{ secrets.SFTP_DIR }}/server
-          bash install-composer.sh
+          'cd ${{ secrets.SFTP_DIR }}/server && bash install-composer.sh'
