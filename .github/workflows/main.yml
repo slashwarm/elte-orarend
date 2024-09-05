@@ -48,5 +48,5 @@ jobs:
 
       - name: Install Composer dependencies on the server
         run: |
-          ssh -p ${{ secrets.SFTP_PORT }} ${{ secrets.SFTP_USER }}@${{ secrets.SFTP_HOST }} \
+          ssh -o StrictHostKeyChecking=accept-new -p ${{ secrets.SFTP_PORT }} ${{ secrets.SFTP_USER }}@${{ secrets.SFTP_HOST }} \
           'cd ${{ secrets.SFTP_DIR }}/server && bash install-composer.sh'
