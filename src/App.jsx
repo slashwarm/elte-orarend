@@ -133,13 +133,11 @@ function decodeLessonsFromSearchParam(param){
 
     returned.push(lesson);
   }
-  // console.log(returned);
   return returned;
 }
 
 function encodeLessonsToSearchParam(lessons){
   // A 🔩-t egy seperátorként használom, mert valószínűtlen, hogy bármilyen kurzusnak vagy tanárnak a nevében szerepelne
-  console.log(lessons);
   let parts = [];
 
   let pastCodes = new Map();
@@ -307,8 +305,6 @@ const App = () => {
 
     url.searchParams.delete("lessons");
     url.searchParams.append("lessons", encodeLessonsToSearchParam(savedLessons));
-
-    console.log(url.toString().length);
 
     await navigator.clipboard.writeText(url.toString());
 
