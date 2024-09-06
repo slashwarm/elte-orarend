@@ -158,7 +158,7 @@ const Calendar = ({
                 </Stack>
             )}
 
-            <div ref={printRef} class={calendarClass}>
+            <div ref={printRef} className={calendarClass}>
                 <FullCalendar
                     plugins={[timeGridPlugin, momentTimezonePlugin]}
                     initialView="timeGridWeek"
