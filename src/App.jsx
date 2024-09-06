@@ -184,7 +184,7 @@ const App = () => {
         <ThemeProvider theme={defaultTheme}>
             <Box display="flex" minHeight="100vh">
                 <CssBaseline />
-                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', maxWidth: '100%' }}>
                     <Box component="main" sx={{ flex: 1 }} p={{ xs: 1, sm: 2, md: 4 }}>
                         <Grid container direction="column" spacing={2} justify="center" alignContent="center">
                             {!viewOnly && (
