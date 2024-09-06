@@ -30,6 +30,8 @@ const Calendar = ({
     own,
     viewOnly,
 }) => {
+    const [calendarClass, setCalendarClass] = useState('');
+
     // popover
     const [popoverInfo, setPopoverInfo] = useState({
         anchorEl: null,
@@ -60,8 +62,13 @@ const Calendar = ({
 
     useEffect(() => {
         if (!stickyHeader) {
-            onImageDownload(printRef);
-            setStickyHeader(true);
+            setCalendarClass('photo-calendar');
+
+            setTimeout(async () => {
+                setStickyHeader(true);
+                await onImageDownload(printRef);
+                setCalendarClass('');
+            }, 0);
         }
     }, [stickyHeader, onImageDownload]);
 
@@ -151,7 +158,7 @@ const Calendar = ({
                 </Stack>
             )}
 
-            <div ref={printRef}>
+            <div ref={printRef} class={calendarClass}>
                 <FullCalendar
                     plugins={[timeGridPlugin, momentTimezonePlugin]}
                     initialView="timeGridWeek"

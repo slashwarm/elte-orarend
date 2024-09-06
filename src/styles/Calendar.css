@@ -45,3 +45,7 @@ a.fc-event:has(div.lecture) {
 a.fc-event:has(div.view-only) {
     cursor: auto;
 }
+
+.photo-calendar {
+    width: 100rem;
+}
