@@ -50,7 +50,9 @@ export function decodeLessonsFromSearchParam(param) {
         const time =
             parts[i + 6] === ''
                 ? ''
-                : `${parts[i + 6].slice(0, 2)}:${parts[i + 6].slice(2, 4)}-${parts[i + 6].slice(4, 6)}:${parts[i + 6].slice(6)}`;
+                : `${parts[i + 6].slice(0, 2)}:${parts[i + 6].slice(2, 4)}-${parts[i + 6].slice(4, 6)}:${parts[
+                      i + 6
+                  ].slice(6)}`;
 
         lesson.time = time.startsWith('0') ? time.slice(1) : time;
 
@@ -61,14 +63,29 @@ export function decodeLessonsFromSearchParam(param) {
             case 'g':
                 lesson.type = 'gyakorlat';
                 break;
-            case 'e':
-                lesson.type = 'elfoglaltság';
-                break;
             case 'k':
                 lesson.type = 'konzultáció';
                 break;
+            case 's':
+                lesson.type = 'szeminárium';
+                break;
+            case 'v':
+                lesson.type = 'vizsgakurzus';
+                break;
+            case 'h':
+                lesson.type = 'házidolgozat';
+                break;
+            case 'l':
+                lesson.type = 'labor';
+                break;
+            case 'sz':
+                lesson.type = 'szakmai gyakorlat';
+                break;
+            case 'el':
+                lesson.type = 'elfoglaltság';
+                break;
             default:
-                console.error('Lehetetlen típus');
+                lesson.type = parts[i + 7];
         }
 
         lesson.id = generateUniqueId(lesson);
@@ -122,7 +139,24 @@ export function encodeLessonsToSearchParam(lessons) {
 
         const time = lesson.time.padStart(11, '0');
         parts.push(`${time.slice(0, 2)}${time.slice(3, 5)}${time.slice(6, 8)}${time.slice(9)}`);
-        parts.push(lesson.type[0]);
+
+        switch (lesson.type) {
+            case 'előadás':
+            case 'gyakorlat':
+            case 'konzultáció':
+            case 'szeminárium':
+            case 'vizsgakurzus':
+            case 'labor':
+            case 'házidolgozat':
+                parts.push(lesson.type[0]);
+                break;
+            case 'elfoglaltság':
+            case 'szakmai gyakorlat':
+                parts.push(lesson.type[0] + lesson.type[1]);
+                break;
+            default:
+                parts.push(lesson.type);
+        }
     }
 
     return LZString.compressToEncodedURIComponent(parts.join('🔩'));
