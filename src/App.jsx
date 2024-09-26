@@ -103,7 +103,7 @@ const App = () => {
         setSavedLessons(newLessons);
     };
 
-    const handleCalendarClick = (id, own) => {
+    const handleCalendarClick = (id) => {
         const lesson = savedLessons.concat(searchResults).find((lesson) => lesson.id === id);
         handleLessonSave(lesson);
     };
