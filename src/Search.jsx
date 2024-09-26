@@ -230,7 +230,13 @@ const Search = ({ onLoadingStart, onDataFetch, onThemeChange, isLoading }) => {
                             Keresés
                         </LoadingButton>
 
-                        <Divider>vagy</Divider>
+                        <Divider
+                            sx={{
+                                color: theme.palette.text.secondary,
+                            }}
+                        >
+                            vagy
+                        </Divider>
 
                         <Button
                             color="secondary"
