@@ -9,7 +9,7 @@ import Paper from '@mui/material/Paper';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import html2canvas from 'html2canvas';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Calendar from './Calendar';
 import EditEvent from './EditEvent';
 import Results from './Results';
@@ -17,8 +17,6 @@ import Search from './Search';
 import Alert from './utils/Alert.jsx';
 import { convertDataToCalendar, convertDataToTable } from './utils/Data.jsx';
 import { decodeLessonsFromSearchParam, encodeLessonsToSearchParam } from './utils/encoder.js';
-import { Fab } from '@mui/material';
-import { DarkMode, LightMode } from '@mui/icons-material';
 
 function Copyright(props) {
     return (
@@ -52,10 +50,9 @@ const themeBase = {
         },
     },
     huHU,
-}
-const lightTheme = createTheme({...themeBase, palette: { mode: "light" }})
-const darkTheme = createTheme({...themeBase, palette: { mode: "dark" }})
-
+};
+const lightTheme = createTheme({ ...themeBase, palette: { mode: 'light' } });
+const darkTheme = createTheme({ ...themeBase, palette: { mode: 'dark' } });
 
 const App = () => {
     const url = new URL(window.location);
@@ -63,7 +60,8 @@ const App = () => {
     const urlTimetable = url.searchParams.has('lessons')
         ? decodeLessonsFromSearchParam(url.searchParams.get('lessons'))
         : null;
-    const themePreference = window.matchMedia('(prefers-color-scheme: dark)')
+    const themePreference = window.matchMedia('(prefers-color-scheme: dark)');
+    const savedTheme = localStorage.getItem('theme');
 
     // Ha vannak a URL-ben órák, akkor azokat töltse be, különben ha van elmentve órarend azt, különben üres.
     const savedTimetable = urlTimetable ? urlTimetable : storageTimetable ? JSON.parse(storageTimetable) : [];
@@ -77,23 +75,9 @@ const App = () => {
     const [savedLessons, setSavedLessons] = useState(savedTimetable); // saját órarend
     const [alertText, setAlertText] = useState(''); // alert szöveg
     const [editEvent, setEditEvent] = useState(null); // szerkesztendő esemény
-
-    const [preference, setPreference] = useState(themePreference.matches ? "dark" : "light")
-    themePreference.addEventListener("change", (event) => setPreference(event.matches ? "dark" : "light"))
-
-    const [saved, setSaved] = useState(localStorage.getItem("theme"))
-    const [themeName, setThemeName] = useState(saved || preference)
-    const [theme, setTheme] = useState(themeName === "light" ? lightTheme : darkTheme)
-
-    useEffect(() => {
-        const themeName = saved || preference
-        setThemeName(themeName)
-        if (themeName === "light") {
-            setTheme(lightTheme)
-        } else {
-            setTheme(darkTheme)
-        }
-    }, [preference, saved])
+    const [theme, setTheme] = useState(savedTheme ?? (themePreference.matches ? 'dark' : 'light'));
+    themePreference.addEventListener('change', (event) => setTheme(event.matches ? 'dark' : 'light'));
+    const themeTemplate = useMemo(() => (theme === 'light' ? lightTheme : darkTheme), [theme]);
 
     // ha van courses akkor minden sor data-hoz csekkeli h az ahhoz tartozó code benne van-e
     const handleDataFetch = (data, courses) => {
@@ -160,7 +144,7 @@ const App = () => {
     };
 
     const handleDownloadImage = async (ref) => {
-        const backgroundColor = theme.palette.background.default;
+        const backgroundColor = themeTemplate.palette.background.default;
         const element = ref.current;
         const canvas = await html2canvas(element, {
             backgroundColor: backgroundColor,
@@ -201,13 +185,13 @@ const App = () => {
     };
 
     const handleThemeChange = () => {
-        const nextTheme = themeName === "light" ? "dark" : "light"
-        window.localStorage.setItem("theme", nextTheme)
-        setSaved(nextTheme)
-    }
+        const nextTheme = theme === 'light' ? 'dark' : 'light';
+        window.localStorage.setItem('theme', nextTheme);
+        setTheme(nextTheme);
+    };
 
     return (
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={themeTemplate}>
             <Box display="flex" minHeight="100vh">
                 <CssBaseline />
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -218,7 +202,7 @@ const App = () => {
                                     <Paper
                                         sx={{
                                             p: 2,
-                                            maxWidth: 1000,
+                                            maxWidth: 700,
                                             margin: 'auto',
                                             overflow: 'hidden',
                                         }}
@@ -226,6 +210,7 @@ const App = () => {
                                         <Search
                                             onDataFetch={handleDataFetch}
                                             onLoadingStart={handleLoadingStart}
+                                            onThemeChange={handleThemeChange}
                                             isLoading={loading}
                                         />
                                     </Paper>
@@ -309,16 +294,6 @@ const App = () => {
 
                     <Box component="footer" sx={{ p: 2 }}>
                         <Copyright />
-
-                        <Fab onClick={handleThemeChange} aria-label="change-theme" title="Change theme" size="small" sx={{float: 'right'}}>
-                        {(() => {
-                            if (themeName == "light") {
-                                return (<LightMode></LightMode>)
-                            } else {
-                                return (<DarkMode></DarkMode>)
-                            }
-                        })()}
-                        </Fab>
                     </Box>
                 </Box>
             </Box>

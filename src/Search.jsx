@@ -20,6 +20,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { fetchTimetable, getSemesters } from './utils/Data.jsx';
 import { read, utils } from 'xlsx';
+import { Fab, useTheme } from '@mui/material';
+import { DarkMode, LightMode, ManageSearch } from '@mui/icons-material';
+import Divider from '@mui/material/Divider';
 
 const labelOptions = {
     subject: 'Tárgy neve / kódja',
@@ -31,7 +34,8 @@ const labelIcons = {
     teacher: <SwitchAccountIcon />,
 };
 
-const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
+const Search = ({ onLoadingStart, onDataFetch, onThemeChange, isLoading }) => {
+    const theme = useTheme();
     const semesters = getSemesters();
 
     const [year, setYear] = useState(semesters[0]);
@@ -140,10 +144,35 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
     return (
         <Fragment>
             <Box component="form" onSubmit={handleSubmit} noValidate spacing={2}>
-                <Stack spacing={2} alignItems="center">
-                    <Typography variant="h6" component="h2">
-                        Keresés
-                    </Typography>
+                <Stack spacing={2}>
+                    <Stack
+                        direction="row"
+                        spacing={2}
+                        sx={{
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                            sx={{
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <ManageSearch />
+
+                            <Typography variant="h6" component="h2">
+                                Keresés
+                            </Typography>
+                        </Stack>
+
+                        <Fab onClick={onThemeChange} aria-label="change-theme" title="Change theme" size="small">
+                            {theme.palette.mode === 'light' ? <DarkMode /> : <LightMode />}
+                        </Fab>
+                    </Stack>
+
                     <TextField
                         margin="normal"
                         fullWidth
@@ -156,41 +185,62 @@ const Search = ({ onLoadingStart, onDataFetch, isLoading }) => {
                         error={error}
                         helperText={error ? 'Hibás bemenet.' : ''}
                     />
-
-                    <ToggleButtonGroup size="small" value={year} onChange={changeYear} exclusive={true}>
-                        {semesters.map((semester) => (
-                            <ToggleButton value={semester} key={semester}>
-                                {semester}
+                    <Stack
+                        direction={{ xs: 'column', sm: 'row' }}
+                        spacing={2}
+                        sx={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            '& .MuiDivider-root': {
+                                display: { xs: 'none', sm: 'block' },
+                            },
+                        }}
+                        divider={<Divider orientation="vertical" flexItem />}
+                    >
+                        <ToggleButtonGroup fullWidth size="small" value={mode} onChange={changeMode} exclusive={true}>
+                            <ToggleButton value="subject" key="subject">
+                                Keresés tárgyra
                             </ToggleButton>
-                        ))}
-                    </ToggleButtonGroup>
+                            <ToggleButton value="teacher" key="teacher">
+                                Keresés oktatóra
+                            </ToggleButton>
+                        </ToggleButtonGroup>
+
+                        <ToggleButtonGroup fullWidth size="small" value={year} onChange={changeYear} exclusive={true}>
+                            {semesters.map((semester) => (
+                                <ToggleButton value={semester} key={semester}>
+                                    {semester}
+                                </ToggleButton>
+                            ))}
+                        </ToggleButtonGroup>
+                    </Stack>
 
                     {year !== semesters[0] && (
                         <Alert severity="warning">Figyelem! Nem az éppen aktuális félév van kiválasztva!</Alert>
                     )}
 
-                    <ToggleButtonGroup size="small" value={mode} onChange={changeMode} exclusive={true}>
-                        <ToggleButton value="subject" key="subject">
-                            Keresés tárgyra
-                        </ToggleButton>
-                        <ToggleButton value="teacher" key="teacher">
-                            Keresés oktatóra
-                        </ToggleButton>
-                    </ToggleButtonGroup>
+                    <Stack spacing={1}>
+                        <LoadingButton
+                            loading={isLoading}
+                            loadingPosition="start"
+                            type="submit"
+                            variant="contained"
+                            startIcon={<SearchIcon />}
+                        >
+                            Keresés
+                        </LoadingButton>
 
-                    <LoadingButton
-                        loading={isLoading}
-                        loadingPosition="start"
-                        type="submit"
-                        variant="contained"
-                        startIcon={<SearchIcon />}
-                    >
-                        Keresés
-                    </LoadingButton>
+                        <Divider>vagy</Divider>
 
-                    <Button variant="outlined" startIcon={<CloudDownloadIcon />} onClick={handleClickOpen}>
-                        Kurzusok importálása Neptunból
-                    </Button>
+                        <Button
+                            color="secondary"
+                            variant="outlined"
+                            startIcon={<CloudDownloadIcon />}
+                            onClick={handleClickOpen}
+                        >
+                            Kurzusok importálása Neptunból
+                        </Button>
+                    </Stack>
                 </Stack>
             </Box>
 
