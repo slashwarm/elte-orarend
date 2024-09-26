@@ -51,8 +51,31 @@ const themeBase = {
     },
     huHU,
 };
-const lightTheme = createTheme({ ...themeBase, palette: { mode: 'light' } });
-const darkTheme = createTheme({ ...themeBase, palette: { mode: 'dark' } });
+const lightTheme = createTheme({
+    ...themeBase,
+    palette: { mode: 'light' },
+    components: {
+        ...themeBase.components,
+        MuiCssBaseline: {
+            styleOverrides: {
+                '.fc thead': { 'background-color': '#F0F0F0' },
+            },
+        },
+    },
+});
+const darkTheme = createTheme({
+    ...themeBase,
+    palette: { mode: 'dark' },
+    components: {
+        ...themeBase.components,
+        MuiCssBaseline: {
+            styleOverrides: {
+                ':root': { '--fc-border-color': '#515151' },
+                '.fc thead': { 'background-color': '#121212' },
+            },
+        },
+    },
+});
 
 const App = () => {
     const url = new URL(window.location);
