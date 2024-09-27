@@ -72,12 +72,15 @@ const App = () => {
     const savedTheme = localStorage.getItem('theme');
 
     // Ha vannak a URL-ben órák, akkor azokat töltse be, különben ha van elmentve órarend azt, különben üres.
-    const storageTimetable = useMemo(() => readStoredTimetable(savedTimetable), [savedTimetable]);
+    const storageTimetable = useMemo(
+        () => (savedTimetable ? readStoredTimetable(savedTimetable) : null),
+        [savedTimetable],
+    );
     const urlTimetable = useMemo(
         () => (lessonsUrlParam ? decodeLessonsFromSearchParam(lessonsUrlParam) : null),
         [lessonsUrlParam],
     );
-    const timetable = urlTimetable ? urlTimetable : storageTimetable ? storageTimetable : [];
+    const timetable = urlTimetable ?? storageTimetable ?? [];
 
     // view only, akkor ha az órarend tartalmát nem lehet megváltoztatni, mert megosztott órarendet nézünk
     const viewOnly = urlTimetable !== null;
