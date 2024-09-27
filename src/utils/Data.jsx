@@ -81,7 +81,7 @@ const convertDataToTable = (data, courses) => {
 
         const uniqueId = generateUniqueId(newObject);
 
-        return { ...newObject, id: uniqueId };
+        return { ...newObject, id: uniqueId, newId: true };
     });
 
     if (courses) {

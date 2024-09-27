@@ -15,7 +15,7 @@ import EditEvent from './EditEvent';
 import Results from './Results';
 import Search from './Search';
 import Alert from './utils/Alert.jsx';
-import { convertDataToCalendar, convertDataToTable } from './utils/Data.jsx';
+import { convertDataToCalendar, convertDataToTable, generateUniqueId } from './utils/Data.jsx';
 import { decodeLessonsFromSearchParam, encodeLessonsToSearchParam } from './utils/encoder.js';
 
 function Copyright(props) {
@@ -55,6 +55,27 @@ const defaultTheme = createTheme({
     huHU,
 });
 
+const readStoredTimetable = (storageTimetable) => {
+    let timetable = JSON.parse(storageTimetable);
+    for (let lesson of timetable) {
+        if (!lesson.newId) {
+            lesson.newId = true;
+            lesson.id = generateUniqueId({
+                name: lesson.name,
+                code: lesson.code,
+                day: lesson.day,
+                time: lesson.time,
+                location: lesson.location,
+                type: lesson.type,
+                course: lesson.course,
+                teacher: lesson.teacher,
+                comment: lesson.comment,
+            });
+        }
+    }
+    return timetable;
+};
+
 const App = () => {
     const url = new URL(window.location);
     const storageTimetable = window.localStorage.getItem('SAVE_TIMETABLE');
@@ -63,7 +84,7 @@ const App = () => {
         : null;
 
     // Ha vannak a URL-ben órák, akkor azokat töltse be, különben ha van elmentve órarend azt, különben üres.
-    const savedTimetable = urlTimetable ? urlTimetable : storageTimetable ? JSON.parse(storageTimetable) : [];
+    const savedTimetable = urlTimetable ? urlTimetable : storageTimetable ? readStoredTimetable(storageTimetable) : [];
 
     // view only, akkor ha az órarend tartalmát nem lehet megváltoztatni, mert megosztott órarendet nézünk
     let viewOnly = urlTimetable !== null;
@@ -118,6 +139,7 @@ const App = () => {
                 const updatedLesson = {
                     ...existingLesson,
                     ...data,
+                    edited: true,
                 };
 
                 const updatedLessons = savedLessons.map((lesson) => {
