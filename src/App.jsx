@@ -4,9 +4,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
-import { huHU } from '@mui/material/locale';
 import Paper from '@mui/material/Paper';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import html2canvas from 'html2canvas';
 import { useMemo, useState } from 'react';
@@ -17,6 +16,7 @@ import Search from './Search';
 import Alert from './utils/Alert.jsx';
 import { convertDataToCalendar, convertDataToTable, generateUniqueId } from './utils/Data.jsx';
 import { decodeLessonsFromSearchParam, encodeLessonsToSearchParam } from './utils/encoder.js';
+import useDynamicTheme from './utils/theme.js';
 
 function Copyright(props) {
     return (
@@ -32,96 +32,65 @@ function Copyright(props) {
     );
 }
 
-const themeBase = {
-    typography: {
-        button: {
-            fontSize: 14,
-            fontWeight: 600,
-        },
-    },
-    components: {
-        MuiGrid: {
-            styleOverrides: {
-                item: {
-                    width: '100%',
-                    maxWidth: '100vw !important',
-                },
-            },
-        },
-    },
-    huHU,
-};
-const lightTheme = createTheme({
-    ...themeBase,
-    palette: { mode: 'light' },
-    components: {
-        ...themeBase.components,
-        MuiCssBaseline: {
-            styleOverrides: {
-                '.fc thead': { 'background-color': '#F0F0F0' },
-            },
-        },
-    },
-});
-const darkTheme = createTheme({
-    ...themeBase,
-    palette: { mode: 'dark' },
-    components: {
-        ...themeBase.components,
-        MuiCssBaseline: {
-            styleOverrides: {
-                ':root': { '--fc-border-color': '#515151' },
-                '.fc thead': { 'background-color': '#121212' },
-            },
-        },
-    },
-});
-
 const readStoredTimetable = (storageTimetable) => {
-    let timetable = JSON.parse(storageTimetable);
-    for (let lesson of timetable) {
+    let save = false;
+    const timetable = JSON.parse(storageTimetable);
+    const updatedTimetable = timetable.map((lesson) => {
         if (!lesson.newId) {
-            lesson.newId = true;
-            lesson.id = generateUniqueId({
-                name: lesson.name,
-                code: lesson.code,
-                day: lesson.day,
-                time: lesson.time,
-                location: lesson.location,
-                type: lesson.type,
-                course: lesson.course,
-                teacher: lesson.teacher,
-                comment: lesson.comment,
-            });
+            save = true;
+            return {
+                ...lesson,
+                newId: true,
+                id: generateUniqueId({
+                    name: lesson.name,
+                    code: lesson.code,
+                    day: lesson.day,
+                    time: lesson.time,
+                    location: lesson.location,
+                    type: lesson.type,
+                    course: lesson.course,
+                    teacher: lesson.teacher,
+                    comment: lesson.comment,
+                }),
+            };
         }
+        return lesson;
+    });
+
+    if (save) {
+        window.localStorage.setItem('SAVE_TIMETABLE', JSON.stringify(updatedTimetable));
     }
-    return timetable;
+
+    return updatedTimetable;
 };
 
 const App = () => {
     const url = new URL(window.location);
-    const storageTimetable = window.localStorage.getItem('SAVE_TIMETABLE');
-    const urlTimetable = url.searchParams.has('lessons')
-        ? decodeLessonsFromSearchParam(url.searchParams.get('lessons'))
-        : null;
+    const lessonsUrlParam = url.searchParams.get('lessons');
+    const savedTimetable = window.localStorage.getItem('SAVE_TIMETABLE');
     const themePreference = window.matchMedia('(prefers-color-scheme: dark)');
     const savedTheme = localStorage.getItem('theme');
 
     // Ha vannak a URL-ben órák, akkor azokat töltse be, különben ha van elmentve órarend azt, különben üres.
-    const savedTimetable = urlTimetable ? urlTimetable : storageTimetable ? readStoredTimetable(storageTimetable) : [];
+    const storageTimetable = useMemo(() => readStoredTimetable(savedTimetable), [savedTimetable]);
+    const urlTimetable = useMemo(
+        () => (lessonsUrlParam ? decodeLessonsFromSearchParam(lessonsUrlParam) : null),
+        [lessonsUrlParam],
+    );
+    const timetable = urlTimetable ? urlTimetable : storageTimetable ? storageTimetable : [];
 
     // view only, akkor ha az órarend tartalmát nem lehet megváltoztatni, mert megosztott órarendet nézünk
-    let viewOnly = urlTimetable !== null;
+    const viewOnly = urlTimetable !== null;
 
     const [firstSearchDone, setFirstSearchDone] = useState(false); // első keresés
     const [loading, setLoading] = useState(false); // töltés
     const [searchResults, setSearchResults] = useState([]); // keresés találatok
-    const [savedLessons, setSavedLessons] = useState(savedTimetable); // saját órarend
+    const [savedLessons, setSavedLessons] = useState(timetable); // saját órarend
     const [alertText, setAlertText] = useState(''); // alert szöveg
     const [editEvent, setEditEvent] = useState(null); // szerkesztendő esemény
-    const [theme, setTheme] = useState(savedTheme ?? (themePreference.matches ? 'dark' : 'light'));
-    themePreference.addEventListener('change', (event) => setTheme(event.matches ? 'dark' : 'light'));
-    const themeTemplate = useMemo(() => (theme === 'light' ? lightTheme : darkTheme), [theme]);
+    const [colorScheme, setColorScheme] = useState(savedTheme ?? (themePreference.matches ? 'dark' : 'light'));
+    themePreference.addEventListener('change', (event) => setColorScheme(event.matches ? 'dark' : 'light'));
+    const theme = useDynamicTheme(colorScheme);
 
     // ha van courses akkor minden sor data-hoz csekkeli h az ahhoz tartozó code benne van-e
     const handleDataFetch = (data, courses) => {
@@ -189,7 +158,7 @@ const App = () => {
     };
 
     const handleDownloadImage = async (ref) => {
-        const backgroundColor = themeTemplate.palette.background.default;
+        const backgroundColor = theme.palette.background.default;
         const element = ref.current;
         const canvas = await html2canvas(element, {
             backgroundColor: backgroundColor,
@@ -230,13 +199,13 @@ const App = () => {
     };
 
     const handleThemeChange = () => {
-        const nextTheme = theme === 'light' ? 'dark' : 'light';
+        const nextTheme = colorScheme === 'light' ? 'dark' : 'light';
         window.localStorage.setItem('theme', nextTheme);
-        setTheme(nextTheme);
+        setColorScheme(nextTheme);
     };
 
     return (
-        <ThemeProvider theme={themeTemplate}>
+        <ThemeProvider theme={theme}>
             <Box display="flex" minHeight="100vh">
                 <CssBaseline />
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', maxWidth: '100%' }}>
