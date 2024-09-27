@@ -44,7 +44,7 @@ jobs:
           remoteDir: ${{ secrets.SFTP_DIR }}
           reverse: true
           ignoreFile: '.lftp_ignore'
-          options: '--verbose --delete --exclude-glob vendor/'
+          options: '--verbose --delete --exclude-glob server/vendor/'
 
       - name: Install Composer dependencies on the server
         env:

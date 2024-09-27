@@ -9,7 +9,7 @@ import Paper from '@mui/material/Paper';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import html2canvas from 'html2canvas';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Calendar from './Calendar';
 import EditEvent from './EditEvent';
 import Results from './Results';
@@ -32,10 +32,7 @@ function Copyright(props) {
     );
 }
 
-const defaultTheme = createTheme({
-    palette: {
-        mode: 'dark',
-    },
+const themeBase = {
     typography: {
         button: {
             fontSize: 14,
@@ -53,6 +50,31 @@ const defaultTheme = createTheme({
         },
     },
     huHU,
+};
+const lightTheme = createTheme({
+    ...themeBase,
+    palette: { mode: 'light' },
+    components: {
+        ...themeBase.components,
+        MuiCssBaseline: {
+            styleOverrides: {
+                '.fc thead': { 'background-color': '#F0F0F0' },
+            },
+        },
+    },
+});
+const darkTheme = createTheme({
+    ...themeBase,
+    palette: { mode: 'dark' },
+    components: {
+        ...themeBase.components,
+        MuiCssBaseline: {
+            styleOverrides: {
+                ':root': { '--fc-border-color': '#515151' },
+                '.fc thead': { 'background-color': '#121212' },
+            },
+        },
+    },
 });
 
 const readStoredTimetable = (storageTimetable) => {
@@ -82,6 +104,8 @@ const App = () => {
     const urlTimetable = url.searchParams.has('lessons')
         ? decodeLessonsFromSearchParam(url.searchParams.get('lessons'))
         : null;
+    const themePreference = window.matchMedia('(prefers-color-scheme: dark)');
+    const savedTheme = localStorage.getItem('theme');
 
     // Ha vannak a URL-ben órák, akkor azokat töltse be, különben ha van elmentve órarend azt, különben üres.
     const savedTimetable = urlTimetable ? urlTimetable : storageTimetable ? readStoredTimetable(storageTimetable) : [];
@@ -95,6 +119,9 @@ const App = () => {
     const [savedLessons, setSavedLessons] = useState(savedTimetable); // saját órarend
     const [alertText, setAlertText] = useState(''); // alert szöveg
     const [editEvent, setEditEvent] = useState(null); // szerkesztendő esemény
+    const [theme, setTheme] = useState(savedTheme ?? (themePreference.matches ? 'dark' : 'light'));
+    themePreference.addEventListener('change', (event) => setTheme(event.matches ? 'dark' : 'light'));
+    const themeTemplate = useMemo(() => (theme === 'light' ? lightTheme : darkTheme), [theme]);
 
     // ha van courses akkor minden sor data-hoz csekkeli h az ahhoz tartozó code benne van-e
     const handleDataFetch = (data, courses) => {
@@ -162,7 +189,7 @@ const App = () => {
     };
 
     const handleDownloadImage = async (ref) => {
-        const backgroundColor = defaultTheme.palette.background.default;
+        const backgroundColor = themeTemplate.palette.background.default;
         const element = ref.current;
         const canvas = await html2canvas(element, {
             backgroundColor: backgroundColor,
@@ -202,8 +229,14 @@ const App = () => {
         setAlertText('');
     };
 
+    const handleThemeChange = () => {
+        const nextTheme = theme === 'light' ? 'dark' : 'light';
+        window.localStorage.setItem('theme', nextTheme);
+        setTheme(nextTheme);
+    };
+
     return (
-        <ThemeProvider theme={defaultTheme}>
+        <ThemeProvider theme={themeTemplate}>
             <Box display="flex" minHeight="100vh">
                 <CssBaseline />
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', maxWidth: '100%' }}>
@@ -214,7 +247,7 @@ const App = () => {
                                     <Paper
                                         sx={{
                                             p: 2,
-                                            maxWidth: 1000,
+                                            maxWidth: 700,
                                             margin: 'auto',
                                             overflow: 'hidden',
                                         }}
@@ -222,6 +255,7 @@ const App = () => {
                                         <Search
                                             onDataFetch={handleDataFetch}
                                             onLoadingStart={handleLoadingStart}
+                                            onThemeChange={handleThemeChange}
                                             isLoading={loading}
                                         />
                                     </Paper>

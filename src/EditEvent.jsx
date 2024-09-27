@@ -1,23 +1,23 @@
-import { useEffect, useState } from 'react';
-import './styles/Calendar.css';
-import Grid from '@mui/material/Grid';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import MenuItem from '@mui/material/MenuItem';
-import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import SaveIcon from '@mui/icons-material/Save';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import FormControl from '@mui/material/FormControl';
+import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs from 'dayjs';
 import 'dayjs/locale/hu';
+import { useEffect, useState } from 'react';
+import './styles/Calendar.css';
 import { generateUniqueId } from './utils/Data.jsx';
 
 const EditEvent = ({ savedLessons, onEventChange, onEventEdit, eventId }) => {
@@ -150,6 +150,11 @@ const EditEvent = ({ savedLessons, onEventChange, onEventEdit, eventId }) => {
                                     <MenuItem value={'előadás'}>előadás</MenuItem>
                                     <MenuItem value={'konzultáció'}>konzultáció</MenuItem>
                                     <MenuItem value={'elfoglaltság'}>elfoglaltság</MenuItem>
+                                    <MenuItem value={'szeminárium'}>szeminárium</MenuItem>
+                                    <MenuItem value={'labor'}>labor</MenuItem>
+                                    <MenuItem value={'vizsgakurzus'}>vizsgakurzus</MenuItem>
+                                    <MenuItem value={'házidolgozat'}>házidolgozat</MenuItem>
+                                    <MenuItem value={'szakmai gyakorlat'}>szakmai gyakorlat</MenuItem>
                                 </Select>
                             </FormControl>
                         </Grid>

@@ -1,5 +1,4 @@
 :root {
-    --fc-border-color: rgba(81, 81, 81, 1);
     --fc-page-bg-color: transparent;
     --fc-event-selected-overlay-color: transparent;
     --fc-today-bg-color: transparent;
@@ -28,10 +27,6 @@
 
 .fc-event {
     cursor: pointer;
-}
-
-thead {
-    background-color: #121212;
 }
 
 a.fc-event:has(div.practice) {
