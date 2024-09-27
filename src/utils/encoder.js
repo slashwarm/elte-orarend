@@ -52,7 +52,9 @@ export function decodeLessonsFromSearchParam(param) {
                 ? ''
                 : `${parts[i + 6].slice(0, 2)}:${parts[i + 6].slice(2, 4)}-${parts[i + 6].slice(4, 6)}:${parts[
                       i + 6
-                  ].slice(6)}`;
+
+                  ].slice(6, 8)}`;
+
 
         lesson.time = time.startsWith('0') ? time.slice(1) : time;
 
@@ -88,7 +90,14 @@ export function decodeLessonsFromSearchParam(param) {
                 lesson.type = parts[i + 7];
         }
 
-        lesson.id = generateUniqueId(lesson);
+        if (parts[i + 6].length > 8) {
+            lesson.id = Number(parts[i + 6].slice(8));
+            lesson.edited = true;
+        } else {
+            lesson.id = generateUniqueId(lesson);
+        }
+
+        lesson.newId = true;
         returned.push(lesson);
     }
     return returned;
@@ -137,8 +146,13 @@ export function encodeLessonsToSearchParam(lessons) {
             pastNames.set(lesson.name, i);
         }
 
+        // Az idővel egybe kerül az id, ha edited
+
+        const savedId = lesson.edited ? lesson.id : '';
+
         const time = lesson.time.padStart(11, '0');
-        parts.push(`${time.slice(0, 2)}${time.slice(3, 5)}${time.slice(6, 8)}${time.slice(9)}`);
+
+        parts.push(`${time.slice(0, 2)}${time.slice(3, 5)}${time.slice(6, 8)}${time.slice(9)}${savedId}`);
 
         switch (lesson.type) {
             case 'előadás':

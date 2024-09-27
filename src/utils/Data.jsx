@@ -81,7 +81,7 @@ const convertDataToTable = (data, courses) => {
 
         const uniqueId = generateUniqueId(newObject);
 
-        return { ...newObject, id: uniqueId };
+        return { ...newObject, id: uniqueId, newId: true };
     });
 
     if (courses) {
@@ -182,7 +182,7 @@ const getSemesters = () => {
 };
 
 const generateUniqueId = (data) => {
-    const valuesOnly = Object.values(data);
+    const valuesOnly = Object.values(data).sort(); // Így generateUniqueId({ a: 'a', b: 'b' }) === generateUniqueId({ b: 'b', a: 'a' })
     return CRC32.str(JSON.stringify(valuesOnly));
 };
 

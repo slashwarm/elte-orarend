@@ -51,19 +51,23 @@ const Calendar = ({
     };
 
     // képként való mentés
-    const [stickyHeader, setStickyHeader] = useState(true);
+    const [isCalendarSaving, setCalendarSaving] = useState(false);
     const printRef = useRef();
 
     const handlePrintClick = () => {
-        setStickyHeader(false);
+        setCalendarSaving(true);
     };
 
     useEffect(() => {
-        if (!stickyHeader) {
-            onImageDownload(printRef);
-            setStickyHeader(true);
+        const handleImageDownload = async () => {
+            await onImageDownload(printRef);
+            setCalendarSaving(false);
+        };
+
+        if (isCalendarSaving) {
+            void handleImageDownload();
         }
-    }, [stickyHeader, onImageDownload]);
+    }, [isCalendarSaving, onImageDownload]);
 
     // URL export
     const handleURLCopy = async () => {
@@ -151,12 +155,12 @@ const Calendar = ({
                 </Stack>
             )}
 
-            <div ref={printRef}>
+            <div ref={printRef} className={isCalendarSaving ? 'photo-calendar' : undefined}>
                 <FullCalendar
                     plugins={[timeGridPlugin, momentTimezonePlugin]}
                     initialView="timeGridWeek"
                     weekends={false}
-                    stickyHeaderDates={stickyHeader}
+                    stickyHeaderDates={!isCalendarSaving}
                     events={filteredTable}
                     headerToolbar={false}
                     allDaySlot={false}
