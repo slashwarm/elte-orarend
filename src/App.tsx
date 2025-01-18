@@ -21,10 +21,10 @@ import { convertDataToTable, Course, Data, generateUniqueId, Lesson } from './ut
 import { decodeLessonsFromSearchParam, encodeLessonsToSearchParam } from './utils/encoder';
 import useDynamicTheme from './utils/theme';
 
-function Copyright(props:{}) {
+function Copyright() {
     return (
         <Box display="flex" flexDirection="column" alignItems="center" gap="8px">
-            <Typography variant="body2" color="text.secondary" align="center" {...props}>
+            <Typography variant="body2" color="text.secondary" align="center">
                 Készült ❤️-el és sok ☕-al az ELTE-n.
             </Typography>
 
@@ -94,11 +94,12 @@ const App: React.FC = () => {
     const [savedLessons, setSavedLessons] = useState(timetable); // saját órarend
     const [alertText, setAlertText] = useState(''); // alert szöveg
     const [editEvent, setEditEvent] = useState<number | null>(null!); // szerkesztendő esemény
-    const [colorScheme, setColorScheme] = useState<PaletteMode>(savedTheme ?? (themePreference.matches ? 'dark' : 'light'));
+    const [colorScheme, setColorScheme] = useState<PaletteMode>(
+        savedTheme ?? (themePreference.matches ? 'dark' : 'light'),
+    );
     themePreference.addEventListener('change', (event) => setColorScheme(event.matches ? 'dark' : 'light'));
     const theme = useDynamicTheme(colorScheme);
 
-    console.log(savedLessons);
     // ha van courses akkor minden sor data-hoz csekkeli h az ahhoz tartozó code benne van-e
     const handleDataFetch = (data: Data, courses?: Course[]) => {
         const convertedData = convertDataToTable(data, courses);
@@ -174,16 +175,11 @@ const App: React.FC = () => {
         const data = canvas.toDataURL('image/png');
         const link = document.createElement('a');
 
-        if (typeof link.download === 'string') {
-            link.href = data;
-            link.download = 'orarend.png';
-
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } else {
-            window.open(data);
-        }
+        link.href = data;
+        link.download = 'orarend.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     const handleUrlExport = async () => {
@@ -197,7 +193,7 @@ const App: React.FC = () => {
         setAlertText('URL sikeresen kimásolva!');
     };
 
-    const handleClose = (event: React.SyntheticEvent<any> | Event, reason: SnackbarCloseReason) => {
+    const handleClose = (_event: unknown, reason: SnackbarCloseReason) => {
         if (reason === 'clickaway') {
             return;
         }
@@ -295,8 +291,7 @@ const App: React.FC = () => {
                                                 onImageDownload={handleDownloadImage}
                                                 onEventEdit={setEditEvent}
                                             />
-                                        ) :
-                                        (
+                                        ) : (
                                             <ViewOnlyCalendar
                                                 lessons={savedLessons}
                                                 onUrlExport={handleUrlExport}

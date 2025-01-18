@@ -35,29 +35,31 @@ const labelIcons = {
 };
 
 type SearchProps = {
-    onLoadingStart: () => void,
-    onDataFetch: (data: Data, course?: Course[]) => void,
-    onThemeChange: () => void,
-    isLoading: boolean
-}
+    onLoadingStart: () => void;
+    onDataFetch: (data: Data, course?: Course[]) => void;
+    onThemeChange: () => void;
+    isLoading: boolean;
+};
 
-const Search: React.FC<SearchProps> = ({ onLoadingStart, onDataFetch, onThemeChange, isLoading }:SearchProps) => {
+type SearchMode = 'subject' | 'teacher';
+
+const Search: React.FC<SearchProps> = ({ onLoadingStart, onDataFetch, onThemeChange, isLoading }: SearchProps) => {
     const theme = useTheme();
     const semesters = getSemesters();
 
     const [year, setYear] = useState(semesters[0]);
-    const [mode, setMode] = useState<"subject" | "teacher">('subject');
+    const [mode, setMode] = useState<SearchMode>('subject');
     const [error, setError] = useState(false);
     const [open, setOpen] = useState(false);
     const [file, setFile] = useState<Blob | null>(null);
 
-    const changeYear = (event: React.MouseEvent, newAlignment:Semester) => {
+    const changeYear = (event: React.MouseEvent, newAlignment: Semester) => {
         if (newAlignment !== null) {
             setYear(newAlignment);
         }
     };
 
-    const changeMode = (event: React.MouseEvent, newAlignment:"subject" | "teacher") => {
+    const changeMode = (event: React.MouseEvent, newAlignment: SearchMode) => {
         if (newAlignment !== null) {
             setMode(newAlignment);
         }
@@ -117,7 +119,7 @@ const Search: React.FC<SearchProps> = ({ onLoadingStart, onDataFetch, onThemeCha
                 return;
             }
 
-            searchImportedData(importedData);
+            void searchImportedData(importedData);
         };
 
         reader.readAsArrayBuffer(file as Blob);
@@ -131,7 +133,7 @@ const Search: React.FC<SearchProps> = ({ onLoadingStart, onDataFetch, onThemeCha
             return;
         }
 
-        let courses: Course[] = data.map((subArray) => {
+        const courses: Course[] = data.map((subArray) => {
             return { courseCode: subArray[0], courseId: subArray[2] };
         });
 
@@ -140,7 +142,7 @@ const Search: React.FC<SearchProps> = ({ onLoadingStart, onDataFetch, onThemeCha
         const formData = {
             name: courses.map((x) => x.courseCode),
             year: year,
-            mode: 'course' as "course",
+            mode: 'course' as const,
         };
 
         const timetable = await fetchTimetable(formData);

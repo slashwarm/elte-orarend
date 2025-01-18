@@ -1,9 +1,12 @@
 import MUIAlert from '@mui/material/Alert';
 import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 
-const Alert = ({ alertText, handleClose }:{
-    alertText:string, 
-    handleClose?:(event:React.SyntheticEvent<any> | Event, reason:SnackbarCloseReason) => void
+const Alert = ({
+    alertText,
+    handleClose,
+}: {
+    alertText: string;
+    handleClose?: (event: React.SyntheticEvent | Event, reason: SnackbarCloseReason) => void;
 }) => {
     return (
         <Snackbar open={alertText !== ''} autoHideDuration={3000} onClose={handleClose}>

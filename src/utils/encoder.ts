@@ -18,10 +18,10 @@ export function decodeLessonsFromSearchParam(param: string): Lesson[] {
 
     const parts = LZString.decompressFromEncodedURIComponent(param).split('🔩');
 
-    let returned: Lesson[] = [];
+    const returned: Lesson[] = [];
 
     for (let i = 0; i < parts.length; i += 8) {
-        let lesson: Lesson = {} as Lesson; // !TODO Jobb típusossággal megoldani
+        const lesson: Partial<Lesson> = {};
 
         lesson.code = isInteger(parts[i]) ? returned[Number(parts[i])].code : parts[i];
         lesson.comment = isInteger(parts[i + 1]) ? returned[Number(parts[i + 1])].comment : parts[i + 1];
@@ -103,7 +103,7 @@ export function decodeLessonsFromSearchParam(param: string): Lesson[] {
         }
 
         lesson.newId = true;
-        returned.push(lesson);
+        returned.push(lesson as Lesson);
     }
     return returned;
 }
@@ -117,12 +117,12 @@ export function decodeLessonsFromSearchParam(param: string): Lesson[] {
  */
 export function encodeLessonsToSearchParam(lessons: Lesson[]): string {
     // A 🔩-t egy seperátorként használom, mert valószínűtlen, hogy bármilyen kurzusnak vagy tanárnak a nevében szerepelne
-    let parts: string[] = [];
+    const parts: string[] = [];
 
-    let pastCodes = new Map();
-    let pastNames = new Map();
-    let pastComments = new Map();
-    let pastLocations = new Map();
+    const pastCodes = new Map();
+    const pastNames = new Map();
+    const pastComments = new Map();
+    const pastLocations = new Map();
 
     for (let i = 0; i < lessons.length; i++) {
         const lesson = lessons[i];

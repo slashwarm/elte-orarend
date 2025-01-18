@@ -14,16 +14,24 @@ import { Lesson } from './utils/Data';
 import CustomNoRowsOverlay from './utils/EmptyListOverlay';
 
 type ResultsProps = {
-    tableData: Lesson[],
-    onLessonSave: (data: Lesson) => void,
-    savedLessons: Lesson[],
-    onEventEdit?: (value: number) => void,
-    onEventChange?: (data: Lesson, toDelete?: boolean) => void,
-    isLoading: boolean,
-    own: boolean
-}
+    tableData: Lesson[];
+    onLessonSave: (data: Lesson) => void;
+    savedLessons: Lesson[];
+    onEventEdit?: (value: number) => void;
+    onEventChange?: (data: Lesson, toDelete?: boolean) => void;
+    isLoading: boolean;
+    own: boolean;
+};
 
-const Results: React.FC<ResultsProps> = ({ tableData, onLessonSave, savedLessons, onEventEdit, onEventChange, isLoading, own }:ResultsProps) => {
+const Results: React.FC<ResultsProps> = ({
+    tableData,
+    onLessonSave,
+    savedLessons,
+    onEventEdit,
+    onEventChange,
+    isLoading,
+    own,
+}: ResultsProps) => {
     const columns: GridColDef<Lesson>[] = [
         {
             field: 'actions',
@@ -33,16 +41,16 @@ const Results: React.FC<ResultsProps> = ({ tableData, onLessonSave, savedLessons
             cellClassName: 'actions',
             sortable: false,
             renderCell: (params) => {
-                const onDeleteClick = (e: React.MouseEvent):void => {
+                const onDeleteClick = (e: React.MouseEvent): void => {
                     e.stopPropagation();
                     return onLessonSave(params.row);
                 };
 
                 if (own) {
-                    const lesson = savedLessons.find(lesson => lesson.id === params.id)
+                    const lesson = savedLessons.find((lesson) => lesson.id === params.id);
                     const isHidden = savedLessons && lesson && lesson.hidden;
 
-                    const onHideClick = (e: React.MouseEvent):void => {
+                    const onHideClick = (e: React.MouseEvent): void => {
                         e.stopPropagation();
                         return onEventChange ? onEventChange({ ...(lesson as Lesson), hidden: !isHidden }) : undefined;
                     };
@@ -55,7 +63,7 @@ const Results: React.FC<ResultsProps> = ({ tableData, onLessonSave, savedLessons
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Szerkesztés" placement="top" disableInteractive>
-                                <IconButton onClick={() => onEventEdit ? onEventEdit(Number(params.id)) : undefined}>
+                                <IconButton onClick={() => (onEventEdit ? onEventEdit(Number(params.id)) : undefined)}>
                                     <EditIcon />
                                 </IconButton>
                             </Tooltip>
@@ -163,7 +171,6 @@ const Results: React.FC<ResultsProps> = ({ tableData, onLessonSave, savedLessons
             }}
             pageSizeOptions={[10, 50, 100]}
             disableRowSelectionOnClick
-            // disableSelectionOnClick
             localeText={huHU.components.MuiDataGrid.defaultProps.localeText}
             slots={{
                 noRowsOverlay: CustomNoRowsOverlay,
@@ -180,9 +187,5 @@ const Results: React.FC<ResultsProps> = ({ tableData, onLessonSave, savedLessons
         />
     );
 };
-
-// Results.propTypes = {
-//     savedLessons: PropTypes.array.isRequired,
-// };
 
 export default Results;

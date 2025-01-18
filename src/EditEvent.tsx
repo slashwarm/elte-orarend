@@ -16,19 +16,18 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/hu';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './styles/Calendar.css';
 import { generateUniqueId, Lesson, TimeRange } from './utils/Data';
 
-
 type EditEventProps = {
-    savedLessons: Lesson[],
-    onEventChange: (data: Lesson, toDelete?: boolean) => void,
-    onEventEdit: (value: number | null) => void,
-    eventId: number
-}
+    savedLessons: Lesson[];
+    onEventChange: (data: Lesson, toDelete?: boolean) => void;
+    onEventEdit: (value: number | null) => void;
+    eventId: number;
+};
 
-const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEventEdit, eventId }:EditEventProps) => {
+const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEventEdit, eventId }: EditEventProps) => {
     useEffect(() => {
         if (eventId !== -1) {
             const lesson = savedLessons.find((lesson) => lesson.id === eventId) as Lesson;
@@ -54,7 +53,7 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                 teacher: '',
                 time: '08:00-09:00',
                 type: 'gyakorlat',
-                id: null!
+                id: null!,
             });
         }
     }, [eventId, savedLessons]);
@@ -64,7 +63,7 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
     const [startTime, setStartTime] = useState<Dayjs | null>(null);
     const [endTime, setEndTime] = useState<Dayjs | null>(null);
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>, child?: ReactNode) => {
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
         setEditEvent({
             ...editEvent,
             [event.target.name]: event.target.value,
@@ -77,7 +76,7 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
 
     const handleDeleteClick = (event: React.MouseEvent) => {
         event.preventDefault();
-        onEventChange(savedLessons.find(lesson => lesson.id === editEvent.id ) as Lesson, true);
+        onEventChange(savedLessons.find((lesson) => lesson.id === editEvent.id) as Lesson, true);
         handleEditClose();
     };
 

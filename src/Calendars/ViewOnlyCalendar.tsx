@@ -7,17 +7,16 @@ import type { Lesson } from '../utils/Data';
 import LessonCalendar from './LessonCalendar';
 
 type ViewOnlyCalendarProps = {
-    lessons: Lesson[], // A megjelenítendő órák
-    onUrlExport: () => void, // URL export kezelő
-    onImageDownload: (ref:React.MutableRefObject<HTMLElement>) => Promise<void>, // Kép mentés kezelő
-}
+    lessons: Lesson[]; // A megjelenítendő órák
+    onUrlExport: () => void; // URL export kezelő
+    onImageDownload: (ref: React.MutableRefObject<HTMLElement>) => Promise<void>; // Kép mentés kezelő
+};
 
 const ViewOnlyCalendar: React.FC<ViewOnlyCalendarProps> = ({
     lessons,
     onUrlExport,
-    onImageDownload
-}:ViewOnlyCalendarProps) => {
-   
+    onImageDownload,
+}: ViewOnlyCalendarProps) => {
     // Más órarendjének mentése sajátként
     const handleTimetableSave = () => {
         const url = new URL(window.location.toString());
@@ -28,40 +27,41 @@ const ViewOnlyCalendar: React.FC<ViewOnlyCalendarProps> = ({
     };
 
     return (
-        <LessonCalendar 
-            lessons={lessons} 
+        <LessonCalendar
+            lessons={lessons}
             onImageDownload={onImageDownload}
             eventContent={(eventInfo) => {
-                return (<div
-                    className={`view-only ${
-                        eventInfo.event.extendedProps.type === 'gyakorlat' ? 'practice' : 'lecture'
-                    }`}
-                >
-                    <div className="fc-event-time">
-                        <b>{eventInfo.timeText}</b>
+                return (
+                    <div
+                        className={`view-only ${
+                            eventInfo.event.extendedProps.type === 'gyakorlat' ? 'practice' : 'lecture'
+                        }`}
+                    >
+                        <div className="fc-event-time">
+                            <b>{eventInfo.timeText}</b>
+                        </div>
+                        <div className="fc-event-title-container">
+                            <div className="fc-event-title fc-sticky">{eventInfo.event.title}</div>
+                        </div>
                     </div>
-                    <div className="fc-event-title-container">
-                        <div className="fc-event-title fc-sticky">{eventInfo.event.title}</div>
-                    </div>
-                </div>)
+                );
             }}
-            >
-
-                <Badge badgeContent="ÚJ" color="secondary">
-                    <Button variant="outlined" startIcon={<LinkIcon />} onClick={onUrlExport} fullWidth>
-                        Mentés hivatkozásként
-                    </Button>
-                </Badge>
-
-                <Button
-                    variant="outlined"
-                    color="success"
-                    startIcon={<BookmarkBorderIcon />}
-                    onClick={handleTimetableSave}
-                    sx={{ visibility: 'visible' }}
-                >
-                    Beállítás saját órarendként
+        >
+            <Badge badgeContent="ÚJ" color="secondary">
+                <Button variant="outlined" startIcon={<LinkIcon />} onClick={onUrlExport} fullWidth>
+                    Mentés hivatkozásként
                 </Button>
+            </Badge>
+
+            <Button
+                variant="outlined"
+                color="success"
+                startIcon={<BookmarkBorderIcon />}
+                onClick={handleTimetableSave}
+                sx={{ visibility: 'visible' }}
+            >
+                Beállítás saját órarendként
+            </Button>
         </LessonCalendar>
     );
 };

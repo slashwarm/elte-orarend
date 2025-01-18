@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { isAxiosError } from 'axios';
 import CRC32 from 'crc-32';
 
 export type DayOfWeek = 'hétfő' | 'kedd' | 'szerda' | 'csütörtök' | 'péntek' | 'szombat' | 'vasárnap';
@@ -71,14 +71,21 @@ const daysOfWeek: DayOfWeek[] = ['hétfő', 'kedd', 'szerda', 'csütörtök', 'p
  */
 const fetchTimetable = async (formData: FormData): Promise<Data> => {
     try {
-        const response = await axios.post('/orarend/server/data.php', formData);
+        const response = await axios.post(
+            import.meta.env.DEV ? 'http://localhost:8000/data.php' : '/orarend/server/data.php',
+            formData,
+        );
         return response.data;
-    } catch (error: any) {
-        if (error.response) {
-            console.error(error.response);
-            console.error('Server response error');
-        } else if (error.request) {
-            console.error('Network error');
+    } catch (error: unknown) {
+        if (isAxiosError(error)) {
+            if (error.response) {
+                console.error(error.response);
+                console.error('Server response error');
+            } else if (error.request) {
+                console.error('Network error');
+            } else {
+                console.error(error);
+            }
         } else {
             console.error(error);
         }
@@ -98,7 +105,7 @@ export const getTeacherFromComment = (comment: string): string => {
 
     if (comment && comment.trim() !== '') {
         // van megjegyzés / oktató
-        let teacherSplit = comment.replace('Dr. ', '').replace(' Dr.', '').replace(regex, '').split(' ');
+        const teacherSplit = comment.replace('Dr. ', '').replace(' Dr.', '').replace(regex, '').split(' ');
 
         if (teacherSplit.length >= 2) {
             // emberi név, tehát legalább 2 tagú
@@ -116,18 +123,17 @@ export const getTeacherFromComment = (comment: string): string => {
  * @returns {Lesson[]}
  */
 const convertDataToTable = (data: Data, courses?: Course[]): Lesson[] => {
-    // console.log({ data, courses });
     let tableObject = data.map((subArray) => {
         let time = subArray[0].split(' ');
-        let lessonIdentifier = subArray[1].split(' ');
-        let courseCodeSplit = lessonIdentifier[0].split('-');
-        let lessonCode = courseCodeSplit.slice(0, courseCodeSplit.length - 1).join('-');
-        let courseCode = courseCodeSplit[courseCodeSplit.length - 1];
-        let lessonType = lessonIdentifier[1].replace('(', '').replace(')', '');
-        let lessonName = subArray[2];
+        const lessonIdentifier = subArray[1].split(' ');
+        const courseCodeSplit = lessonIdentifier[0].split('-');
+        const lessonCode = courseCodeSplit.slice(0, courseCodeSplit.length - 1).join('-');
+        const courseCode = courseCodeSplit[courseCodeSplit.length - 1];
+        const lessonType = lessonIdentifier[1].replace('(', '').replace(')', '');
+        const lessonName = subArray[2];
         let location = subArray[3];
-        let comment = subArray[5];
-        let teacher = getTeacherFromComment(comment);
+        const comment = subArray[5];
+        const teacher = getTeacherFromComment(comment);
 
         if (time.length >= 4) {
             // van helyes időnk
@@ -163,13 +169,13 @@ const convertDataToTable = (data: Data, courses?: Course[]): Lesson[] => {
     });
 
     if (courses) {
-        let uniqueIds: any = [];
+        const uniqueIds: number[] = [];
 
-        tableObject = tableObject.filter((subArray: any) => {
+        tableObject = tableObject.filter((subArray) => {
             // csak az az óra kell ami a kiválasztott kurzusokhoz tartozik
             const isInCourse = courses
-                .filter((x: any) => x.courseCode === subArray.code)
-                .some((x: any) => x.courseId === subArray.course);
+                .filter((x: Course) => x.courseCode === subArray.code)
+                .some((x: Course) => x.courseId === subArray.course);
 
             if (isInCourse && !uniqueIds.includes(subArray.id)) {
                 // duplikáció ellen
@@ -276,7 +282,7 @@ const getSemesters = (): Semester[] => {
  * @param {*} data
  * @returns {number}
  */
-const generateUniqueId = (data: any): number => {
+const generateUniqueId = (data: object): number => {
     const valuesOnly = Object.values(data).sort(); // Így generateUniqueId({ a: 'a', b: 'b' }) === generateUniqueId({ b: 'b', a: 'a' })
     return CRC32.str(JSON.stringify(valuesOnly));
 };

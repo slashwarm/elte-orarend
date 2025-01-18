@@ -14,28 +14,26 @@ import { Button } from '@mui/material';
 import { convertDataToCalendar, type Lesson } from '../utils/Data';
 
 type PopoverInfo = {
-    anchorEl:EventTarget | null,
-    event:EventContentArg | null
-}
-
+    anchorEl: EventTarget | null;
+    event: EventContentArg | null;
+};
 
 type LessonCalendarProps = {
-    lessons: Lesson[], // A megjelenítendő órák
-    eventContent: React.FC<EventContentArg>, // Egy addott naptári elemhez tartozó componenst add meg
-    onEventClick?: (arg:EventClickArg) => void, // Megmondja, hogy egy naptári eseményre kattintáskor mi történik
-    calendarClassNames?: string, // Extra CSS osztályok a naptárnak
-    showPopover?: boolean, // Megadja, hogyha az órák felett van a kurzor, akkor megjelenik-e a popover. Ha nincs megadva, nincs popover
-    popoverActionIcon?: (id: number) => React.ReactNode // A popover alján megjelenő icon. Pl a naptárszerkesztés ikon
-    popoverActionText?: (id: number) => string // A popover alján megjelenő akcióra figyelmet felhívó szöveg. Pl "Kattints a szerkesztéshez"
-    onImageDownload?: (ref:React.MutableRefObject<HTMLElement>) => Promise<void>, // A kép letöltés kezelése, ha nincs megadva akkor nem lesz kép letöltő gomb
-    children?: React.ReactNode, // A naptár felé kerülő elemek
-}
+    lessons: Lesson[]; // A megjelenítendő órák
+    eventContent: React.FC<EventContentArg>; // Egy addott naptári elemhez tartozó componenst add meg
+    onEventClick?: (arg: EventClickArg) => void; // Megmondja, hogy egy naptári eseményre kattintáskor mi történik
+    calendarClassNames?: string; // Extra CSS osztályok a naptárnak
+    showPopover?: boolean; // Megadja, hogyha az órák felett van a kurzor, akkor megjelenik-e a popover. Ha nincs megadva, nincs popover
+    popoverActionIcon?: (id: number) => React.ReactNode; // A popover alján megjelenő icon. Pl a naptárszerkesztés ikon
+    popoverActionText?: (id: number) => string; // A popover alján megjelenő akcióra figyelmet felhívó szöveg. Pl "Kattints a szerkesztéshez"
+    onImageDownload?: (ref: React.MutableRefObject<HTMLElement>) => Promise<void>; // A kép letöltés kezelése, ha nincs megadva akkor nem lesz kép letöltő gomb
+    children?: React.ReactNode; // A naptár felé kerülő elemek
+};
 
 /**
  * Egy órákat megjelenítő naptár, ami fölé tetszőleges gombok és elemek lehelyezhetők
  *
  * @param {LessonCalendarProps} props
- * @returns {*} 
  */
 const LessonCalendar: React.FC<LessonCalendarProps> = ({
     lessons,
@@ -47,13 +45,8 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
     popoverActionText,
     onImageDownload,
     children,
-    
-}:LessonCalendarProps) => {
-    
-    const events = useMemo(
-        () => convertDataToCalendar(lessons),
-        [lessons]
-    )
+}: LessonCalendarProps) => {
+    const events = useMemo(() => convertDataToCalendar(lessons), [lessons]);
 
     // popover
     const [popoverInfo, setPopoverInfo] = useState<PopoverInfo>({
@@ -61,7 +54,7 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
         event: null,
     });
 
-    const handlePopoverOpen = (event:React.MouseEvent<HTMLElement, MouseEvent>, eventInfo:EventContentArg) => {
+    const handlePopoverOpen = (event: React.MouseEvent<HTMLElement, MouseEvent>, eventInfo: EventContentArg) => {
         // console.log({event, eventInfo});
         setPopoverInfo({ anchorEl: event.currentTarget, event: eventInfo });
     };
@@ -82,7 +75,7 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
 
     useEffect(() => {
         const handleImageDownload = async () => {
-            if (onImageDownload){
+            if (onImageDownload) {
                 await onImageDownload(printRef);
                 setCalendarSaving(false);
             }
@@ -97,13 +90,12 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
         <>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} marginBottom={2}>
                 {onImageDownload && (
-                <Button variant="outlined" startIcon={<DownloadIcon/>} onClick={handlePrintClick}>
-                    Mentés képként
-                </Button>
+                    <Button variant="outlined" startIcon={<DownloadIcon />} onClick={handlePrintClick}>
+                        Mentés képként
+                    </Button>
                 )}
                 {children}
             </Stack>
-      
 
             <div ref={printRef} className={`${calendarClassNames} ${isCalendarSaving ? 'photo-calendar' : ''}`}>
                 <FullCalendar
@@ -133,7 +125,7 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
                                 onMouseEnter={(e) => handlePopoverOpen(e, eventInfo)}
                                 onMouseLeave={handlePopoverClose}
                             >
-                               {eventContent(eventInfo)}
+                                {eventContent(eventInfo)}
                             </div>
                         );
                     }}
