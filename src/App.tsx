@@ -10,12 +10,14 @@ import { ThemeProvider } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import html2canvas from 'html2canvas';
 import { useMemo, useState } from 'react';
-import Calendar from './Calendar';
+import OwnCalendar from './Calendars/OwnCalendar';
+import ResultsCalendar from './Calendars/ResultsCalendar';
+import ViewOnlyCalendar from './Calendars/ViewOnlyCalendar';
 import EditEvent from './EditEvent';
 import Results from './Results';
 import Search from './Search';
 import Alert from './utils/Alert';
-import { convertDataToCalendar, convertDataToTable, Course, Data, generateUniqueId, Lesson } from './utils/Data';
+import { convertDataToTable, Course, Data, generateUniqueId, Lesson } from './utils/Data';
 import { decodeLessonsFromSearchParam, encodeLessonsToSearchParam } from './utils/encoder';
 import useDynamicTheme from './utils/theme';
 
@@ -96,7 +98,7 @@ const App: React.FC = () => {
     themePreference.addEventListener('change', (event) => setColorScheme(event.matches ? 'dark' : 'light'));
     const theme = useDynamicTheme(colorScheme);
 
-    // console.log(savedLessons);
+    console.log(savedLessons);
     // ha van courses akkor minden sor data-hoz csekkeli h az ahhoz tartozó code benne van-e
     const handleDataFetch = (data: Data, courses?: Course[]) => {
         const convertedData = convertDataToTable(data, courses);
@@ -252,15 +254,15 @@ const App: React.FC = () => {
                             {firstSearchDone && !viewOnly && (
                                 <Grid item xs={12}>
                                     <Paper sx={{ p: 2 }}>
-                                        <Calendar
-                                            tableData={convertDataToCalendar(searchResults)}
-                                            onCalendarClick={handleCalendarClick}
-                                            savedLessons={savedLessons}
-                                            own={false}
+                                        <ResultsCalendar
+                                            lessonsResults={searchResults}
+                                            ownLessons={savedLessons}
+                                            onEventClick={handleCalendarClick}
                                         />
                                     </Paper>
                                 </Grid>
                             )}
+
                             <Grid item xs={12}>
                                 <Typography variant="h5" component="h2">
                                     {viewOnly ? 'A velem megosztott órarend' : 'Saját órarendem'}
@@ -286,16 +288,21 @@ const App: React.FC = () => {
                             {savedLessons.length > 0 && (
                                 <Grid item xs={12}>
                                     <Paper sx={{ p: 2 }}>
-                                        <Calendar
-                                            tableData={convertDataToCalendar(savedLessons)}
-                                            onCalendarClick={handleCalendarClick}
-                                            onImageDownload={handleDownloadImage}
-                                            onURLExport={handleUrlExport}
-                                            savedLessons={savedLessons}
-                                            onEventEdit={setEditEvent}
-                                            own={true}
-                                            viewOnly={viewOnly}
-                                        />
+                                        {!viewOnly ? (
+                                            <OwnCalendar
+                                                lessons={savedLessons}
+                                                onUrlExport={handleUrlExport}
+                                                onImageDownload={handleDownloadImage}
+                                                onEventEdit={setEditEvent}
+                                            />
+                                        ) :
+                                        (
+                                            <ViewOnlyCalendar
+                                                lessons={savedLessons}
+                                                onUrlExport={handleUrlExport}
+                                                onImageDownload={handleDownloadImage}
+                                            />
+                                        )}
                                     </Paper>
                                 </Grid>
                             )}

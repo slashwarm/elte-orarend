@@ -16,6 +16,9 @@
 .fc-direction-ltr .fc-daygrid-event.fc-event-end,
 .fc-event-main-frame {
     flex-direction: column;
+    div {
+        flex-grow: 1;
+    }
 }
 
 .fc-event-desc,
@@ -27,6 +30,7 @@
 
 .fc-event {
     cursor: pointer;
+    overflow: hidden;
 }
 
 a.fc-event:has(div.practice) {
