@@ -1,28 +1,28 @@
-import { Fragment, useState } from 'react';
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
-import Alert from '@mui/material/Alert';
-import InputAdornment from '@mui/material/InputAdornment';
-import SearchIcon from '@mui/icons-material/Search';
-import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
-import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
-import Stack from '@mui/material/Stack';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+import { DarkMode, LightMode, ManageSearch } from '@mui/icons-material';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import EventRepeatIcon from '@mui/icons-material/EventRepeat';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import SearchIcon from '@mui/icons-material/Search';
+import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { Fab, useTheme } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import LoadingButton from '@mui/lab/LoadingButton';
-import { fetchTimetable, getSemesters } from './utils/Data.jsx';
-import { read, utils } from 'xlsx';
-import { Fab, useTheme } from '@mui/material';
-import { DarkMode, LightMode, ManageSearch } from '@mui/icons-material';
 import Divider from '@mui/material/Divider';
+import InputAdornment from '@mui/material/InputAdornment';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Typography from '@mui/material/Typography';
+import { Fragment, useState } from 'react';
+import { read, utils } from 'xlsx';
+import { Course, Data, fetchTimetable, getSemesters, Semester } from './utils/Data';
 
 const labelOptions = {
     subject: 'Tárgy neve / kódja',
@@ -34,34 +34,43 @@ const labelIcons = {
     teacher: <SwitchAccountIcon />,
 };
 
-const Search = ({ onLoadingStart, onDataFetch, onThemeChange, isLoading }) => {
+type SearchProps = {
+    onLoadingStart: () => void;
+    onDataFetch: (data: Data, course?: Course[]) => void;
+    onThemeChange: () => void;
+    isLoading: boolean;
+};
+
+type SearchMode = 'subject' | 'teacher';
+
+const Search: React.FC<SearchProps> = ({ onLoadingStart, onDataFetch, onThemeChange, isLoading }: SearchProps) => {
     const theme = useTheme();
     const semesters = getSemesters();
 
     const [year, setYear] = useState(semesters[0]);
-    const [mode, setMode] = useState('subject');
+    const [mode, setMode] = useState<SearchMode>('subject');
     const [error, setError] = useState(false);
     const [open, setOpen] = useState(false);
-    const [file, setFile] = useState(null);
+    const [file, setFile] = useState<Blob | null>(null);
 
-    const changeYear = (event, newAlignment) => {
+    const changeYear = (event: React.MouseEvent, newAlignment: Semester) => {
         if (newAlignment !== null) {
             setYear(newAlignment);
         }
     };
 
-    const changeMode = (event, newAlignment) => {
+    const changeMode = (event: React.MouseEvent, newAlignment: SearchMode) => {
         if (newAlignment !== null) {
             setMode(newAlignment);
         }
     };
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         const data = new FormData(event.currentTarget);
 
-        const name = data.get('name').trim();
+        const name = (data.get('name') as string).trim();
 
         const formData = {
             name: name,
@@ -99,10 +108,10 @@ const Search = ({ onLoadingStart, onDataFetch, onThemeChange, isLoading }) => {
         const reader = new FileReader();
 
         reader.onload = function (e) {
-            const data = new Uint8Array(e.target.result);
+            const data = new Uint8Array((e.target as FileReader).result as ArrayBuffer);
             const workbook = read(data, { type: 'array' });
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const importedData = utils.sheet_to_json(sheet, { header: 1 });
+            const importedData: string[][] = utils.sheet_to_json(sheet, { header: 1 });
 
             if (!importedData) {
                 onDataFetch([]);
@@ -110,13 +119,13 @@ const Search = ({ onLoadingStart, onDataFetch, onThemeChange, isLoading }) => {
                 return;
             }
 
-            searchImportedData(importedData);
+            void searchImportedData(importedData);
         };
 
-        reader.readAsArrayBuffer(file);
+        reader.readAsArrayBuffer(file as Blob);
     };
 
-    const searchImportedData = async (data) => {
+    const searchImportedData = async (data: string[][]) => {
         if (data.length <= 1) {
             // ha nincs kurzus
             onDataFetch([]);
@@ -124,7 +133,7 @@ const Search = ({ onLoadingStart, onDataFetch, onThemeChange, isLoading }) => {
             return;
         }
 
-        let courses = data.map((subArray) => {
+        const courses: Course[] = data.map((subArray) => {
             return { courseCode: subArray[0], courseId: subArray[2] };
         });
 
@@ -133,7 +142,7 @@ const Search = ({ onLoadingStart, onDataFetch, onThemeChange, isLoading }) => {
         const formData = {
             name: courses.map((x) => x.courseCode),
             year: year,
-            mode: 'course',
+            mode: 'course' as const,
         };
 
         const timetable = await fetchTimetable(formData);
@@ -143,7 +152,7 @@ const Search = ({ onLoadingStart, onDataFetch, onThemeChange, isLoading }) => {
 
     return (
         <Fragment>
-            <Box component="form" onSubmit={handleSubmit} noValidate spacing={2}>
+            <Box component="form" onSubmit={handleSubmit} noValidate>
                 <Stack spacing={2}>
                     <Stack
                         direction="row"
@@ -271,7 +280,7 @@ const Search = ({ onLoadingStart, onDataFetch, onThemeChange, isLoading }) => {
                                 <TextField
                                     type={'file'}
                                     inputProps={{ accept: '.xlsx' }}
-                                    onChange={(e) => setFile(e.target.files[0])}
+                                    onChange={(e) => setFile(((e.target as HTMLInputElement).files as FileList)[0])}
                                     disabled={isLoading}
                                 />
                                 <Button

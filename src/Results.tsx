@@ -1,20 +1,38 @@
-import PropTypes from 'prop-types';
-import { DataGrid, huHU } from '@mui/x-data-grid';
-import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
-import Link from '@mui/material/Link';
-import IconButton from '@mui/material/IconButton';
-import LinearProgress from '@mui/material/LinearProgress';
-import Tooltip from '@mui/material/Tooltip';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import BookmarkRemoveIcon from '@mui/icons-material/BookmarkRemove';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import CustomNoRowsOverlay from './utils/EmptyListOverlay.jsx';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
+import LinearProgress from '@mui/material/LinearProgress';
+import Link from '@mui/material/Link';
+import Tooltip from '@mui/material/Tooltip';
+import { DataGrid, GridColDef, huHU } from '@mui/x-data-grid';
+import { Lesson } from './utils/Data';
+import CustomNoRowsOverlay from './utils/EmptyListOverlay';
 
-const Results = ({ tableData, onLessonSave, savedLessons, onEventEdit, onEventChange, isLoading, own }) => {
-    const columns = [
+type ResultsProps = {
+    tableData: Lesson[];
+    onLessonSave: (data: Lesson) => void;
+    savedLessons: Lesson[];
+    onEventEdit?: (value: number) => void;
+    onEventChange?: (data: Lesson, toDelete?: boolean) => void;
+    isLoading: boolean;
+    own: boolean;
+};
+
+const Results: React.FC<ResultsProps> = ({
+    tableData,
+    onLessonSave,
+    savedLessons,
+    onEventEdit,
+    onEventChange,
+    isLoading,
+    own,
+}: ResultsProps) => {
+    const columns: GridColDef<Lesson>[] = [
         {
             field: 'actions',
             type: 'actions',
@@ -23,17 +41,18 @@ const Results = ({ tableData, onLessonSave, savedLessons, onEventEdit, onEventCh
             cellClassName: 'actions',
             sortable: false,
             renderCell: (params) => {
-                const onDeleteClick = (e) => {
+                const onDeleteClick = (e: React.MouseEvent): void => {
                     e.stopPropagation();
                     return onLessonSave(params.row);
                 };
 
                 if (own) {
-                    const isHidden = savedLessons && savedLessons.some((obj) => obj.id === params.id && obj.hidden);
+                    const lesson = savedLessons.find((lesson) => lesson.id === params.id);
+                    const isHidden = savedLessons && lesson && lesson.hidden;
 
-                    const onHideClick = (e) => {
+                    const onHideClick = (e: React.MouseEvent): void => {
                         e.stopPropagation();
-                        return onEventChange({ id: params.id, hidden: !isHidden });
+                        return onEventChange ? onEventChange({ ...(lesson as Lesson), hidden: !isHidden }) : undefined;
                     };
 
                     return (
@@ -44,7 +63,7 @@ const Results = ({ tableData, onLessonSave, savedLessons, onEventEdit, onEventCh
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Szerkesztés" placement="top" disableInteractive>
-                                <IconButton onClick={() => onEventEdit(params.id)}>
+                                <IconButton onClick={() => (onEventEdit ? onEventEdit(Number(params.id)) : undefined)}>
                                     <EditIcon />
                                 </IconButton>
                             </Tooltip>
@@ -152,7 +171,6 @@ const Results = ({ tableData, onLessonSave, savedLessons, onEventEdit, onEventCh
             }}
             pageSizeOptions={[10, 50, 100]}
             disableRowSelectionOnClick
-            disableSelectionOnClick
             localeText={huHU.components.MuiDataGrid.defaultProps.localeText}
             slots={{
                 noRowsOverlay: CustomNoRowsOverlay,
@@ -168,10 +186,6 @@ const Results = ({ tableData, onLessonSave, savedLessons, onEventEdit, onEventCh
             loading={isLoading}
         />
     );
-};
-
-Results.propTypes = {
-    savedLessons: PropTypes.array.isRequired,
 };
 
 export default Results;

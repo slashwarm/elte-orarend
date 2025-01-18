@@ -1,21 +1,14 @@
 <?php
-  /*header("Content-type: application/json; charset=utf-8");
+  header("Content-Type: application/json; charset=utf-8");
 
   header("Access-Control-Allow-Origin: *");
-  header('Access-Control-Allow-Methods: *');
+  header('Access-Control-Allow-Methods: POST, OPTIONS');
   header("Access-Control-Allow-Headers: *");
 
   if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    // It's a preflight request. Respond successfully:
-    header('Access-Control-Allow-Origin: *');
-    header('Access-Control-Allow-Methods: *'); // or specify `'POST, GET, OPTIONS'`, etc
-    header('Access-Control-Allow-Headers: *'); // or specify `'Content-Type, Authorization'`, etc
-    header('Access-Control-Max-Age: 86400'); // cache this preflight request for 1 day
+    header('Access-Control-Max-Age: 86400');
     exit;
   }
-
-  error_reporting(E_ALL); // TO REMOVE
-  ini_set('display_errors', 1); // TO REMOVE*/
 
   require "vendor/autoload.php";
   use PHPHtmlParser\Dom;
