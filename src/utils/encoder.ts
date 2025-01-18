@@ -21,18 +21,7 @@ export function decodeLessonsFromSearchParam(param: string): Lesson[] {
     let returned: Lesson[] = [];
 
     for (let i = 0; i < parts.length; i += 8) {
-        let lesson: Lesson = {
-            code: null!,
-            comment: null!,
-            course: null!,
-            name: null!,
-            teacher: null!,
-            day: null!,
-            type: null!,
-            time: null!,
-            location: null!,
-            id: null!,
-        }; // !TODO Jobb típusossággal megoldani
+        let lesson: Lesson = {} as Lesson; // !TODO Jobb típusossággal megoldani
 
         lesson.code = isInteger(parts[i]) ? returned[Number(parts[i])].code : parts[i];
         lesson.comment = isInteger(parts[i + 1]) ? returned[Number(parts[i + 1])].comment : parts[i + 1];
