@@ -1,4 +1,5 @@
 import GitHubIcon from '@mui/icons-material/GitHub';
+import { PaletteMode, SnackbarCloseReason } from '@mui/material';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
@@ -13,12 +14,12 @@ import Calendar from './Calendar';
 import EditEvent from './EditEvent';
 import Results from './Results';
 import Search from './Search';
-import Alert from './utils/Alert.jsx';
-import { convertDataToCalendar, convertDataToTable, generateUniqueId } from './utils/Data.jsx';
-import { decodeLessonsFromSearchParam, encodeLessonsToSearchParam } from './utils/encoder.js';
-import useDynamicTheme from './utils/theme.js';
+import Alert from './utils/Alert';
+import { convertDataToCalendar, convertDataToTable, Course, Data, generateUniqueId, Lesson } from './utils/Data';
+import { decodeLessonsFromSearchParam, encodeLessonsToSearchParam } from './utils/encoder';
+import useDynamicTheme from './utils/theme';
 
-function Copyright(props) {
+function Copyright(props:{}) {
     return (
         <Box display="flex" flexDirection="column" alignItems="center" gap="8px">
             <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -32,9 +33,9 @@ function Copyright(props) {
     );
 }
 
-const readStoredTimetable = (storageTimetable) => {
+const readStoredTimetable = (storageTimetable: string) => {
     let save = false;
-    const timetable = JSON.parse(storageTimetable);
+    const timetable: Lesson[] = JSON.parse(storageTimetable);
     const updatedTimetable = timetable.map((lesson) => {
         if (!lesson.newId) {
             save = true;
@@ -64,12 +65,12 @@ const readStoredTimetable = (storageTimetable) => {
     return updatedTimetable;
 };
 
-const App = () => {
-    const url = new URL(window.location);
+const App: React.FC = () => {
+    const url = new URL(window.location.toString());
     const lessonsUrlParam = url.searchParams.get('lessons');
     const savedTimetable = window.localStorage.getItem('SAVE_TIMETABLE');
     const themePreference = window.matchMedia('(prefers-color-scheme: dark)');
-    const savedTheme = localStorage.getItem('theme');
+    const savedTheme: PaletteMode = localStorage.getItem('theme') as PaletteMode;
 
     // Ha vannak a URL-ben órák, akkor azokat töltse be, különben ha van elmentve órarend azt, különben üres.
     const storageTimetable = useMemo(
@@ -87,16 +88,17 @@ const App = () => {
 
     const [firstSearchDone, setFirstSearchDone] = useState(false); // első keresés
     const [loading, setLoading] = useState(false); // töltés
-    const [searchResults, setSearchResults] = useState([]); // keresés találatok
+    const [searchResults, setSearchResults] = useState<Lesson[]>([]); // keresés találatok
     const [savedLessons, setSavedLessons] = useState(timetable); // saját órarend
     const [alertText, setAlertText] = useState(''); // alert szöveg
-    const [editEvent, setEditEvent] = useState(null); // szerkesztendő esemény
-    const [colorScheme, setColorScheme] = useState(savedTheme ?? (themePreference.matches ? 'dark' : 'light'));
+    const [editEvent, setEditEvent] = useState<number | null>(null!); // szerkesztendő esemény
+    const [colorScheme, setColorScheme] = useState<PaletteMode>(savedTheme ?? (themePreference.matches ? 'dark' : 'light'));
     themePreference.addEventListener('change', (event) => setColorScheme(event.matches ? 'dark' : 'light'));
     const theme = useDynamicTheme(colorScheme);
 
+    // console.log(savedLessons);
     // ha van courses akkor minden sor data-hoz csekkeli h az ahhoz tartozó code benne van-e
-    const handleDataFetch = (data, courses) => {
+    const handleDataFetch = (data: Data, courses?: Course[]) => {
         const convertedData = convertDataToTable(data, courses);
 
         setSearchResults(convertedData);
@@ -107,7 +109,7 @@ const App = () => {
         }
     };
 
-    const handleLessonSave = (data) => {
+    const handleLessonSave = (data: Lesson) => {
         const existingLesson = savedLessons.find((lesson) => lesson.id === data.id);
         let newLessons;
 
@@ -123,12 +125,12 @@ const App = () => {
         setSavedLessons(newLessons);
     };
 
-    const handleCalendarClick = (id) => {
-        const lesson = savedLessons.concat(searchResults).find((lesson) => lesson.id === id);
+    const handleCalendarClick = (id: number) => {
+        const lesson = savedLessons.concat(searchResults).find((lesson) => lesson.id === id) as Lesson;
         handleLessonSave(lesson);
     };
 
-    const handleEventChange = (data, toDelete) => {
+    const handleEventChange = (data: Lesson, toDelete?: boolean): void => {
         if (toDelete) {
             handleLessonSave(data);
         } else {
@@ -160,7 +162,7 @@ const App = () => {
         setLoading(true);
     };
 
-    const handleDownloadImage = async (ref) => {
+    const handleDownloadImage = async (ref: React.MutableRefObject<HTMLElement>) => {
         const backgroundColor = theme.palette.background.default;
         const element = ref.current;
         const canvas = await html2canvas(element, {
@@ -183,7 +185,7 @@ const App = () => {
     };
 
     const handleUrlExport = async () => {
-        const url = new URL(window.location);
+        const url = new URL(window.location.toString());
 
         url.searchParams.delete('lessons');
         url.searchParams.append('lessons', encodeLessonsToSearchParam(savedLessons));
@@ -193,7 +195,7 @@ const App = () => {
         setAlertText('URL sikeresen kimásolva!');
     };
 
-    const handleClose = (event, reason) => {
+    const handleClose = (event: React.SyntheticEvent<any> | Event, reason: SnackbarCloseReason) => {
         if (reason === 'clickaway') {
             return;
         }
@@ -213,7 +215,7 @@ const App = () => {
                 <CssBaseline />
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', maxWidth: '100%' }}>
                     <Box component="main" sx={{ flex: 1 }} p={{ xs: 1, sm: 2, md: 4 }}>
-                        <Grid container direction="column" spacing={2} justify="center" alignContent="center">
+                        <Grid container direction="column" spacing={2} alignContent="center">
                             {!viewOnly && (
                                 <Grid item xs={12} sm={6} md={4} lg={3}>
                                     <Paper

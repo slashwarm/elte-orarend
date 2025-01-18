@@ -1,15 +1,79 @@
 import axios from 'axios';
 import CRC32 from 'crc-32';
 
+export type DayOfWeek = 'hétfő' | 'kedd' | 'szerda' | 'csütörtök' | 'péntek' | 'szombat' | 'vasárnap';
+
+export type DayOfWeekCapital = 'Hétfő' | 'Kedd' | 'Szerda' | 'Csütörtök' | 'Péntek' | 'Szombat' | 'Vasárnap';
+
+export type TimeRange = `${number}:${number}${number}-${number}:${number}${number}`; // Pl "16:20-18:30"
+
+export type Semester = `${number}-${number}-${1 | 2}`; // Pl "2024-2025-1", "2013-2014-2"
+
+export type Lesson = {
+    name: string;
+    code: string;
+    day: DayOfWeekCapital;
+    time: TimeRange;
+    location: string;
+    type: string;
+    course: string;
+    teacher: string;
+    comment: string;
+    id: number; // Amit a `generateUniqueId` add neki a fenti adattagok alapján. SZERKESZTÉSKOR NEM VÁLTOZIK
+    newId?: boolean; // Backwards compatibility miatt. Mostmár elvben új Lesson-nél true az értéke
+    edited?: boolean; // Ha nincs vagy hamis akkor nem lett szerkesztve, ha igaz akkor lett
+    hidden?: boolean;
+};
+
+export type FormData = {
+    name: string | string[];
+    year: Semester;
+    mode: 'subject' | 'teacher' | 'course';
+};
+
+// Az excel-ből betöltött adatokhoz
+export type Course = {
+    courseCode: string;
+    courseId: string;
+};
+
+export type Data = [
+    `${DayOfWeekCapital} ${TimeRange} ${string}`,
+    `${string} (${string})`,
+    `${string} (${string})`,
+    string,
+    string,
+    string,
+    string,
+][];
+
+export type CalendarEvent = {
+    id: string;
+    title: string;
+    start: Date;
+    end: Date;
+    type: string;
+};
+
 const regex = /[\d!@#$%^&*()_+=[\]{};':"\\|,.<>/?]/g;
 
-const daysOfWeek = ['hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat', 'vasárnap'];
+const daysOfWeek: DayOfWeek[] = ['hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat', 'vasárnap'];
 
-const fetchTimetable = async (formData) => {
+/**
+ * Lekérdezi a szerverről a kért adatokat
+ *
+ * @async
+ * @param {FormData} formData
+ * year: A lekérdezett szemeszter;
+ * mode: 'subject' ha tárgy, 'teacher' ha tanár és 'course ha kurzus';
+ * name: A keresendő kulcszó
+ * @returns {Promise<Data>}
+ */
+const fetchTimetable = async (formData: FormData): Promise<Data> => {
     try {
         const response = await axios.post('/orarend/server/data.php', formData);
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         if (error.response) {
             console.error(error.response);
             console.error('Server response error');
@@ -23,7 +87,13 @@ const fetchTimetable = async (formData) => {
     }
 };
 
-export const getTeacherFromComment = (comment) => {
+/**
+ * A Data-ból jövő commentből kiszedi a tanár nevét
+ *
+ * @param {string} comment
+ * @returns {string}
+ */
+export const getTeacherFromComment = (comment: string): string => {
     let teacher = '';
 
     if (comment && comment.trim() !== '') {
@@ -38,7 +108,15 @@ export const getTeacherFromComment = (comment) => {
     return teacher;
 };
 
-const convertDataToTable = (data, courses) => {
+/**
+ * Data-ból vagy Course array-ből előállítja a Lesson-öket
+ *
+ * @param {Data} data A szerverről az adatok, vagy üres array
+ * @param {Course[] | undefined} courses Az excelből beolvasott kurzus adatok
+ * @returns {Lesson[]}
+ */
+const convertDataToTable = (data: Data, courses?: Course[]): Lesson[] => {
+    // console.log({ data, courses });
     let tableObject = data.map((subArray) => {
         let time = subArray[0].split(' ');
         let lessonIdentifier = subArray[1].split(' ');
@@ -70,8 +148,8 @@ const convertDataToTable = (data, courses) => {
         const newObject = {
             name: lessonName,
             code: lessonCode,
-            day: time[0],
-            time: time[1],
+            day: time[0] as DayOfWeekCapital,
+            time: time[1] as TimeRange,
             location: location,
             type: lessonType,
             course: courseCode,
@@ -85,13 +163,13 @@ const convertDataToTable = (data, courses) => {
     });
 
     if (courses) {
-        let uniqueIds = [];
+        let uniqueIds: any = [];
 
-        tableObject = tableObject.filter((subArray) => {
+        tableObject = tableObject.filter((subArray: any) => {
             // csak az az óra kell ami a kiválasztott kurzusokhoz tartozik
             const isInCourse = courses
-                .filter((x) => x.courseCode === subArray.code)
-                .some((x) => x.courseId === subArray.course);
+                .filter((x: any) => x.courseCode === subArray.code)
+                .some((x: any) => x.courseId === subArray.course);
 
             if (isInCourse && !uniqueIds.includes(subArray.id)) {
                 // duplikáció ellen
@@ -106,7 +184,13 @@ const convertDataToTable = (data, courses) => {
     return tableObject;
 };
 
-const convertDataToCalendar = (data) => {
+/**
+ * Naptáreseményeket állít elő Lesson-ökből
+ *
+ * @param {Lesson[]} data
+ * @returns {CalendarEvent[]}
+ */
+const convertDataToCalendar = (data: Lesson[]): CalendarEvent[] => {
     return data
         .filter((subArray) => subArray.time && subArray.time.trim() !== '' && !subArray.hidden)
         .map((subArray) => {
@@ -115,14 +199,14 @@ const convertDataToCalendar = (data) => {
             const endTime = time[1].split(':');
 
             const now = new Date();
-            const dayIndex = daysOfWeek.indexOf(subArray.day.toLowerCase());
+            const dayIndex = daysOfWeek.indexOf(subArray.day.toLowerCase() as DayOfWeek);
             const targetDate = new Date();
             const diff = dayIndex - ((now.getDay() + 6) % 7);
             targetDate.setDate(now.getDate() + diff);
             const location = subArray.location ? `\n${subArray.location}` : '';
 
             return {
-                id: subArray.id,
+                id: subArray.id.toString(),
                 title: `[#${subArray.course}] ${subArray.name}\r (${subArray.type})\r${location}\r\n${subArray.comment}`,
                 start: new Date(
                     targetDate.getFullYear(),
@@ -145,15 +229,20 @@ const convertDataToCalendar = (data) => {
         });
 };
 
-const getSemesters = () => {
+/**
+ * Visszaadja a 6db legkésőbbi Semester-t
+ *
+ * @returns {Semester[]}
+ */
+const getSemesters = (): Semester[] => {
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth();
-    const semesters = [];
+    const semesters: Semester[] = [];
     let prevSemester;
 
     if (currentMonth < 6) {
         // tavaszi félév
-        semesters.push(`${currentYear - 1}-${currentYear}-2`);
+        semesters.push(`${currentYear - 1}-${currentYear}-2` as Semester);
         prevSemester = 1;
     } else {
         // őszi félév
@@ -181,7 +270,13 @@ const getSemesters = () => {
     return semesters;
 };
 
-const generateUniqueId = (data) => {
+/**
+ * Bármilyen objektumhoz azonosítót generál
+ *
+ * @param {*} data
+ * @returns {number}
+ */
+const generateUniqueId = (data: any): number => {
     const valuesOnly = Object.values(data).sort(); // Így generateUniqueId({ a: 'a', b: 'b' }) === generateUniqueId({ b: 'b', a: 'a' })
     return CRC32.str(JSON.stringify(valuesOnly));
 };

@@ -1,20 +1,38 @@
 import LZString from 'lz-string';
-import { generateUniqueId, getTeacherFromComment } from './Data.jsx';
+import { generateUniqueId, getTeacherFromComment, Lesson, TimeRange } from './Data.js';
 
 // URL-be lesson-ök encodolása
 
 // Link megosztáskor az egész órarend tartalma belekerül az URL lessons paraméterébe valamennyire tömörítve
-export function decodeLessonsFromSearchParam(param) {
-    function isInteger(str) {
+/**
+ * A Link lessons paraméterébe kódolt Lesson-öket kidekódolja. Fordítottja az `encodeLessonsToSearchParam()`
+ *
+ * @export
+ * @param {string} param
+ * @returns {Lesson[]}
+ */
+export function decodeLessonsFromSearchParam(param: string): Lesson[] {
+    function isInteger(str: string): boolean {
         return /^(0|[1-9]\d*)$/.test(str);
     }
 
     const parts = LZString.decompressFromEncodedURIComponent(param).split('🔩');
 
-    let returned = [];
+    let returned: Lesson[] = [];
 
     for (let i = 0; i < parts.length; i += 8) {
-        let lesson = {};
+        let lesson: Lesson = {
+            code: null!,
+            comment: null!,
+            course: null!,
+            name: null!,
+            teacher: null!,
+            day: null!,
+            type: null!,
+            time: null!,
+            location: null!,
+            id: null!,
+        }; // !TODO Jobb típusossággal megoldani
 
         lesson.code = isInteger(parts[i]) ? returned[Number(parts[i])].code : parts[i];
         lesson.comment = isInteger(parts[i + 1]) ? returned[Number(parts[i + 1])].comment : parts[i + 1];
@@ -36,7 +54,7 @@ export function decodeLessonsFromSearchParam(param) {
                 lesson.day = 'Péntek';
                 break;
             case '': // Néha nincsen nap
-                lesson.day = '';
+                lesson.day = 'Vasárnap';
                 break;
             default:
                 console.error(`Invalid nap ${parts[i + 3]}`);
@@ -52,11 +70,9 @@ export function decodeLessonsFromSearchParam(param) {
                 ? ''
                 : `${parts[i + 6].slice(0, 2)}:${parts[i + 6].slice(2, 4)}-${parts[i + 6].slice(4, 6)}:${parts[
                       i + 6
-
                   ].slice(6, 8)}`;
 
-
-        lesson.time = time.startsWith('0') ? time.slice(1) : time;
+        lesson.time = (time.startsWith('0') ? time.slice(1) : time) as TimeRange;
 
         switch (parts[i + 7]) {
             case 'e':
@@ -103,9 +119,16 @@ export function decodeLessonsFromSearchParam(param) {
     return returned;
 }
 
-export function encodeLessonsToSearchParam(lessons) {
+/**
+ * Link megosztásához query-string-be kódolja az adott lesson-öket valamennyire tömörítve
+ *
+ * @export
+ * @param {Lesson[]} lessons
+ * @returns {string}
+ */
+export function encodeLessonsToSearchParam(lessons: Lesson[]): string {
     // A 🔩-t egy seperátorként használom, mert valószínűtlen, hogy bármilyen kurzusnak vagy tanárnak a nevében szerepelne
-    let parts = [];
+    let parts: string[] = [];
 
     let pastCodes = new Map();
     let pastNames = new Map();

@@ -15,12 +15,25 @@ import Button from '@mui/material/Button';
 import Popover from '@mui/material/Popover';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import PropTypes from 'prop-types';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import './styles/Calendar.css';
 import { convertDataToCalendar } from './utils/Data';
 
-const Calendar = ({
+import { EventClickArg, EventContentArg, EventInput } from '@fullcalendar/core';
+import type { CalendarEvent, Lesson } from './utils/Data';
+
+type CalendarProps = {
+    tableData: CalendarEvent[],
+    onCalendarClick: (id:number, own:boolean) => void,
+    onEventEdit?: (id:number) => void,
+    onImageDownload?: (ref:React.MutableRefObject<HTMLElement>) => Promise<void>,
+    onURLExport?: () => Promise<void>,
+    savedLessons: Lesson[],
+    own: boolean,
+    viewOnly?: boolean,
+}
+
+const Calendar: React.FC<CalendarProps> = ({
     tableData,
     onCalendarClick,
     onEventEdit,
@@ -29,20 +42,21 @@ const Calendar = ({
     savedLessons,
     own,
     viewOnly,
-}) => {
+}:CalendarProps) => {
     // popover
-    const [popoverInfo, setPopoverInfo] = useState({
+    const [popoverInfo, setPopoverInfo] = useState<{anchorEl:EventTarget | null, event:EventContentArg | null}>({
         anchorEl: null,
         event: null,
     });
 
-    const [showOwnSubjects, setShowOwnSubjects] = useState(false);
-    const filteredTable = useMemo(
+    const [showOwnSubjects, setShowOwnSubjects] = useState<boolean>(false);
+    const filteredTable = useMemo<CalendarEvent[]>(
         () => (showOwnSubjects ? [...tableData, ...convertDataToCalendar(savedLessons)] : tableData),
         [tableData, showOwnSubjects, savedLessons],
     );
 
-    const handlePopoverOpen = (event, eventInfo) => {
+    const handlePopoverOpen = (event:React.MouseEvent<HTMLElement, MouseEvent>, eventInfo:EventContentArg) => {
+        // console.log({event, eventInfo});
         setPopoverInfo({ anchorEl: event.currentTarget, event: eventInfo });
     };
 
@@ -51,8 +65,8 @@ const Calendar = ({
     };
 
     // képként való mentés
-    const [isCalendarSaving, setCalendarSaving] = useState(false);
-    const printRef = useRef();
+    const [isCalendarSaving, setCalendarSaving] = useState<boolean>(false);
+    const printRef = useRef<HTMLDivElement>(null!);
 
     const handlePrintClick = () => {
         setCalendarSaving(true);
@@ -60,8 +74,10 @@ const Calendar = ({
 
     useEffect(() => {
         const handleImageDownload = async () => {
-            await onImageDownload(printRef);
-            setCalendarSaving(false);
+            if (onImageDownload){
+                await onImageDownload(printRef);
+                setCalendarSaving(false);
+            }
         };
 
         if (isCalendarSaving) {
@@ -71,21 +87,24 @@ const Calendar = ({
 
     // URL export
     const handleURLCopy = async () => {
-        await onURLExport();
+        if (onURLExport){
+            await onURLExport();
+        }
+        
     };
 
     // Más órarendjének mentése sajátként
     const handleTimetableSave = () => {
-        const url = new URL(window.location);
+        const url = new URL(window.location.toString());
         url.searchParams.delete('lessons');
 
-        window.location = url;
+        window.location.href = url.toString();
         window.localStorage.setItem('SAVE_TIMETABLE', JSON.stringify(savedLessons));
     };
     // egyéb
     const isPopoverOpen = Boolean(popoverInfo.anchorEl);
 
-    const onEventClick = (eventInfo) => {
+    const onEventClick = (eventInfo:EventClickArg) => {
         if (viewOnly) {
             return;
         }
@@ -93,13 +112,15 @@ const Calendar = ({
         handlePopoverClose();
 
         if (own) {
-            return onEventEdit(parseInt(eventInfo.event.id));
+            if (onEventEdit){
+                return onEventEdit(parseInt(eventInfo.event.id));
+            }
         } else {
             return onCalendarClick(parseInt(eventInfo.event.id), own);
         }
     };
 
-    const isEventInSaved = (eventId) => {
+    const isEventInSaved = (eventId:string) => {
         return savedLessons.some((lesson) => lesson.id === parseInt(eventId));
     };
 
@@ -107,7 +128,7 @@ const Calendar = ({
         <>
             {own && (
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} marginBottom={2}>
-                    <Button variant="outlined" startIcon={<DownloadIcon />} onClick={handlePrintClick}>
+                    <Button variant="outlined" startIcon={<DownloadIcon/>} onClick={handlePrintClick}>
                         Mentés képként
                     </Button>
 
@@ -122,7 +143,7 @@ const Calendar = ({
                             variant="outlined"
                             color="success"
                             startIcon={<AddIcon />}
-                            onClick={() => onEventEdit(-1)}
+                            onClick={() => onEventEdit ? onEventEdit(-1) : undefined}
                             sx={{ visibility: 'visible' }}
                         >
                             Saját kurzus hozzáadása
@@ -161,7 +182,7 @@ const Calendar = ({
                     initialView="timeGridWeek"
                     weekends={false}
                     stickyHeaderDates={!isCalendarSaving}
-                    events={filteredTable}
+                    events={filteredTable as EventInput[]}
                     headerToolbar={false}
                     allDaySlot={false}
                     slotMinTime="08:00:00"
@@ -206,7 +227,7 @@ const Calendar = ({
                     id="mouse-over-popover"
                     sx={{ pointerEvents: 'none' }}
                     open={isPopoverOpen}
-                    anchorEl={popoverInfo.anchorEl}
+                    anchorEl={popoverInfo.anchorEl as Element}
                     anchorOrigin={{
                         vertical: 'top',
                         horizontal: 'center',
@@ -257,13 +278,13 @@ const Calendar = ({
     );
 };
 
-Calendar.propTypes = {
-    tableData: PropTypes.array.isRequired,
-    onCalendarClick: PropTypes.func.isRequired,
-    savedLessons: PropTypes.array,
-    onEventEdit: PropTypes.func,
-    onImageDownload: PropTypes.func,
-    own: PropTypes.bool.isRequired,
-};
+// Calendar.propTypes = {
+//     tableData: PropTypes.array.isRequired,
+//     onCalendarClick: PropTypes.func.isRequired,
+//     savedLessons: PropTypes.array,
+//     onEventEdit: PropTypes.func,
+//     onImageDownload: PropTypes.func,
+//     own: PropTypes.bool.isRequired,
+// };
 
 export default Calendar;
