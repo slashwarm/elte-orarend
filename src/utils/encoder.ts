@@ -1,5 +1,5 @@
 import LZString from 'lz-string';
-import { generateUniqueId, getTeacherFromComment, Lesson, TimeRange } from './Data.js';
+import { generateUniqueId, getTeacherFromComment, Lesson, TimeRange } from './data';
 
 // URL-be lesson-ök encodolása
 

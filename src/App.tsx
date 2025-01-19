@@ -1,39 +1,25 @@
-import GitHubIcon from '@mui/icons-material/GitHub';
-import { PaletteMode, SnackbarCloseReason } from '@mui/material';
-import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
+import { PaletteMode } from '@mui/material';
+import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
-import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 import { ThemeProvider } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import html2canvas from 'html2canvas';
-import { useMemo, useState } from 'react';
-import OwnCalendar from './Calendars/OwnCalendar';
-import ResultsCalendar from './Calendars/ResultsCalendar';
-import ViewOnlyCalendar from './Calendars/ViewOnlyCalendar';
+import React, { useMemo, useState } from 'react';
+import OwnCalendar from './calendars/OwnCalendar';
+import ResultsCalendar from './calendars/ResultsCalendar';
+import ViewOnlyCalendar from './calendars/ViewOnlyCalendar';
 import EditEvent from './EditEvent';
 import Results from './Results';
 import Search from './Search';
-import Alert from './utils/Alert';
-import { convertDataToTable, Course, Data, generateUniqueId, Lesson } from './utils/Data';
+import { convertDataToTable, Course, Data, fetchTimetable, SearchData, generateUniqueId, Lesson } from './utils/data';
 import { decodeLessonsFromSearchParam, encodeLessonsToSearchParam } from './utils/encoder';
 import useDynamicTheme from './utils/theme';
-
-function Copyright() {
-    return (
-        <Box display="flex" flexDirection="column" alignItems="center" gap="8px">
-            <Typography variant="body2" color="text.secondary" align="center">
-                Készült ❤️-el és sok ☕-al az ELTE-n.
-            </Typography>
-
-            <IconButton aria-label="github" href="https://github.com/slashwarm/elte-orarend">
-                <GitHubIcon />
-            </IconButton>
-        </Box>
-    );
-}
+import Footer from './components/Footer';
+import useDownloadImage from './utils/image';
+import { useQuery } from '@tanstack/react-query';
+import { toast, ToastContainer } from 'react-toastify';
 
 const readStoredTimetable = (storageTimetable: string) => {
     let save = false;
@@ -83,16 +69,15 @@ const App: React.FC = () => {
         () => (lessonsUrlParam ? decodeLessonsFromSearchParam(lessonsUrlParam) : null),
         [lessonsUrlParam],
     );
+    const handleDownloadImage = useDownloadImage();
     const timetable = urlTimetable ?? storageTimetable ?? [];
 
     // view only, akkor ha az órarend tartalmát nem lehet megváltoztatni, mert megosztott órarendet nézünk
     const viewOnly = urlTimetable !== null;
 
-    const [firstSearchDone, setFirstSearchDone] = useState(false); // első keresés
-    const [loading, setLoading] = useState(false); // töltés
-    const [searchResults, setSearchResults] = useState<Lesson[]>([]); // keresés találatok
+    const [searchQuery, setSearchQuery] = useState<SearchData>(); // keresési paraméterek
+    const [selectedCourses, setSelectedCourses] = useState<Course[]>(); // kiválasztott kurzusok
     const [savedLessons, setSavedLessons] = useState(timetable); // saját órarend
-    const [alertText, setAlertText] = useState(''); // alert szöveg
     const [editEvent, setEditEvent] = useState<number | null>(null!); // szerkesztendő esemény
     const [colorScheme, setColorScheme] = useState<PaletteMode>(
         savedTheme ?? (themePreference.matches ? 'dark' : 'light'),
@@ -100,16 +85,24 @@ const App: React.FC = () => {
     themePreference.addEventListener('change', (event) => setColorScheme(event.matches ? 'dark' : 'light'));
     const theme = useDynamicTheme(colorScheme);
 
-    // ha van courses akkor minden sor data-hoz csekkeli h az ahhoz tartozó code benne van-e
-    const handleDataFetch = (data: Data, courses?: Course[]) => {
-        const convertedData = convertDataToTable(data, courses);
+    const { isLoading, dataUpdatedAt, data } = useQuery<Data>({
+        queryKey: ['results', searchQuery],
+        staleTime: 1000 * 60 * 45, // 45 perc
+        gcTime: 1000 * 60 * 10, // 10 perc
+        queryFn: () => fetchTimetable(searchQuery),
+        enabled: Boolean(searchQuery),
+    });
 
-        setSearchResults(convertedData);
-        setLoading(false);
-
-        if (!firstSearchDone) {
-            setFirstSearchDone(true);
+    const searchResults = useMemo<Lesson[]>(() => {
+        if (!data) {
+            return [];
         }
+        return convertDataToTable(data, selectedCourses) ?? [];
+    }, [data, selectedCourses]);
+
+    const handleSearch = (data: SearchData, courses?: Course[]) => {
+        setSearchQuery(data);
+        setSelectedCourses(courses);
     };
 
     const handleLessonSave = (data: Lesson) => {
@@ -118,10 +111,10 @@ const App: React.FC = () => {
 
         if (existingLesson) {
             newLessons = savedLessons.filter((lesson) => lesson.id !== data.id);
-            setAlertText('Kurzus eltávolítva az órarendből');
+            toast.success('Kurzus eltávolítva az órarendből ✨');
         } else {
             newLessons = [...savedLessons, data];
-            setAlertText('Kurzus hozzáadva a saját órarendhez');
+            toast.success('Kurzus hozzáadva a saját órarendhez ✨');
         }
 
         window.localStorage.setItem('SAVE_TIMETABLE', JSON.stringify(newLessons));
@@ -161,27 +154,6 @@ const App: React.FC = () => {
         }
     };
 
-    const handleLoadingStart = () => {
-        setLoading(true);
-    };
-
-    const handleDownloadImage = async (ref: React.MutableRefObject<HTMLElement>) => {
-        const backgroundColor = theme.palette.background.default;
-        const element = ref.current;
-        const canvas = await html2canvas(element, {
-            backgroundColor: backgroundColor,
-        });
-
-        const data = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-
-        link.href = data;
-        link.download = 'orarend.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
     const handleUrlExport = async () => {
         const url = new URL(window.location.toString());
 
@@ -190,15 +162,7 @@ const App: React.FC = () => {
 
         await navigator.clipboard.writeText(url.toString());
 
-        setAlertText('URL sikeresen kimásolva!');
-    };
-
-    const handleClose = (_event: unknown, reason: SnackbarCloseReason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setAlertText('');
+        toast.success('URL sikeresen kimásolva ✨');
     };
 
     const handleThemeChange = () => {
@@ -225,29 +189,28 @@ const App: React.FC = () => {
                                         }}
                                     >
                                         <Search
-                                            onDataFetch={handleDataFetch}
-                                            onLoadingStart={handleLoadingStart}
+                                            onSubmit={handleSearch}
                                             onThemeChange={handleThemeChange}
-                                            isLoading={loading}
+                                            isLoading={isLoading}
                                         />
                                     </Paper>
                                 </Grid>
                             )}
-                            {firstSearchDone && !viewOnly && (
+                            {dataUpdatedAt !== 0 && !viewOnly && (
                                 <Grid item xs={12}>
                                     <Paper sx={{ p: 2 }}>
                                         <Results
                                             tableData={searchResults}
                                             onLessonSave={handleLessonSave}
                                             savedLessons={savedLessons}
-                                            isLoading={loading}
+                                            isLoading={isLoading}
                                             own={false}
                                         />
                                     </Paper>
                                 </Grid>
                             )}
 
-                            {firstSearchDone && !viewOnly && (
+                            {dataUpdatedAt !== 0 && !viewOnly && (
                                 <Grid item xs={12}>
                                     <Paper sx={{ p: 2 }}>
                                         <ResultsCalendar
@@ -273,7 +236,7 @@ const App: React.FC = () => {
                                             tableData={savedLessons}
                                             onLessonSave={handleLessonSave}
                                             savedLessons={savedLessons}
-                                            isLoading={loading}
+                                            isLoading={isLoading}
                                             onEventEdit={setEditEvent}
                                             onEventChange={handleEventChange}
                                             own={true}
@@ -314,12 +277,11 @@ const App: React.FC = () => {
                     )}
 
                     <Box component="footer" sx={{ p: 2 }}>
-                        <Copyright />
+                        <Footer />
                     </Box>
                 </Box>
             </Box>
-
-            {!!alertText && <Alert alertText={alertText} handleClose={handleClose} />}
+            <ToastContainer theme={colorScheme} />
         </ThemeProvider>
     );
 };

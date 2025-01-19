@@ -1,5 +1,6 @@
 import axios, { isAxiosError } from 'axios';
 import CRC32 from 'crc-32';
+import { toast } from 'react-toastify';
 
 export type DayOfWeek = 'hétfő' | 'kedd' | 'szerda' | 'csütörtök' | 'péntek' | 'szombat' | 'vasárnap';
 
@@ -25,7 +26,7 @@ export type Lesson = {
     hidden?: boolean;
 };
 
-export type FormData = {
+export type SearchData = {
     name: string | string[];
     year: Semester;
     mode: 'subject' | 'teacher' | 'course';
@@ -63,13 +64,13 @@ const daysOfWeek: DayOfWeek[] = ['hétfő', 'kedd', 'szerda', 'csütörtök', 'p
  * Lekérdezi a szerverről a kért adatokat
  *
  * @async
- * @param {FormData} formData
+ * @param {SearchData} formData
  * year: A lekérdezett szemeszter;
  * mode: 'subject' ha tárgy, 'teacher' ha tanár és 'course ha kurzus';
  * name: A keresendő kulcszó
  * @returns {Promise<Data>}
  */
-const fetchTimetable = async (formData: FormData): Promise<Data> => {
+const fetchTimetable = async (formData?: SearchData): Promise<Data> => {
     try {
         const response = await axios.post(
             import.meta.env.DEV ? 'http://localhost:8000/data.php' : '/orarend/server/data.php',
@@ -79,17 +80,16 @@ const fetchTimetable = async (formData: FormData): Promise<Data> => {
     } catch (error: unknown) {
         if (isAxiosError(error)) {
             if (error.response) {
-                console.error(error.response);
-                console.error('Server response error');
+                console.error('Server response error', error.response);
             } else if (error.request) {
-                console.error('Network error');
+                console.error('Network error', error.request);
             } else {
-                console.error(error);
+                console.error('Axios error:', error);
             }
         } else {
-            console.error(error);
+            console.error('Error fetching', error);
         }
-
+        toast.error('Hiba történt az adatok lekérdezése közben. Részletek a konzolban.');
         return [];
     }
 };

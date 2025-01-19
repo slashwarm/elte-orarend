@@ -5,7 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import LinkIcon from '@mui/icons-material/Link';
 import { Badge, Button } from '@mui/material';
-import type { Lesson } from '../utils/Data';
+import type { Lesson } from '../utils/data';
 import LessonCalendar from './LessonCalendar';
 
 type OwnCalendarProps = {

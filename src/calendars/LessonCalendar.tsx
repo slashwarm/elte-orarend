@@ -3,19 +3,20 @@ import momentTimezonePlugin from '@fullcalendar/moment-timezone';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import DownloadIcon from '@mui/icons-material/Download';
-import Popover from '@mui/material/Popover';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import '../styles/Calendar.css';
 
-import { EventClickArg, EventContentArg, EventInput } from '@fullcalendar/core';
-import { Button } from '@mui/material';
-import { convertDataToCalendar, type Lesson } from '../utils/Data';
+import { EventClickArg, EventContentArg, EventHoveringArg, EventInput } from '@fullcalendar/core';
+import { Button, Fade, Popper } from '@mui/material';
+import { convertDataToCalendar, type Lesson } from '../utils/data';
+import Paper from '@mui/material/Paper';
+import { EventImpl } from '@fullcalendar/core/internal';
+import dayjs from 'dayjs';
 
-type PopoverInfo = {
+type ActivePopper = {
     anchorEl: EventTarget | null;
-    event: EventContentArg | null;
+    event: EventImpl | null;
 };
 
 type LessonCalendarProps = {
@@ -49,21 +50,22 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
     const events = useMemo(() => convertDataToCalendar(lessons), [lessons]);
 
     // popover
-    const [popoverInfo, setPopoverInfo] = useState<PopoverInfo>({
+    const [activePopper, setActivePopper] = useState<ActivePopper>({
         anchorEl: null,
         event: null,
     });
 
-    const handlePopoverOpen = (event: React.MouseEvent<HTMLElement, MouseEvent>, eventInfo: EventContentArg) => {
-        // console.log({event, eventInfo});
-        setPopoverInfo({ anchorEl: event.currentTarget, event: eventInfo });
+    const handlePopoverOpen = ({ event, el }: EventHoveringArg) => {
+        setActivePopper({ anchorEl: el, event: event });
     };
 
     const handlePopoverClose = () => {
-        setPopoverInfo({ anchorEl: null, event: null });
+        setActivePopper({ anchorEl: null, event: null });
     };
 
-    const isPopoverOpen = Boolean(popoverInfo.anchorEl);
+    const isPopperOpen = Boolean(activePopper.anchorEl);
+    const { id, start, end } = activePopper?.event ?? {};
+    const eventId = typeof id === 'string' ? parseInt(id) : null;
 
     // képként való mentés
     const [isCalendarSaving, setCalendarSaving] = useState<boolean>(false);
@@ -118,59 +120,47 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
                     height="auto"
                     slotDuration="00:20:00"
                     eventClick={onEventClick}
+                    eventMouseEnter={handlePopoverOpen}
+                    eventMouseLeave={handlePopoverClose}
                     eventContent={(eventInfo) => {
-                        return (
-                            <div
-                                className="fc-event-main-frame"
-                                onMouseEnter={(e) => handlePopoverOpen(e, eventInfo)}
-                                onMouseLeave={handlePopoverClose}
-                            >
-                                {eventContent(eventInfo)}
-                            </div>
-                        );
+                        return <div className="fc-event-main-frame">{eventContent(eventInfo)}</div>;
                     }}
                 />
             </div>
 
-            {showPopover && !isCalendarSaving && popoverInfo.event && (
-                <Popover
-                    id="mouse-over-popover"
-                    sx={{ pointerEvents: 'none' }}
-                    open={isPopoverOpen}
-                    anchorEl={popoverInfo.anchorEl as Element}
-                    anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'center',
-                    }}
-                    transformOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'center',
-                    }}
-                    onClose={handlePopoverClose}
-                    disableRestoreFocus
+            {showPopover && !isCalendarSaving && activePopper.event && (
+                <Popper
+                    id={'mouse-over-popover'}
+                    sx={{ zIndex: 1200, pointerEvents: 'none' }}
+                    open={isPopperOpen}
+                    anchorEl={activePopper.anchorEl as Element}
+                    placement={'top'}
+                    transition
                 >
-                    <Typography sx={{ p: 1 }}>
-                        <div>{popoverInfo.event.timeText}</div>
-                        {popoverInfo.event.event.title.split('\r').map((item, ind) => {
-                            return <div key={ind}>{item}</div>;
-                        })}
-                        {(popoverActionIcon || popoverActionText) && (
-                            <Stack
-                                direction="row"
-                                spacing={0.5}
-                                sx={{ fontSize: 'small', color: 'gray' }}
-                                marginTop={0.5}
-                            >
+                    {({ TransitionProps }) => (
+                        <Fade {...TransitionProps} timeout={350}>
+                            <Paper sx={{ p: 1 }}>
                                 <div>
-                                    {popoverActionIcon && popoverActionIcon(parseInt(popoverInfo.event.event.id))}
+                                    {dayjs(start).format('HH:mm')} - {dayjs(end).format('HH:mm')}
                                 </div>
-                                <div>
-                                    {popoverActionText && popoverActionText(parseInt(popoverInfo.event.event.id))}
-                                </div>
-                            </Stack>
-                        )}
-                    </Typography>
-                </Popover>
+                                {activePopper?.event?.title.split('\r').map((item, ind) => {
+                                    return <div key={ind}>{item}</div>;
+                                })}
+                                {(popoverActionIcon || popoverActionText) && (
+                                    <Stack
+                                        direction="row"
+                                        spacing={0.5}
+                                        sx={{ fontSize: 'small', color: 'gray' }}
+                                        marginTop={0.5}
+                                    >
+                                        <div>{eventId && popoverActionIcon && popoverActionIcon(eventId)}</div>
+                                        <div>{eventId && popoverActionText && popoverActionText(eventId)}</div>
+                                    </Stack>
+                                )}
+                            </Paper>
+                        </Fade>
+                    )}
+                </Popper>
             )}
         </>
     );

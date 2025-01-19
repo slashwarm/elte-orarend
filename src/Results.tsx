@@ -10,8 +10,8 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Link from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
 import { DataGrid, GridColDef, huHU } from '@mui/x-data-grid';
-import { Lesson } from './utils/Data';
-import CustomNoRowsOverlay from './utils/EmptyListOverlay';
+import { Lesson } from './utils/data';
+import CustomNoRowsOverlay from './components/EmptyListOverlay';
 
 type ResultsProps = {
     tableData: Lesson[];

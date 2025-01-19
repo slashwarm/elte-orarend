@@ -3,7 +3,7 @@ import '../styles/Calendar.css';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import LinkIcon from '@mui/icons-material/Link';
 import { Badge, Button } from '@mui/material';
-import type { Lesson } from '../utils/Data';
+import type { Lesson } from '../utils/data';
 import LessonCalendar from './LessonCalendar';
 
 type ViewOnlyCalendarProps = {

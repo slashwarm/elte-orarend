@@ -18,7 +18,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/hu';
 import { useEffect, useState } from 'react';
 import './styles/Calendar.css';
-import { generateUniqueId, Lesson, TimeRange } from './utils/Data';
+import { generateUniqueId, Lesson, TimeRange } from './utils/data';
 
 type EditEventProps = {
     savedLessons: Lesson[];

@@ -22,7 +22,8 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 import { Fragment, useState } from 'react';
 import { read, utils } from 'xlsx';
-import { Course, Data, fetchTimetable, getSemesters, Semester } from './utils/Data';
+import { Course, getSemesters, SearchData, Semester } from './utils/data';
+import { toast } from 'react-toastify';
 
 const labelOptions = {
     subject: 'Tárgy neve / kódja',
@@ -35,15 +36,14 @@ const labelIcons = {
 };
 
 type SearchProps = {
-    onLoadingStart: () => void;
-    onDataFetch: (data: Data, course?: Course[]) => void;
+    onSubmit: (data: SearchData, course?: Course[]) => void;
     onThemeChange: () => void;
     isLoading: boolean;
 };
 
 type SearchMode = 'subject' | 'teacher';
 
-const Search: React.FC<SearchProps> = ({ onLoadingStart, onDataFetch, onThemeChange, isLoading }: SearchProps) => {
+const Search: React.FC<SearchProps> = ({ onSubmit, onThemeChange, isLoading }: SearchProps) => {
     const theme = useTheme();
     const semesters = getSemesters();
 
@@ -88,10 +88,7 @@ const Search: React.FC<SearchProps> = ({ onLoadingStart, onDataFetch, onThemeCha
             setError(false);
         }
 
-        onLoadingStart();
-
-        const timetable = await fetchTimetable(formData);
-        onDataFetch(timetable);
+        onSubmit(formData);
     };
 
     const handleClickOpen = () => {
@@ -103,51 +100,37 @@ const Search: React.FC<SearchProps> = ({ onLoadingStart, onDataFetch, onThemeCha
         setOpen(false);
     };
 
-    const handleUpload = () => {
-        onLoadingStart();
-        const reader = new FileReader();
-
-        reader.onload = function (e) {
-            const data = new Uint8Array((e.target as FileReader).result as ArrayBuffer);
-            const workbook = read(data, { type: 'array' });
+    const handleUpload = async () => {
+        if (file) {
+            const data = await file.arrayBuffer();
+            const workbook = read(data);
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const importedData: string[][] = utils.sheet_to_json(sheet, { header: 1 });
+            const importedData: string[][] = utils.sheet_to_json(sheet, {
+                header: 1,
+                blankrows: false,
+                skipHidden: true,
+                range: 'A2:H100',
+            });
 
-            if (!importedData) {
-                onDataFetch([]);
+            if (!importedData.length) {
+                toast.error('Nem található adat az importált fájlban 😞');
                 handleClose();
                 return;
             }
 
-            void searchImportedData(importedData);
-        };
+            const courses: Course[] = importedData.map((subArray) => {
+                return { courseCode: subArray[0], courseId: subArray[2] };
+            });
 
-        reader.readAsArrayBuffer(file as Blob);
-    };
+            const formData = {
+                name: courses.map((x) => x.courseCode),
+                year: year,
+                mode: 'course' as const,
+            };
 
-    const searchImportedData = async (data: string[][]) => {
-        if (data.length <= 1) {
-            // ha nincs kurzus
-            onDataFetch([]);
+            onSubmit(formData, courses);
             handleClose();
-            return;
         }
-
-        const courses: Course[] = data.map((subArray) => {
-            return { courseCode: subArray[0], courseId: subArray[2] };
-        });
-
-        courses.shift(); // fejléc off
-
-        const formData = {
-            name: courses.map((x) => x.courseCode),
-            year: year,
-            mode: 'course' as const,
-        };
-
-        const timetable = await fetchTimetable(formData);
-        onDataFetch(timetable, courses);
-        handleClose();
     };
 
     return (

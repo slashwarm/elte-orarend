@@ -5,7 +5,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import { Button } from '@mui/material';
-import { type Lesson } from '../utils/Data';
+import { type Lesson } from '../utils/data';
 import LessonCalendar from './LessonCalendar';
 
 type ResultsCalendarProps = {
