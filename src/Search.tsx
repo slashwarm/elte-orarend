@@ -105,13 +105,13 @@ const Search: React.FC<SearchProps> = ({ onSubmit, onThemeChange, isLoading }: S
             const data = await file.arrayBuffer();
             const workbook = read(data);
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
             const importedData: string[][] = utils.sheet_to_json(sheet, {
                 header: 1,
                 blankrows: false,
                 skipHidden: true,
                 range: 'A2:H100',
             });
-
             if (!importedData.length) {
                 toast.error('Nem található adat az importált fájlban 😞');
                 handleClose();
@@ -129,6 +129,7 @@ const Search: React.FC<SearchProps> = ({ onSubmit, onThemeChange, isLoading }: S
             };
 
             onSubmit(formData, courses);
+            toast.success('A fájlban található kurzusok betöltve! 🎉 Az órarendi adatokat a lenti táblázatban találod.');
             handleClose();
         }
     };

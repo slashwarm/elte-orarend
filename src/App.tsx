@@ -148,6 +148,7 @@ const App: React.FC = () => {
 
                 window.localStorage.setItem('SAVE_TIMETABLE', JSON.stringify(updatedLessons));
                 setSavedLessons(updatedLessons);
+                toast.success('Kurzus módosítva ✨');
             } else {
                 handleLessonSave(data);
             }
@@ -162,7 +163,7 @@ const App: React.FC = () => {
 
         await navigator.clipboard.writeText(url.toString());
 
-        toast.success('URL sikeresen kimásolva ✨');
+        toast.success('URL kimásolva a vágólapra ✨');
     };
 
     const handleThemeChange = () => {
