@@ -162,9 +162,12 @@ export function encodeLessonsToSearchParam(lessons: Lesson[]): string {
 
         const savedId = lesson.edited ? lesson.id : '';
 
-        const time = lesson.time.padStart(11, '0');
+        const [start_time, end_time] = lesson.time.split('-');
 
-        parts.push(`${time.slice(0, 2)}${time.slice(3, 5)}${time.slice(6, 8)}${time.slice(9)}${savedId}`);
+        const [start_hour, start_minute] = start_time.split(':').map((str) => str.padStart(2, '0'));
+        const [end_hour, end_minute] = end_time.split(':').map((str) => str.padStart(2, '0'));
+
+        parts.push(`${start_hour}${start_minute}${end_hour}${end_minute}${savedId}`);
 
         switch (lesson.type) {
             case 'előadás':
