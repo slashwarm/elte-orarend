@@ -24,6 +24,7 @@ import { Fragment, useState } from 'react';
 import { read, utils } from 'xlsx';
 import { Course, getSemesters, SearchData, Semester } from './utils/data';
 import { toast } from 'react-toastify';
+import { useThemeContext } from './utils/providers';
 
 const labelOptions = {
     subject: 'Tárgy neve / kódja',
@@ -37,13 +38,13 @@ const labelIcons = {
 
 type SearchProps = {
     onSubmit: (data: SearchData, course?: Course[]) => void;
-    onThemeChange: () => void;
     isLoading: boolean;
 };
 
 type SearchMode = 'subject' | 'teacher';
 
-const Search: React.FC<SearchProps> = ({ onSubmit, onThemeChange, isLoading }: SearchProps) => {
+const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => {
+    const { colorScheme, setColorScheme } = useThemeContext();
     const theme = useTheme();
     const semesters = getSemesters();
 
@@ -129,9 +130,16 @@ const Search: React.FC<SearchProps> = ({ onSubmit, onThemeChange, isLoading }: S
             };
 
             onSubmit(formData, courses);
-            toast.success('A fájlban található kurzusok betöltve! 🎉 Az órarendi adatokat a lenti táblázatban találod.');
+            toast.success(
+                'A fájlban található kurzusok betöltve! 🎉 Az órarendi adatokat a lenti táblázatban találod.',
+            );
             handleClose();
         }
+    };
+
+    const toggleTheme = () => {
+        const newTheme = colorScheme === 'light' ? 'dark' : 'light';
+        setColorScheme(newTheme);
     };
 
     return (
@@ -161,8 +169,8 @@ const Search: React.FC<SearchProps> = ({ onSubmit, onThemeChange, isLoading }: S
                             </Typography>
                         </Stack>
 
-                        <Fab onClick={onThemeChange} aria-label="change-theme" title="Change theme" size="small">
-                            {theme.palette.mode === 'light' ? <DarkMode /> : <LightMode />}
+                        <Fab onClick={toggleTheme} aria-label="change-theme" title="Change theme" size="small">
+                            {colorScheme === 'light' ? <DarkMode /> : <LightMode />}
                         </Fab>
                     </Stack>
 

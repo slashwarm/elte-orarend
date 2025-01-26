@@ -1,12 +1,11 @@
 import { useCallback } from 'react';
-import { useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material';
 import html2canvas from 'html2canvas';
 
 export default function useDownloadImage() {
     const theme = useTheme();
-
     return useCallback(
-        async (ref: React.MutableRefObject<HTMLElement>) => {
+    async (ref: React.MutableRefObject<HTMLElement>) => {
             const backgroundColor = theme.palette.background.default;
             const element = ref.current;
 

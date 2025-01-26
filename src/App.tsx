@@ -1,10 +1,8 @@
 import CssBaseline from '@mui/material/CssBaseline';
-import { PaletteMode } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import { ThemeProvider } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import React, { useMemo, useState } from 'react';
 import OwnCalendar from './calendars/OwnCalendar';
@@ -15,11 +13,10 @@ import Results from './Results';
 import Search from './Search';
 import { convertDataToTable, Course, Data, fetchTimetable, SearchData, generateUniqueId, Lesson } from './utils/data';
 import { decodeLessonsFromSearchParam, encodeLessonsToSearchParam } from './utils/encoder';
-import useDynamicTheme from './utils/theme';
 import Footer from './components/Footer';
 import useDownloadImage from './utils/image';
 import { useQuery } from '@tanstack/react-query';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 const readStoredTimetable = (storageTimetable: string) => {
     let save = false;
@@ -57,8 +54,6 @@ const App: React.FC = () => {
     const url = new URL(window.location.toString());
     const lessonsUrlParam = url.searchParams.get('lessons');
     const savedTimetable = window.localStorage.getItem('SAVE_TIMETABLE');
-    const themePreference = window.matchMedia('(prefers-color-scheme: dark)');
-    const savedTheme: PaletteMode = localStorage.getItem('theme') as PaletteMode;
 
     // Ha vannak a URL-ben órák, akkor azokat töltse be, különben ha van elmentve órarend azt, különben üres.
     const storageTimetable = useMemo(
@@ -78,12 +73,7 @@ const App: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState<SearchData>(); // keresési paraméterek
     const [selectedCourses, setSelectedCourses] = useState<Course[]>(); // kiválasztott kurzusok
     const [savedLessons, setSavedLessons] = useState(timetable); // saját órarend
-    const [editEvent, setEditEvent] = useState<number | null>(null!); // szerkesztendő esemény
-    const [colorScheme, setColorScheme] = useState<PaletteMode>(
-        savedTheme ?? (themePreference.matches ? 'dark' : 'light'),
-    );
-    themePreference.addEventListener('change', (event) => setColorScheme(event.matches ? 'dark' : 'light'));
-    const theme = useDynamicTheme(colorScheme);
+    const [editEvent, setEditEvent] = useState<number | null>(null); // szerkesztendő esemény
 
     const { isLoading, dataUpdatedAt, data } = useQuery<Data>({
         queryKey: ['results', searchQuery],
@@ -166,124 +156,111 @@ const App: React.FC = () => {
         toast.success('URL kimásolva a vágólapra ✨');
     };
 
-    const handleThemeChange = () => {
-        const nextTheme = colorScheme === 'light' ? 'dark' : 'light';
-        window.localStorage.setItem('theme', nextTheme);
-        setColorScheme(nextTheme);
-    };
-
     return (
-        <ThemeProvider theme={theme}>
-            <Box display="flex" minHeight="100vh">
-                <CssBaseline />
-                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', maxWidth: '100%' }}>
-                    <Box component="main" sx={{ flex: 1 }} p={{ xs: 1, sm: 2, md: 4 }}>
-                        <Grid container direction="column" spacing={2} alignContent="center">
-                            {!viewOnly && (
-                                <Grid item xs={12} sm={6} md={4} lg={3}>
-                                    <Paper
-                                        sx={{
-                                            p: 2,
-                                            maxWidth: 700,
-                                            margin: 'auto',
-                                            overflow: 'hidden',
-                                        }}
-                                    >
-                                        <Search
-                                            onSubmit={handleSearch}
-                                            onThemeChange={handleThemeChange}
-                                            isLoading={isLoading}
-                                        />
-                                    </Paper>
-                                </Grid>
-                            )}
-                            {dataUpdatedAt !== 0 && !viewOnly && (
-                                <Grid item xs={12}>
-                                    <Paper sx={{ p: 2 }}>
-                                        <Results
-                                            tableData={searchResults}
-                                            onLessonSave={handleLessonSave}
-                                            savedLessons={savedLessons}
-                                            isLoading={isLoading}
-                                            own={false}
-                                        />
-                                    </Paper>
-                                </Grid>
-                            )}
-
-                            {dataUpdatedAt !== 0 && !viewOnly && (
-                                <Grid item xs={12}>
-                                    <Paper sx={{ p: 2 }}>
-                                        <ResultsCalendar
-                                            lessonsResults={searchResults}
-                                            ownLessons={savedLessons}
-                                            onEventClick={handleCalendarClick}
-                                        />
-                                    </Paper>
-                                </Grid>
-                            )}
-
-                            <Grid item xs={12}>
-                                <Typography variant="h5" component="h2">
-                                    {viewOnly ? 'A velem megosztott órarend' : 'Saját órarendem'}
-                                </Typography>
-
-                                <Divider />
+        <Box display="flex" minHeight="100vh">
+            <CssBaseline />
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', maxWidth: '100%' }}>
+                <Box component="main" sx={{ flex: 1 }} p={{ xs: 1, sm: 2, md: 4 }}>
+                    <Grid container direction="column" spacing={2} alignContent="center">
+                        {!viewOnly && (
+                            <Grid item xs={12} sm={6} md={4} lg={3}>
+                                <Paper
+                                    sx={{
+                                        p: 2,
+                                        maxWidth: 700,
+                                        margin: 'auto',
+                                        overflow: 'hidden',
+                                    }}
+                                >
+                                    <Search onSubmit={handleSearch} isLoading={isLoading} />
+                                </Paper>
                             </Grid>
-                            {!viewOnly && (
-                                <Grid item xs={12}>
-                                    <Paper sx={{ p: 2 }}>
-                                        <Results
-                                            tableData={savedLessons}
-                                            onLessonSave={handleLessonSave}
-                                            savedLessons={savedLessons}
-                                            isLoading={isLoading}
-                                            onEventEdit={setEditEvent}
-                                            onEventChange={handleEventChange}
-                                            own={true}
-                                        />
-                                    </Paper>
-                                </Grid>
-                            )}
-                            {savedLessons.length > 0 && (
-                                <Grid item xs={12}>
-                                    <Paper sx={{ p: 2 }}>
-                                        {!viewOnly ? (
-                                            <OwnCalendar
-                                                lessons={savedLessons}
-                                                onUrlExport={handleUrlExport}
-                                                onImageDownload={handleDownloadImage}
-                                                onEventEdit={setEditEvent}
-                                            />
-                                        ) : (
-                                            <ViewOnlyCalendar
-                                                lessons={savedLessons}
-                                                onUrlExport={handleUrlExport}
-                                                onImageDownload={handleDownloadImage}
-                                            />
-                                        )}
-                                    </Paper>
-                                </Grid>
-                            )}
+                        )}
+                        {dataUpdatedAt !== 0 && !viewOnly && (
+                            <Grid item xs={12}>
+                                <Paper sx={{ p: 2 }}>
+                                    <Results
+                                        tableData={searchResults}
+                                        onLessonSave={handleLessonSave}
+                                        savedLessons={savedLessons}
+                                        isLoading={isLoading}
+                                        own={false}
+                                    />
+                                </Paper>
+                            </Grid>
+                        )}
+
+                        {dataUpdatedAt !== 0 && !viewOnly && (
+                            <Grid item xs={12}>
+                                <Paper sx={{ p: 2 }}>
+                                    <ResultsCalendar
+                                        lessonsResults={searchResults}
+                                        ownLessons={savedLessons}
+                                        onEventClick={handleCalendarClick}
+                                    />
+                                </Paper>
+                            </Grid>
+                        )}
+
+                        <Grid item xs={12}>
+                            <Typography variant="h5" component="h2">
+                                {viewOnly ? 'A velem megosztott órarend' : 'Saját órarendem'}
+                            </Typography>
+
+                            <Divider />
                         </Grid>
-                    </Box>
+                        {!viewOnly && (
+                            <Grid item xs={12}>
+                                <Paper sx={{ p: 2 }}>
+                                    <Results
+                                        tableData={savedLessons}
+                                        onLessonSave={handleLessonSave}
+                                        savedLessons={savedLessons}
+                                        isLoading={isLoading}
+                                        onEventEdit={setEditEvent}
+                                        onEventChange={handleEventChange}
+                                        own={true}
+                                    />
+                                </Paper>
+                            </Grid>
+                        )}
+                        {savedLessons.length > 0 && (
+                            <Grid item xs={12}>
+                                <Paper sx={{ p: 2 }}>
+                                    {!viewOnly ? (
+                                        <OwnCalendar
+                                            lessons={savedLessons}
+                                            onUrlExport={handleUrlExport}
+                                            onImageDownload={handleDownloadImage}
+                                            onEventEdit={setEditEvent}
+                                        />
+                                    ) : (
+                                        <ViewOnlyCalendar
+                                            lessons={savedLessons}
+                                            onUrlExport={handleUrlExport}
+                                            onImageDownload={handleDownloadImage}
+                                        />
+                                    )}
+                                </Paper>
+                            </Grid>
+                        )}
+                    </Grid>
+                </Box>
 
-                    {!!editEvent && (
-                        <EditEvent
-                            eventId={editEvent}
-                            savedLessons={savedLessons}
-                            onEventChange={handleEventChange}
-                            onEventEdit={setEditEvent}
-                        />
-                    )}
+                {!!editEvent && (
+                    <EditEvent
+                        eventId={editEvent}
+                        savedLessons={savedLessons}
+                        onEventChange={handleEventChange}
+                        onEventEdit={setEditEvent}
+                    />
+                )}
 
-                    <Box component="footer" sx={{ p: 2 }}>
-                        <Footer />
-                    </Box>
+                <Box component="footer" sx={{ p: 2 }}>
+                    <Footer />
                 </Box>
             </Box>
-            <ToastContainer theme={colorScheme} />
-        </ThemeProvider>
+        </Box>
     );
 };
 
