@@ -24,6 +24,7 @@ import { Fragment, useState } from 'react';
 import { read, utils } from 'xlsx';
 import { Course, getSemesters, SearchData, Semester } from './utils/data';
 import { toast } from 'react-toastify';
+import { useThemeContext } from './utils/providers';
 
 const labelOptions = {
     subject: 'Tárgy neve / kódja',
@@ -37,13 +38,13 @@ const labelIcons = {
 
 type SearchProps = {
     onSubmit: (data: SearchData, course?: Course[]) => void;
-    onThemeChange: () => void;
     isLoading: boolean;
 };
 
 type SearchMode = 'subject' | 'teacher';
 
-const Search: React.FC<SearchProps> = ({ onSubmit, onThemeChange, isLoading }: SearchProps) => {
+const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => {
+    const { colorScheme, setColorScheme } = useThemeContext();
     const theme = useTheme();
     const semesters = getSemesters();
 
@@ -105,13 +106,13 @@ const Search: React.FC<SearchProps> = ({ onSubmit, onThemeChange, isLoading }: S
             const data = await file.arrayBuffer();
             const workbook = read(data);
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
             const importedData: string[][] = utils.sheet_to_json(sheet, {
                 header: 1,
                 blankrows: false,
                 skipHidden: true,
                 range: 'A2:H100',
             });
-
             if (!importedData.length) {
                 toast.error('Nem található adat az importált fájlban 😞');
                 handleClose();
@@ -129,8 +130,16 @@ const Search: React.FC<SearchProps> = ({ onSubmit, onThemeChange, isLoading }: S
             };
 
             onSubmit(formData, courses);
+            toast.success(
+                'A fájlban található kurzusok betöltve! 🎉 Az órarendi adatokat a lenti táblázatban találod.',
+            );
             handleClose();
         }
+    };
+
+    const toggleTheme = () => {
+        const newTheme = colorScheme === 'light' ? 'dark' : 'light';
+        setColorScheme(newTheme);
     };
 
     return (
@@ -160,8 +169,8 @@ const Search: React.FC<SearchProps> = ({ onSubmit, onThemeChange, isLoading }: S
                             </Typography>
                         </Stack>
 
-                        <Fab onClick={onThemeChange} aria-label="change-theme" title="Change theme" size="small">
-                            {theme.palette.mode === 'light' ? <DarkMode /> : <LightMode />}
+                        <Fab onClick={toggleTheme} aria-label="change-theme" title="Change theme" size="small">
+                            {colorScheme === 'light' ? <DarkMode /> : <LightMode />}
                         </Fab>
                     </Stack>
 
