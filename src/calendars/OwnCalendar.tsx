@@ -4,15 +4,20 @@ import { EventClickArg } from '@fullcalendar/core';
 import AddIcon from '@mui/icons-material/Add';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import LinkIcon from '@mui/icons-material/Link';
-import { Badge, Button } from '@mui/material';
+import { Badge, Box, Button, IconButton, Stack } from '@mui/material';
 import type { Lesson } from '../utils/data';
 import LessonCalendar from './LessonCalendar';
+import { Redo, Undo } from '@mui/icons-material';
 
 type OwnCalendarProps = {
     lessons: Lesson[]; // A megjelenítendő órák
     onUrlExport: () => void; // URL export kezelő
     onImageDownload: (ref: React.MutableRefObject<HTMLElement>) => Promise<void>; // Kép mentés kezelő
     onEventEdit: (id: number) => void; // Óra szerkesztés kezelő
+    canUndo: boolean;
+    canRedo: boolean;
+    undo: () => void;
+    redo: () => void;
 };
 
 const OwnCalendar: React.FC<OwnCalendarProps> = ({
@@ -20,6 +25,10 @@ const OwnCalendar: React.FC<OwnCalendarProps> = ({
     onUrlExport,
     onImageDownload,
     onEventEdit,
+    canUndo,
+    canRedo,
+    undo,
+    redo
 }: OwnCalendarProps) => {
     const onEventClick = (eventInfo: EventClickArg) => onEventEdit(parseInt(eventInfo.event.id));
 
@@ -44,11 +53,11 @@ const OwnCalendar: React.FC<OwnCalendarProps> = ({
             popoverActionIcon={() => <EditCalendarIcon fontSize="small" />}
             popoverActionText={() => 'Kattints a szerkesztéshez'}
         >
-            <Badge badgeContent="ÚJ" color="secondary">
-                <Button variant="outlined" startIcon={<LinkIcon />} onClick={onUrlExport} fullWidth>
-                    Mentés hivatkozásként
-                </Button>
-            </Badge>
+            
+            <Button variant="outlined" startIcon={<LinkIcon />} onClick={onUrlExport} >
+                Mentés hivatkozásként
+            </Button>
+            
 
             <Button
                 variant="outlined"
@@ -59,6 +68,33 @@ const OwnCalendar: React.FC<OwnCalendarProps> = ({
             >
                 Saját kurzus hozzáadása
             </Button>
+
+
+  
+            <Stack
+                direction="row"
+                marginLeft="auto"
+            >
+                <IconButton
+                    aria-label='Visszavonás'
+                    color="success"
+                    onClick={undo}
+                    disabled={!canUndo}
+                    sx={{marginRight: "auto"}}
+                >
+                    <Undo/>
+                </IconButton>
+
+                <IconButton
+                    aria-label="Újra csinálás"
+                    color="success"
+                    onClick={redo}
+                    disabled={!canRedo}
+                >
+                    <Redo/>
+                </IconButton>
+            </Stack>
+            
         </LessonCalendar>
     );
 };

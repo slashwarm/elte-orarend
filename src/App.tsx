@@ -4,7 +4,7 @@ import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import OwnCalendar from './calendars/OwnCalendar';
 import ResultsCalendar from './calendars/ResultsCalendar';
 import ViewOnlyCalendar from './calendars/ViewOnlyCalendar';
@@ -51,6 +51,7 @@ const readStoredTimetable = (storageTimetable: string) => {
 };
 
 const App: React.FC = () => {
+    // window.localStorage.setItem("SAVE_TIMETABLE", "[]");
     const url = new URL(window.location.toString());
     const lessonsUrlParam = url.searchParams.get('lessons');
     const savedTimetable = window.localStorage.getItem('SAVE_TIMETABLE');
@@ -74,6 +75,103 @@ const App: React.FC = () => {
     const [selectedCourses, setSelectedCourses] = useState<Course[]>(); // kiválasztott kurzusok
     const [savedLessons, setSavedLessons] = useState(timetable); // saját órarend
     const [editEvent, setEditEvent] = useState<number | null>(null); // szerkesztendő esemény
+
+    const MAX_HISTORY_LENGTH = 30;
+    let lessonHistory = useRef<{
+        stack: Lesson[][], 
+        idx: number, 
+        undoAction: 'undo' | 'redo' | 'none',
+        canUndo: boolean,
+        canRedo: boolean
+    }>(
+        {
+            stack: [savedLessons.map(lesson => ({...lesson} as Lesson))],
+            idx: 0,
+            undoAction: 'none',
+            canUndo: false,
+            canRedo: false,
+        }
+    );
+
+    useEffect(() => {
+        if (lessonHistory.current.undoAction !== 'none'){
+            lessonHistory.current.undoAction = 'none';
+            return;
+        }
+
+        // lessonHistory.current.stack = lessonHistory.current.stack.filter(
+        //     (lessons, idx, arr) => lessons.some(
+        //         lesson1 => idx + 1 >= arr.length || arr[idx + 1].find(
+        //             lesson2 => lesson2.id !== lesson1.id
+        //         ) !== undefined)
+        //     )
+
+        while(lessonHistory.current.idx < lessonHistory.current.stack.length - 1){
+            lessonHistory.current.stack.pop();
+        }
+
+        lessonHistory.current.stack.push(savedLessons.map(lesson => ({...lesson} as Lesson)));
+
+        while (lessonHistory.current.stack.length > MAX_HISTORY_LENGTH){
+            lessonHistory.current.stack.shift();
+        }
+
+        lessonHistory.current.idx = lessonHistory.current.stack.length - 1;
+
+        lessonHistory.current.canUndo = lessonHistory.current.idx !== 0;
+        lessonHistory.current.canRedo = false;
+
+        // console.log({...lessonHistory.current});
+    }, [savedLessons])
+
+    const undo = () => {
+        if (!lessonHistory.current.canUndo){
+            return;
+        }
+
+        lessonHistory.current.idx -= 1;
+        lessonHistory.current.undoAction = 'undo';
+        lessonHistory.current.canRedo = true;
+        lessonHistory.current.canUndo = lessonHistory.current.idx !== 0;
+
+        const newLessons = lessonHistory.current.stack[lessonHistory.current.idx];
+        window.localStorage.setItem('SAVE_TIMETABLE', JSON.stringify(newLessons));
+        setSavedLessons(newLessons);
+        // toast.success("Művelet visszavonva ✨");
+    }
+
+    const redo = () => {
+        if (!lessonHistory.current.canRedo){
+            return;
+        }
+
+        lessonHistory.current.idx += 1;
+        lessonHistory.current.undoAction = 'redo';
+        lessonHistory.current.canRedo = lessonHistory.current.idx !== lessonHistory.current.stack.length - 1
+        lessonHistory.current.canUndo = true;
+
+        const newLessons = lessonHistory.current.stack[lessonHistory.current.idx];
+        window.localStorage.setItem('SAVE_TIMETABLE', JSON.stringify(newLessons));
+        setSavedLessons(newLessons);
+        // toast.success("Művelet újra csinálva ✨");
+    }
+
+    const handleKeyPress = useCallback<(event: KeyboardEvent) => void>(event => {
+        // console.log(event);
+        if (event.ctrlKey && event.key.toLowerCase() == "z" && !viewOnly){
+            undo();
+        } else if (event.ctrlKey && event.key.toLowerCase() == "y" && !viewOnly){
+            redo();
+        }
+    }, []);
+
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyPress);
+    
+        return () => {
+          document.removeEventListener('keydown', handleKeyPress);
+        };
+      }, [handleKeyPress]);
 
     const { isLoading, dataUpdatedAt, data } = useQuery<Data>({
         queryKey: ['results', searchQuery],
@@ -224,6 +322,7 @@ const App: React.FC = () => {
                                 </Paper>
                             </Grid>
                         )}
+                        
                         {savedLessons.length > 0 && (
                             <Grid item xs={12}>
                                 <Paper sx={{ p: 2 }}>
@@ -233,6 +332,10 @@ const App: React.FC = () => {
                                             onUrlExport={handleUrlExport}
                                             onImageDownload={handleDownloadImage}
                                             onEventEdit={setEditEvent}
+                                            canUndo={lessonHistory.current.canUndo}
+                                            canRedo={lessonHistory.current.canRedo}
+                                            undo={undo}
+                                            redo={redo}
                                         />
                                     ) : (
                                         <ViewOnlyCalendar

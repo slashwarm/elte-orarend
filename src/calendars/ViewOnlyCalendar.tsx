@@ -47,11 +47,11 @@ const ViewOnlyCalendar: React.FC<ViewOnlyCalendarProps> = ({
                 );
             }}
         >
-            <Badge badgeContent="ÚJ" color="secondary">
-                <Button variant="outlined" startIcon={<LinkIcon />} onClick={onUrlExport} fullWidth>
-                    Mentés hivatkozásként
-                </Button>
-            </Badge>
+            
+            <Button variant="outlined" startIcon={<LinkIcon />} onClick={onUrlExport}>
+                Mentés hivatkozásként
+            </Button>
+          
 
             <Button
                 variant="outlined"
