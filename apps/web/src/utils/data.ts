@@ -76,7 +76,7 @@ const fetchTimetable = async (formData?: SearchData): Promise<Data> => {
             ? ((import.meta as any).env.VITE_API_URL as string).replace(/\/$/, '')
             : (import.meta as any).env.DEV
                 ? 'http://localhost:3000'
-                : 'https://your-api-project.vercel.app';
+                : 'https://elte-orarend.vercel.app';
 
         const response = await axios.post(`${apiBase}/api`, formData);
         return response.data;
