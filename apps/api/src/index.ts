@@ -6,10 +6,10 @@ import { z } from 'zod';
 const ModeSchema = z.enum(['subject', 'teacher', 'course']);
 const RequestBodySchema = z.object({
     mode: ModeSchema,
-    year: z.union([z.string(), z.number()]).transform(val => String(val)),
+    year: z.string().regex(/^\d{4}-\d{4}-\d{1}$/),
     name: z.union([
         z.string().min(1),
-        z.array(z.string().min(1)).min(1).max(20)
+        z.array(z.string().min(1)).min(1).max(100)
     ])
 });
 
@@ -33,6 +33,9 @@ const SEARCH_MODES: Record<Mode, string[]> = {
     course: ['keres_kod_azon'],
 };
 
+const CACHE = new Map<string, { data: string[][], timestamp: number }>();
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
 async function fetchSearchData(searchMode: string, searchName: string, year: string): Promise<string[][]> {
     const baseUrl = 'https://tanrend.elte.hu/tanrendnavigation.php';
     const qs = new URLSearchParams({ 
@@ -41,9 +44,25 @@ async function fetchSearchData(searchMode: string, searchName: string, year: str
         k: searchName 
     });
     
+    const cacheKey = `${searchMode}:${searchName}:${year}`;
+    const cached = CACHE.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+        return cached.data;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     const resp = await fetch(`${baseUrl}?${qs.toString()}`, { 
+        signal: controller.signal,
         redirect: 'manual' 
     });
+
+    clearTimeout(timeoutId);
+
+    if (!resp.ok || resp.status !== 200) {
+        return [];
+    }
 
     const html = await resp.text();
     const $ = load(html);
@@ -59,6 +78,7 @@ async function fetchSearchData(searchMode: string, searchName: string, year: str
         if (row.length) data.push(row);
     });
 
+    CACHE.set(cacheKey, { data, timestamp: Date.now() });
     return data;
 }
 
@@ -66,7 +86,7 @@ app.post('/api', async c => {
     try {
         const rawBody = await c.req.json().catch(() => null);
         if (!rawBody) {
-            return c.json({ error: 'Hibás paraméterek' }, 400);
+            return c.json({ error: 'No body provided' }, 400);
         }
 
         const validationResult = RequestBodySchema.safeParse(rawBody);
@@ -89,6 +109,7 @@ app.post('/api', async c => {
             
             const nameResults = await Promise.allSettled(nameTasks);
             
+            // ha van ebben a searchMode-ban találat akkor kihagyhatjuk a kövit
             let foundData = false;
             for (const result of nameResults) {
                 if (result.status === 'fulfilled' && result.value.length > 0) {
@@ -100,8 +121,7 @@ app.post('/api', async c => {
             if (foundData) break;
         }
 
-        c.header('Content-Type', 'application/json; charset=utf-8');
-        return c.body(JSON.stringify(data));
+        return c.json(data);
     } catch (error) {
         console.error('API error:', error);
         return c.json({ error: 'Internal server error' }, 500);
@@ -109,7 +129,7 @@ app.post('/api', async c => {
 });
 
 app.get('/', (c) => {
-    return c.json({ status: 'ok', message: 'ELTE Órarend API is running' });
+    return c.json({ status: 'ok', message: 'ELTE Órarend API is running 🚀' });
 });
 
 if (process.env.NODE_ENV !== 'production') {
