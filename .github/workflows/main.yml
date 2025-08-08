@@ -41,8 +41,7 @@ jobs:
           onlyNewer: true
           settings: 'sftp:auto-confirm=yes'
           # Mirror command options
-          localDir: 'apps/web/dist'  # Updated path to web dist
+          localDir: 'apps/web/dist'
           remoteDir: ${{ secrets.SFTP_DIR }}
           reverse: true
-          ignoreFile: '.lftp_ignore'
           options: '--verbose --delete'
