@@ -83,11 +83,12 @@ npm install
 
 3. Start the development server:
 ```bash
-# Using tsx for TypeScript execution
-npx tsx src/index.ts
-```
+# Using npm scripts (recommended)
+npm run dev
 
-**Note**: The backend is configured for serverless deployment. For local development, you may need to add a server startup script or use a development server like `@hono/node-server`.
+# Or using the start script
+npm start
+```
 
 The API will be available at `http://localhost:3000`
 
@@ -142,7 +143,9 @@ The web application will be available at `http://localhost:5173`
 - **`src/index.ts`**: Main server file with Hono framework
 - **API Endpoints**: 
   - `POST /api` - Search for course data
+  - `GET /` - Health check endpoint
 - **Data Sources**: Scrapes ELTE's official timetable system
+- **Development**: Includes local server startup with `@hono/node-server`
 
 #### Frontend (`apps/web/`)
 - **`src/App.tsx`**: Main application component
@@ -168,6 +171,17 @@ The web application will be available at `http://localhost:5173`
 ## 🌐 API Documentation
 
 ### Endpoints
+
+#### `GET /`
+Health check endpoint.
+
+**Response:**
+```json
+{
+  "status": "ok",
+  "message": "ELTE Órarend API is running"
+}
+```
 
 #### `POST /api`
 Search for course timetable data.

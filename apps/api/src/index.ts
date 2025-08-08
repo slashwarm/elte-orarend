@@ -108,4 +108,20 @@ app.post('/api', async c => {
     }
 });
 
+app.get('/', (c) => {
+    return c.json({ status: 'ok', message: 'ELTE Órarend API is running' });
+});
+
+if (process.env.NODE_ENV !== 'production') {
+    const port = process.env.PORT || 3000;
+    console.log(`🚀 Server starting on port ${port}...`);
+    
+    const { serve } = await import('@hono/node-server');
+    serve({
+        fetch: app.fetch,
+        port: Number(port)
+    });
+    console.log(`✅ Server running at http://localhost:${port}`);
+}
+
 export default app;

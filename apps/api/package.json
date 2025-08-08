@@ -3,7 +3,13 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "scripts": {
+    "start": "npx tsx src/index.ts",
+    "dev": "npx tsx src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
+    "@hono/node-server": "^1.18.1",
     "cheerio": "^1.1.2",
     "hono": "^4.9.0",
     "zod": "^3.22.4"
