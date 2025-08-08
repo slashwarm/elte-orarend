@@ -1,0 +1,38 @@
+# Exclude API folder - this is deployed separately to Vercel
+apps/api/
+
+# Exclude development and build artifacts
+node_modules/
+.git/
+.github/
+.idea/
+.history/
+*.log
+.env*
+.DS_Store
+Thumbs.db
+
+# Exclude source files (only built files should be deployed)
+apps/web/src/
+*.ts
+*.tsx
+*.js
+*.jsx
+!apps/web/dist/**/*.js
+
+# Exclude configuration files
+package.json
+package-lock.json
+tsconfig.json
+vite.config.js
+eslint.config.js
+.prettierrc
+vercel.json
+
+# Exclude documentation
+README.md
+LICENSE
+
+# Exclude other app folders
+apps/
+!apps/web/dist/

@@ -72,10 +72,13 @@ const daysOfWeek: DayOfWeek[] = ['hétfő', 'kedd', 'szerda', 'csütörtök', 'p
  */
 const fetchTimetable = async (formData?: SearchData): Promise<Data> => {
     try {
-        const response = await axios.post(
-            import.meta.env.DEV ? 'http://localhost:8000/data.php' : '/orarend/server/data.php',
-            formData,
-        );
+        const apiBase = (import.meta as any).env.VITE_API_URL
+            ? ((import.meta as any).env.VITE_API_URL as string).replace(/\/$/, '')
+            : (import.meta as any).env.DEV
+                ? 'http://localhost:3000'
+                : 'https://your-api-project.vercel.app';
+
+        const response = await axios.post(`${apiBase}/api`, formData);
         return response.data;
     } catch (error: unknown) {
         if (isAxiosError(error)) {

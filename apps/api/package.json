@@ -1,0 +1,14 @@
+{
+  "name": "elte-orarend-api",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "hono": "^4.9.0",
+    "cheerio": "^1.1.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7"
+  }
+}
