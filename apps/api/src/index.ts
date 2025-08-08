@@ -1,7 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { load } from 'cheerio';
-import { handle } from 'hono/vercel';
 import { z } from 'zod';
 
 const ModeSchema = z.enum(['subject', 'teacher', 'course']);
@@ -109,6 +108,4 @@ app.post('/api', async c => {
     }
 });
 
-export const config = { runtime: 'nodejs' };
-
-export default handle(app);
+export default app;

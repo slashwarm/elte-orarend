@@ -4,9 +4,7 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "npm run dev:api & npm run dev:web",
-        "dev:web": "vite",
-        "dev:api": "vercel dev --local",
+        "dev": "vite",
         "build": "vite build",
         "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview"

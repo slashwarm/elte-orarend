@@ -4,11 +4,12 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "hono": "^4.9.0",
     "cheerio": "^1.1.2",
+    "hono": "^4.9.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/node": "^22.10.7"
+    "@types/node": "^22.10.7",
+    "typescript": "^5.9.2"
   }
 }
