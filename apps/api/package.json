@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.18.1",
+    "@hono/zod-validator": "^0.7.2",
     "cheerio": "^1.1.2",
     "hono": "^4.9.0",
     "zod": "^3.22.4"

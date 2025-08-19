@@ -2,11 +2,12 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { load } from 'cheerio';
 import { z } from 'zod';
+import { zValidator } from '@hono/zod-validator';
 
 const ModeSchema = z.enum(['subject', 'teacher', 'course']);
 const RequestBodySchema = z.object({
     mode: ModeSchema,
-    year: z.string().regex(/^\d{4}-\d{4}-\d{1}$/),
+    year: z.string().regex(/^\d{4}-\d{4}-\d$/),
     name: z.union([
         z.string().min(1),
         z.array(z.string().min(1)).min(1).max(100)
@@ -82,22 +83,9 @@ async function fetchSearchData(searchMode: string, searchName: string, year: str
     return data;
 }
 
-app.post('/api', async c => {
+app.post('/api', zValidator('json', RequestBodySchema), async c => {
     try {
-        const rawBody = await c.req.json().catch(() => null);
-        if (!rawBody) {
-            return c.json({ error: 'No body provided' }, 400);
-        }
-
-        const validationResult = RequestBodySchema.safeParse(rawBody);
-        if (!validationResult.success) {
-            return c.json({ 
-                error: 'Validation failed', 
-                details: validationResult.error.errors 
-            }, 400);
-        }
-
-        const { mode, year, name } = validationResult.data;
+        const { mode, year, name } = c.req.valid('json');
         const names = Array.isArray(name) ? name : [name];
         const data: string[][] = [];
         const searchModes = SEARCH_MODES[mode];
