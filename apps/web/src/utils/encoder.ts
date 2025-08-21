@@ -159,13 +159,12 @@ export function encodeLessonsToSearchParam(lessons: Lesson[]): string {
         }
 
         // Az idővel egybe kerül az id, ha edited
-
         const savedId = lesson.edited ? lesson.id : '';
 
-        const [start_time, end_time] = lesson.time.split('-');
+        const [start_time = "", end_time = ""] = lesson.time.split('-');
 
-        const [start_hour, start_minute] = start_time.split(':').map((str) => str.padStart(2, '0'));
-        const [end_hour, end_minute] = end_time.split(':').map((str) => str.padStart(2, '0'));
+        const [start_hour, start_minute] = start_time === "" ? ["01","00"] : start_time.split(':').map((str) => str.padStart(2, '0'));
+        const [end_hour, end_minute] = start_time === "" ? ["01","00"] : end_time.split(':').map((str) => str.padStart(2, '0'));
 
         parts.push(`${start_hour}${start_minute}${end_hour}${end_minute}${savedId}`);
 
