@@ -31,7 +31,7 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
     useEffect(() => {
         if (eventId !== -1) {
             const lesson = savedLessons.find((lesson) => lesson.id === eventId) as Lesson;
-            const [start, end] = lesson.time.split('-');
+            const [start, end] = lesson.time !== '' ? lesson.time.split('-') : ["08:00", "09:00"];
             const [startHour, startMinute] = start.split(':');
             const [endHour, endMinute] = end.split(':');
 

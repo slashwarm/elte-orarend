@@ -4,9 +4,9 @@ import { toast } from 'react-toastify';
 
 export type DayOfWeek = 'hétfő' | 'kedd' | 'szerda' | 'csütörtök' | 'péntek' | 'szombat' | 'vasárnap';
 
-export type DayOfWeekCapital = 'Hétfő' | 'Kedd' | 'Szerda' | 'Csütörtök' | 'Péntek' | 'Szombat' | 'Vasárnap';
+export type DayOfWeekCapital = 'Hétfő' | 'Kedd' | 'Szerda' | 'Csütörtök' | 'Péntek' | 'Szombat' | 'Vasárnap' | '';
 
-export type TimeRange = `${number}:${number}${number}-${number}:${number}${number}`; // Pl "16:20-18:30"
+export type TimeRange = `${number}:${number}${number}-${number}:${number}${number}` | ''; // Pl "16:20-18:30"
 
 export type Semester = `${number}-${number}-${1 | 2}`; // Pl "2024-2025-1", "2013-2014-2"
 
