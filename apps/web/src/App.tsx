@@ -77,13 +77,16 @@ const App: React.FC = () => {
     const [savedLessons, setSavedLessons] = useState(timetable); // saját órarend
     const [editEvent, setEditEvent] = useState<number | null>(null); // szerkesztendő esemény
 
+    const [canUndo, setCanUndo] = useState(false);
+    const [canRedo, setCanRedo] = useState(false);
+
     const MAX_HISTORY_LENGTH = 30;
     let lessonHistory = useRef<{
         stack: Lesson[][], 
         idx: number, 
         undoAction: 'undo' | 'redo' | 'none',
         canUndo: boolean,
-        canRedo: boolean
+        canRedo: boolean,
     }>(
         {
             stack: [savedLessons.map(lesson => ({...lesson} as Lesson))],
@@ -100,29 +103,37 @@ const App: React.FC = () => {
             return;
         }
 
-        // lessonHistory.current.stack = lessonHistory.current.stack.filter(
-        //     (lessons, idx, arr) => lessons.some(
-        //         lesson1 => idx + 1 >= arr.length || arr[idx + 1].find(
-        //             lesson2 => lesson2.id !== lesson1.id
-        //         ) !== undefined)
-        //     )
+        const newLessons = savedLessons.map(lesson => ({...lesson} as Lesson));
 
-        while(lessonHistory.current.idx < lessonHistory.current.stack.length - 1){
+        if (lessonHistory.current.idx !== 0){
+            const lastLessons = lessonHistory.current.stack[lessonHistory.current.idx - 1];
+
+            if(JSON.stringify(newLessons) === JSON.stringify(lastLessons)){
+                return;
+            }
+        }
+        
+
+        while(lessonHistory.current.idx < lessonHistory.current.stack.length){
             lessonHistory.current.stack.pop();
         }
 
-        lessonHistory.current.stack.push(savedLessons.map(lesson => ({...lesson} as Lesson)));
+        lessonHistory.current.stack.push(newLessons);
 
         while (lessonHistory.current.stack.length > MAX_HISTORY_LENGTH){
             lessonHistory.current.stack.shift();
         }
 
-        lessonHistory.current.idx = lessonHistory.current.stack.length - 1;
+        lessonHistory.current.idx = lessonHistory.current.stack.length;
 
-        lessonHistory.current.canUndo = lessonHistory.current.idx !== 0;
+        lessonHistory.current.canUndo = lessonHistory.current.idx > 1;
         lessonHistory.current.canRedo = false;
 
-        // console.log({...lessonHistory.current});
+        setCanUndo(lessonHistory.current.canUndo);
+        setCanRedo(lessonHistory.current.canRedo);
+
+        // console.log(JSON.parse(JSON.stringify({c: lessonHistory.current, canUndo, canRedo})));
+
     }, [savedLessons])
 
     const undo = () => {
@@ -132,12 +143,16 @@ const App: React.FC = () => {
 
         lessonHistory.current.idx -= 1;
         lessonHistory.current.undoAction = 'undo';
-        lessonHistory.current.canRedo = true;
-        lessonHistory.current.canUndo = lessonHistory.current.idx !== 0;
 
-        const newLessons = lessonHistory.current.stack[lessonHistory.current.idx];
+        lessonHistory.current.canUndo = lessonHistory.current.idx > 1;
+        lessonHistory.current.canRedo = true;
+        setCanUndo(lessonHistory.current.canUndo);
+        setCanRedo(lessonHistory.current.canRedo);
+
+        const newLessons = lessonHistory.current.stack[lessonHistory.current.idx - 1];
         window.localStorage.setItem('SAVE_TIMETABLE', JSON.stringify(newLessons));
         setSavedLessons(newLessons);
+        // console.log(JSON.parse(JSON.stringify({c: lessonHistory.current, canUndo, canRedo})));
         // toast.success("Művelet visszavonva ✨");
     }
 
@@ -148,20 +163,25 @@ const App: React.FC = () => {
 
         lessonHistory.current.idx += 1;
         lessonHistory.current.undoAction = 'redo';
-        lessonHistory.current.canRedo = lessonHistory.current.idx !== lessonHistory.current.stack.length - 1
-        lessonHistory.current.canUndo = true;
 
-        const newLessons = lessonHistory.current.stack[lessonHistory.current.idx];
+        lessonHistory.current.canRedo = lessonHistory.current.idx !== lessonHistory.current.stack.length;
+        lessonHistory.current.canUndo = true;
+        setCanRedo(lessonHistory.current.canRedo);
+        setCanUndo(lessonHistory.current.canUndo);
+
+        const newLessons = lessonHistory.current.stack[lessonHistory.current.idx - 1];
         window.localStorage.setItem('SAVE_TIMETABLE', JSON.stringify(newLessons));
         setSavedLessons(newLessons);
+        // console.log(JSON.parse(JSON.stringify({c: lessonHistory.current, canUndo, canRedo})));
         // toast.success("Művelet újra csinálva ✨");
     }
 
     const handleKeyPress = useCallback<(event: KeyboardEvent) => void>(event => {
-        // console.log(event);
         if (event.ctrlKey && event.key.toLowerCase() == "z" && !viewOnly){
+            // console.log("undid");
             undo();
         } else if (event.ctrlKey && event.key.toLowerCase() == "y" && !viewOnly){
+            // console.log("redid");
             redo();
         }
     }, []);
@@ -334,8 +354,8 @@ const App: React.FC = () => {
                                             onUrlExport={handleUrlExport}
                                             onImageDownload={handleDownloadImage}
                                             onEventEdit={setEditEvent}
-                                            canUndo={lessonHistory.current.canUndo}
-                                            canRedo={lessonHistory.current.canRedo}
+                                            canUndo={canUndo}
+                                            canRedo={canRedo}
                                             undo={undo}
                                             redo={redo}
                                         />
