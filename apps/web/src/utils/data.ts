@@ -4,9 +4,9 @@ import { toast } from 'react-toastify';
 
 export type DayOfWeek = 'hétfő' | 'kedd' | 'szerda' | 'csütörtök' | 'péntek' | 'szombat' | 'vasárnap';
 
-export type DayOfWeekCapital = 'Hétfő' | 'Kedd' | 'Szerda' | 'Csütörtök' | 'Péntek' | 'Szombat' | 'Vasárnap';
+export type DayOfWeekCapital = 'Hétfő' | 'Kedd' | 'Szerda' | 'Csütörtök' | 'Péntek' | 'Szombat' | 'Vasárnap' | '';
 
-export type TimeRange = `${number}:${number}${number}-${number}:${number}${number}`; // Pl "16:20-18:30"
+export type TimeRange = `${number}:${number}${number}-${number}:${number}${number}` | ''; // Pl "16:20-18:30"
 
 export type Semester = `${number}-${number}-${1 | 2}`; // Pl "2024-2025-1", "2013-2014-2"
 
@@ -72,10 +72,13 @@ const daysOfWeek: DayOfWeek[] = ['hétfő', 'kedd', 'szerda', 'csütörtök', 'p
  */
 const fetchTimetable = async (formData?: SearchData): Promise<Data> => {
     try {
-        const response = await axios.post(
-            import.meta.env.DEV ? 'http://localhost:8000/data.php' : '/orarend/server/data.php',
-            formData,
-        );
+        const apiBase = (import.meta as any).env.VITE_API_URL
+            ? ((import.meta as any).env.VITE_API_URL as string).replace(/\/$/, '')
+            : (import.meta as any).env.DEV
+                ? 'http://localhost:3000'
+                : 'https://elte-orarend.vercel.app';
+
+        const response = await axios.post(`${apiBase}/api`, formData);
         return response.data;
     } catch (error: unknown) {
         if (isAxiosError(error)) {

@@ -14,6 +14,7 @@ import Search from './Search';
 import { convertDataToTable, Course, Data, fetchTimetable, SearchData, generateUniqueId, Lesson } from './utils/data';
 import { decodeLessonsFromSearchParam, encodeLessonsToSearchParam } from './utils/encoder';
 import Footer from './components/Footer';
+import InfoBox from './components/InfoBox';
 import useDownloadImage from './utils/image';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
@@ -258,8 +259,9 @@ const App: React.FC = () => {
         <Box display="flex" minHeight="100vh">
             <CssBaseline />
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', maxWidth: '100%' }}>
-                <Box component="main" sx={{ flex: 1 }} p={{ xs: 1, sm: 2, md: 4 }}>
+                <Box component="main" sx={{ flex: 1, mt: 0 }} p={{ xs: 1, sm: 2, md: 4 }}>
                     <Grid container direction="column" spacing={2} alignContent="center">
+                        <InfoBox />
                         {!viewOnly && (
                             <Grid item xs={12} sm={6} md={4} lg={3}>
                                 <Paper

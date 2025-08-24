@@ -43,7 +43,7 @@ export function decodeLessonsFromSearchParam(param: string): Lesson[] {
                 lesson.day = 'Péntek';
                 break;
             case '': // Néha nincsen nap
-                lesson.day = 'Vasárnap';
+                lesson.day = '';
                 break;
             default:
                 console.error(`Invalid nap ${parts[i + 3]}`);
@@ -55,7 +55,7 @@ export function decodeLessonsFromSearchParam(param: string): Lesson[] {
 
         // Néha nincs időpont
         const time =
-            parts[i + 6] === ''
+            parts[i + 6].includes("99")
                 ? ''
                 : `${parts[i + 6].slice(0, 2)}:${parts[i + 6].slice(2, 4)}-${parts[i + 6].slice(4, 6)}:${parts[
                       i + 6
@@ -159,13 +159,12 @@ export function encodeLessonsToSearchParam(lessons: Lesson[]): string {
         }
 
         // Az idővel egybe kerül az id, ha edited
-
         const savedId = lesson.edited ? lesson.id : '';
 
-        const [start_time, end_time] = lesson.time.split('-');
+        const [start_time = "", end_time = ""] = lesson.time.split('-');
 
-        const [start_hour, start_minute] = start_time.split(':').map((str) => str.padStart(2, '0'));
-        const [end_hour, end_minute] = end_time.split(':').map((str) => str.padStart(2, '0'));
+        const [start_hour, start_minute] = start_time === "" ? ["99","99"] : start_time.split(':').map((str) => str.padStart(2, '0'));
+        const [end_hour, end_minute] = start_time === "" ? ["99","99"] : end_time.split(':').map((str) => str.padStart(2, '0'));
 
         parts.push(`${start_hour}${start_minute}${end_hour}${end_minute}${savedId}`);
 
