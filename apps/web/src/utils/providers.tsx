@@ -5,6 +5,8 @@ import { ThemeProvider } from '@mui/material/styles';
 import { ToastContainer } from 'react-toastify';
 import { PaletteMode } from '@mui/material';
 import useDynamicTheme from './theme';
+import { TimetableProvider } from '../contexts';
+import { useTimetableStorage } from '../hooks';
 
 type ProviderProps = {
     children: ReactNode;
@@ -49,14 +51,17 @@ const Providers: React.FC<ProviderProps> = ({ children }: ProviderProps) => {
     }, [colorScheme]);
 
     const theme = useDynamicTheme(colorScheme);
+    const { timetable } = useTimetableStorage();
 
     return (
         <QueryClientProvider client={queryClient}>
-            <ThemeContext.Provider value={{ colorScheme, setColorScheme }}>
-                <ThemeProvider theme={theme}>{children}</ThemeProvider>
-                <ReactQueryDevtools initialIsOpen={false} />
-                <ToastContainer theme={colorScheme} />
-            </ThemeContext.Provider>
+            <TimetableProvider initialLessons={timetable}>
+                <ThemeContext.Provider value={{ colorScheme, setColorScheme }}>
+                    <ThemeProvider theme={theme}>{children}</ThemeProvider>
+                    <ReactQueryDevtools initialIsOpen={false} />
+                    <ToastContainer theme={colorScheme} />
+                </ThemeContext.Provider>
+            </TimetableProvider>
         </QueryClientProvider>
     );
 };

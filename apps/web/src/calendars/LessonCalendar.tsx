@@ -90,7 +90,7 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
 
     return (
         <>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} marginBottom={2}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} marginBottom={2} useFlexGap>
                 {onImageDownload && (
                     <Button variant="outlined" startIcon={<DownloadIcon />} onClick={handlePrintClick}>
                         Mentés képként
