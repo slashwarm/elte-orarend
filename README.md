@@ -2,205 +2,51 @@
 
 A modern web application for managing and viewing ELTE (Eötvös Loránd University) course timetables. This monorepo contains both the frontend web application and the backend API service.
 
-## 🏗️ Project Structure
+> **Note**: This is an unofficial application and is not affiliated with or endorsed by ELTE University.
 
-```
-elte-orarend/
-├── apps/
-│   ├── api/                 # Backend API service
-│   │   ├── src/
-│   │   │   └── index.ts     # Main API server
-│   │   ├── package.json
-│   │   └── tsconfig.json
-│   └── web/                 # Frontend React application
-│       ├── src/
-│       │   ├── calendars/   # Calendar components
-│       │   ├── components/  # Reusable UI components
-│       │   ├── utils/       # Utility functions
-│       │   ├── styles/      # CSS styles
-│       │   ├── App.tsx      # Main application component
-│       │   ├── Search.tsx   # Search functionality
-│       │   ├── Results.tsx  # Results display
-│       │   └── EditEvent.tsx # Event editing
-│       ├── public/          # Static assets
-│       ├── package.json
-│       └── vite.config.js
-├── LICENSE
-└── README.md
-```
+## 🌐 Live Demo
 
-## 🚀 Technologies Used
-
-### Backend (API)
-- **Hono** - Fast, lightweight web framework
-- **Cheerio** - Server-side HTML parsing
-- **Zod** - TypeScript-first schema validation
-- **TypeScript** - Type-safe JavaScript
-
-### Frontend (Web)
-- **React 18** - UI library
-- **TypeScript** - Type-safe JavaScript
-- **Vite** - Build tool and dev server
-- **Material-UI (MUI)** - React component library
-- **FullCalendar** - Calendar component
-- **React Query (TanStack Query)** - Data fetching and caching
-- **Axios** - HTTP client
-- **Day.js** - Date manipulation
-- **React Toastify** - Toast notifications
-
-### Development Tools
-- **ESLint** - Code linting
-- **TypeScript** - Type checking
-- **Vite** - Development server and build tool
+Try the application online: [https://gernyimark.web.elte.hu](https://gernyimark.web.elte.hu)
 
 ## 🎯 Features
 
-- **Course Search**: Search for courses by subject, teacher, or course code
-- **Timetable Management**: Create and manage personal timetables
-- **Calendar View**: Interactive calendar display with FullCalendar
-- **Event Editing**: Edit and customize lesson details
-- **Data Export**: Export timetables as images or shareable URLs
-- **Responsive Design**: Mobile-friendly interface
-- **Real-time Updates**: Live data fetching with caching
+-   **Course Search**: Search for courses by subject, teacher, or course code
+-   **Timetable Management**: Create and manage personal timetables
+-   **Calendar View**: Interactive calendar display
+-   **Event Editing**: Edit and customize lesson details
+-   **Data Export**: Export timetables as images or shareable URLs
+-   **Responsive Design**: Mobile-friendly interface
 
-## 🛠️ Setup and Installation
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js (v18 or higher)
-- npm or yarn
 
-### Backend Setup
+-   Node.js (v18 or higher)
+-   npm or yarn
 
-1. Navigate to the API directory:
-```bash
-cd apps/api
-```
+### Development Setup
 
-2. Install dependencies:
-```bash
-npm install
-```
+1. **Backend (API)**
 
-3. Start the development server:
-```bash
-# Using npm scripts (recommended)
-npm run dev
+    ```bash
+    cd apps/api
+    npm install
+    npm run dev
+    ```
 
-# Or using the start script
-npm start
-```
+2. **Frontend (Web)**
+    ```bash
+    cd apps/web
+    npm install
+    npm run dev
+    ```
 
-The API will be available at `http://localhost:3000`
+The API will be available at `http://localhost:3000` and the web app at `http://localhost:5173`.
 
-### Frontend Setup
+## 🚀 Deployment
 
-1. Navigate to the web directory:
-```bash
-cd apps/web
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Start the development server:
-```bash
-npm run dev
-```
-
-The web application will be available at `http://localhost:5173`
-
-## 📖 Usage
-
-### Searching for Courses
-1. Use the search interface to find courses by:
-   - **Subject**: Search by course name
-   - **Teacher**: Search by instructor name
-   - **Course Code**: Search by specific course codes
-
-2. Select the academic year and semester
-
-3. View results in the calendar or table format
-
-### Managing Timetables
-1. **Add Courses**: Search and select courses to add to your timetable
-2. **Edit Events**: Click on events to modify details
-3. **Save Timetable**: Your timetable is automatically saved to localStorage
-4. **Share Timetable**: Export as URL or image
-
-### Calendar Features
-- **Week/Day View**: Switch between different calendar views
-- **Event Details**: Click events to see full information
-- **Drag & Drop**: Reorganize events (in edit mode)
-- **Export**: Download timetable as image
-
-## 🔧 Development
-
-### Project Structure Details
-
-#### Backend (`apps/api/`)
-- **`src/index.ts`**: Main server file with Hono framework
-- **API Endpoints**: 
-  - `POST /api` - Search for course data
-  - `GET /` - Health check endpoint
-- **Data Sources**: Scrapes ELTE's official timetable system
-- **Development**: Includes local server startup with `@hono/node-server`
-
-#### Frontend (`apps/web/`)
-- **`src/App.tsx`**: Main application component
-- **`src/Search.tsx`**: Search interface component
-- **`src/Results.tsx`**: Results display component
-- **`src/EditEvent.tsx`**: Event editing component
-- **`src/calendars/`**: Calendar-related components
-- **`src/utils/`**: Utility functions for data processing
-- **`src/components/`**: Reusable UI components
-
-### Key Features Implementation
-
-#### Data Management
-- **React Query**: Handles data fetching, caching, and synchronization
-- **Local Storage**: Persists user timetables
-- **URL Parameters**: Shareable timetable links
-
-#### UI/UX
-- **Material-UI**: Consistent design system
-- **FullCalendar**: Professional calendar interface
-- **Responsive Design**: Mobile-first approach
-
-## 🌐 API Documentation
-
-### Endpoints
-
-#### `GET /`
-Health check endpoint.
-
-**Response:**
-```json
-{
-  "status": "ok",
-  "message": "ELTE Órarend API is running"
-}
-```
-
-#### `POST /api`
-Search for course timetable data.
-
-**Request Body:**
-```json
-{
-  "mode": "subject" | "teacher" | "course",
-  "year": "2024-2025-1",
-  "name": "string" | ["string"]
-}
-```
-
-**Response:**
-```json
-[
-  ["Monday 16:20-18:30 Room 101", "Course Name (CODE)", "Teacher Name (ID)", "location", "type", "course", "teacher", "comment"]
-]
-```
+The frontend builds to static files that can be deployed to any static hosting service.
+The backend can be deployed to any Node.js hosting platform.
 
 ## 📝 License
 
