@@ -57,8 +57,6 @@ const OwnCalendar: React.FC<OwnCalendarProps> = ({
             <Button variant="outlined" startIcon={<LinkIcon />} onClick={onUrlExport} >
                 Mentés hivatkozásként
             </Button>
-            
-
             <Button
                 variant="outlined"
                 color="success"
@@ -68,9 +66,6 @@ const OwnCalendar: React.FC<OwnCalendarProps> = ({
             >
                 Saját kurzus hozzáadása
             </Button>
-
-
-  
             <Stack
                 direction="row"
                 marginLeft="auto"
@@ -84,7 +79,6 @@ const OwnCalendar: React.FC<OwnCalendarProps> = ({
                 >
                     <Undo/>
                 </IconButton>
-
                 <IconButton
                     aria-label="Újra csinálás"
                     color="success"
@@ -94,7 +88,6 @@ const OwnCalendar: React.FC<OwnCalendarProps> = ({
                     <Redo/>
                 </IconButton>
             </Stack>
-            
         </LessonCalendar>
     );
 };

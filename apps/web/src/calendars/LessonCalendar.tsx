@@ -92,14 +92,29 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
         <>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} marginBottom={2} useFlexGap>
                 {onImageDownload && (
-                    <Button variant="outlined" startIcon={<DownloadIcon />} onClick={handlePrintClick}>
+                    <Button
+                        variant="outlined"
+                        startIcon={<DownloadIcon />}
+                        onClick={handlePrintClick}
+                        aria-label="Órarend mentése képként"
+                    >
                         Mentés képként
                     </Button>
                 )}
                 {children}
             </Stack>
 
-            <div ref={printRef} className={`${calendarClassNames} ${isCalendarSaving ? 'photo-calendar' : ''}`}>
+            <div
+                ref={printRef}
+                className={`${calendarClassNames} ${isCalendarSaving ? 'photo-calendar' : ''}`}
+                role="application"
+                aria-label="Órarend naptár"
+                aria-describedby="calendar-description"
+            >
+                <div id="calendar-description" style={{ display: 'none' }}>
+                    Heti órarend naptár, amely az órákat időrendi sorrendben jeleníti meg. Az órákra kattintva
+                    részleteket lehet megtekinteni.
+                </div>
                 <FullCalendar
                     plugins={[timeGridPlugin, momentTimezonePlugin]}
                     initialView="timeGridWeek"
@@ -123,7 +138,11 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
                     eventMouseEnter={handlePopoverOpen}
                     eventMouseLeave={handlePopoverClose}
                     eventContent={(eventInfo) => {
-                        return <div className="fc-event-main-frame">{eventContent(eventInfo)}</div>;
+                        return (
+                            <div className="fc-event-main-frame" role="button">
+                                {eventContent(eventInfo)}
+                            </div>
+                        );
                     }}
                 />
             </div>
@@ -136,6 +155,8 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
                     anchorEl={activePopper.anchorEl as Element}
                     placement={'top'}
                     transition
+                    role="tooltip"
+                    aria-hidden="true"
                 >
                     {({ TransitionProps }) => (
                         <Fade {...TransitionProps} timeout={350}>

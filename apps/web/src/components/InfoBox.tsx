@@ -14,8 +14,15 @@ const InfoBox: React.FC = () => {
                 margin: 'auto',
             }}
             severity="info"
+            role="status"
+            aria-live="polite"
             action={
-                <IconButton aria-label="close" color="inherit" size="small" onClick={() => setIsOpen(false)}>
+                <IconButton
+                    aria-label="Információs üzenet bezárása"
+                    color="inherit"
+                    size="small"
+                    onClick={() => setIsOpen(false)}
+                >
                     <CloseIcon />
                 </IconButton>
             }

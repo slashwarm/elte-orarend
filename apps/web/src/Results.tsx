@@ -36,7 +36,7 @@ const Results: React.FC<ResultsProps> = ({
         {
             field: 'actions',
             type: 'actions',
-            headerName: '',
+            headerName: 'Műveletek',
             width: 160,
             cellClassName: 'actions',
             sortable: false,
@@ -58,12 +58,21 @@ const Results: React.FC<ResultsProps> = ({
                     return (
                         <>
                             <Tooltip title="Eltávolítás" placement="top" disableInteractive>
-                                <IconButton color="error" onClick={onDeleteClick}>
+                                <IconButton
+                                    color="error"
+                                    onClick={onDeleteClick}
+                                    aria-label={`Eltávolítás: ${params.row.name}`}
+                                    tabIndex={params.tabIndex}
+                                >
                                     <BookmarkRemoveIcon />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Szerkesztés" placement="top" disableInteractive>
-                                <IconButton onClick={() => (onEventEdit ? onEventEdit(Number(params.id)) : undefined)}>
+                                <IconButton
+                                    onClick={() => (onEventEdit ? onEventEdit(Number(params.id)) : undefined)}
+                                    aria-label={`Szerkesztés: ${params.row.name}`}
+                                    tabIndex={params.tabIndex}
+                                >
                                     <EditIcon />
                                 </IconButton>
                             </Tooltip>
@@ -72,7 +81,12 @@ const Results: React.FC<ResultsProps> = ({
                                 placement="top"
                                 disableInteractive
                             >
-                                <IconButton color={isHidden ? 'secondary' : 'primary'} onClick={onHideClick}>
+                                <IconButton
+                                    color={isHidden ? 'secondary' : 'primary'}
+                                    onClick={onHideClick}
+                                    aria-label={`${isHidden ? 'Megjelenítés' : 'Elrejtés'} a naptárból: ${params.row.name}`}
+                                    tabIndex={params.tabIndex}
+                                >
                                     {isHidden ? <VisibilityIcon /> : <VisibilityOffIcon />}
                                 </IconButton>
                             </Tooltip>
@@ -87,6 +101,8 @@ const Results: React.FC<ResultsProps> = ({
                             onClick={onDeleteClick}
                             color={!isSaved ? 'success' : 'error'}
                             startIcon={!isSaved ? <BookmarkAddIcon /> : <BookmarkRemoveIcon />}
+                            aria-label={`${!isSaved ? 'Mentés' : 'Eltávolítás'}: ${params.row.name}`}
+                            tabIndex={params.tabIndex}
                         >
                             {!isSaved ? 'Mentés' : 'Eltávolítás'}
                         </Button>
@@ -132,7 +148,18 @@ const Results: React.FC<ResultsProps> = ({
                 const teacherName = params.row.teacher;
                 const url = 'https://www.markmyprofessor.com/kereses?q=' + encodeURI(teacherName);
 
-                return <Chip label="MMP" component={Link} variant="outlined" href={url} target="_blank" clickable />;
+                return (
+                    <Chip
+                        label="MMP"
+                        component={Link}
+                        variant="outlined"
+                        href={url}
+                        target="_blank"
+                        clickable
+                        aria-label={`Vélemények megtekintése: ${teacherName}`}
+                        tabIndex={params.tabIndex}
+                    />
+                );
             },
         },
         {
@@ -182,8 +209,15 @@ const Results: React.FC<ResultsProps> = ({
                     whiteSpace: 'normal',
                     lineHeight: 'normal',
                 },
+                '& .MuiDataGrid-virtualScroller': {
+                    '&:focus': {
+                        outline: '2px solid #1976d2',
+                        outlineOffset: '2px',
+                    },
+                },
             }}
             loading={isLoading}
+            aria-label={own ? 'Saját órarend táblázat' : 'Keresési eredmények táblázat'}
         />
     );
 };

@@ -169,7 +169,12 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                             </Typography>
                         </Stack>
 
-                        <Fab onClick={toggleTheme} aria-label="change-theme" title="Change theme" size="small">
+                        <Fab
+                            onClick={toggleTheme}
+                            aria-label={`Téma váltása ${colorScheme === 'light' ? 'sötét' : 'világos'} módra`}
+                            title={`Téma váltása ${colorScheme === 'light' ? 'sötét' : 'világos'} módra`}
+                            size="small"
+                        >
                             {colorScheme === 'light' ? <DarkMode /> : <LightMode />}
                         </Fab>
                     </Stack>
@@ -185,6 +190,8 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                         name="name"
                         error={error}
                         helperText={error ? 'Hibás bemenet.' : ''}
+                        aria-describedby={error ? 'name-error' : undefined}
+                        aria-required="true"
                     />
                     <Stack
                         direction={{ xs: 'column', sm: 'row' }}
@@ -198,18 +205,32 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                         }}
                         divider={<Divider orientation="vertical" flexItem />}
                     >
-                        <ToggleButtonGroup fullWidth size="small" value={mode} onChange={changeMode} exclusive={true}>
-                            <ToggleButton value="subject" key="subject">
+                        <ToggleButtonGroup
+                            fullWidth
+                            size="small"
+                            value={mode}
+                            onChange={changeMode}
+                            exclusive={true}
+                            aria-label="Keresési mód kiválasztása"
+                        >
+                            <ToggleButton value="subject" key="subject" aria-label="Keresés tárgyra">
                                 Keresés tárgyra
                             </ToggleButton>
-                            <ToggleButton value="teacher" key="teacher">
+                            <ToggleButton value="teacher" key="teacher" aria-label="Keresés oktatóra">
                                 Keresés oktatóra
                             </ToggleButton>
                         </ToggleButtonGroup>
 
-                        <ToggleButtonGroup fullWidth size="small" value={year} onChange={changeYear} exclusive={true}>
+                        <ToggleButtonGroup
+                            fullWidth
+                            size="small"
+                            value={year}
+                            onChange={changeYear}
+                            exclusive={true}
+                            aria-label="Félév kiválasztása"
+                        >
                             {semesters.map((semester) => (
-                                <ToggleButton value={semester} key={semester}>
+                                <ToggleButton value={semester} key={semester} aria-label={`Félév: ${semester}`}>
                                     {semester}
                                 </ToggleButton>
                             ))}
@@ -217,7 +238,9 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                     </Stack>
 
                     {year !== semesters[0] && (
-                        <Alert severity="warning">Figyelem! Nem az éppen aktuális félév van kiválasztva!</Alert>
+                        <Alert severity="warning" role="alert">
+                            Figyelem! Nem az éppen aktuális félév van kiválasztva!
+                        </Alert>
                     )}
 
                     <Stack spacing={1}>
@@ -227,6 +250,7 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                             type="submit"
                             variant="contained"
                             startIcon={<SearchIcon />}
+                            aria-label="Keresés indítása"
                         >
                             Keresés
                         </LoadingButton>
@@ -244,6 +268,7 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                             variant="outlined"
                             startIcon={<CloudDownloadIcon />}
                             onClick={handleClickOpen}
+                            aria-label="Kurzusok importálása Neptunból"
                         >
                             Kurzusok importálása Neptunból
                         </Button>
@@ -251,8 +276,8 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                 </Stack>
             </Box>
 
-            <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Felvett kurzuslista táblázat importálása</DialogTitle>
+            <Dialog open={open} onClose={handleClose} aria-labelledby="import-dialog-title">
+                <DialogTitle id="import-dialog-title">Felvett kurzuslista táblázat importálása</DialogTitle>
                 <DialogContent>
                     <Typography variant="body1" component="div">
                         <ol>
@@ -271,33 +296,41 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                                 <TextField
                                     type={'file'}
-                                    inputProps={{ accept: '.xlsx' }}
+                                    inputProps={{
+                                        accept: '.xlsx',
+                                        'aria-label': 'Excel fájl kiválasztása',
+                                    }}
                                     onChange={(e) => setFile(((e.target as HTMLInputElement).files as FileList)[0])}
                                     disabled={isLoading}
+                                    label="Fájl kiválasztása"
+                                    variant="outlined"
                                 />
                                 <Button
                                     variant="contained"
                                     startIcon={<EventRepeatIcon />}
                                     onClick={handleUpload}
                                     disabled={isLoading || !file}
+                                    aria-label="Fájl betöltése"
                                 >
                                     Betöltés
                                 </Button>
                             </Stack>
                         </form>
 
-                        <Alert variant="outlined" severity="info">
+                        <Alert variant="outlined" severity="info" role="status">
                             Kiválasztott félév: <b>{year}</b>
                         </Alert>
 
-                        <Alert variant="outlined" severity="warning">
+                        <Alert variant="outlined" severity="warning" role="alert">
                             Neptunban a <b>Felvett kurzusok</b> menüpontban található táblázatot töltsd le, <b>ne</b> a
                             Felvett tárgyakban lévőt!
                         </Alert>
                     </Stack>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Bezárás</Button>
+                    <Button onClick={handleClose} aria-label="Párbeszédablak bezárása">
+                        Bezárás
+                    </Button>
                 </DialogActions>
             </Dialog>
         </Fragment>

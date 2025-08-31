@@ -31,7 +31,7 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
     useEffect(() => {
         if (eventId !== -1) {
             const lesson = savedLessons.find((lesson) => lesson.id === eventId) as Lesson;
-            const [start, end] = lesson.time !== '' ? lesson.time.split('-') : ["08:00", "09:00"];
+            const [start, end] = lesson.time !== '' ? lesson.time.split('-') : ['08:00', '09:00'];
             const [startHour, startMinute] = start.split(':');
             const [endHour, endMinute] = end.split(':');
 
@@ -110,11 +110,18 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
     }
 
     return (
-        <Dialog open={true} onClose={handleEditClose}>
-            <DialogTitle>Kurzus módosítása</DialogTitle>
-            <DialogContent>
+        <Dialog
+            open={true}
+            onClose={handleEditClose}
+            aria-labelledby="edit-event-dialog-title"
+            aria-describedby="edit-event-dialog-description"
+            maxWidth="md"
+            fullWidth
+        >
+            <DialogTitle id="edit-event-dialog-title">Kurzus módosítása</DialogTitle>
+            <DialogContent id="edit-event-dialog-description">
                 <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="hu">
-                    <Grid container spacing={2} marginTop={1}>
+                    <Grid container spacing={2} marginTop={1} component="form" role="form">
                         <Grid item xs={9} md={10}>
                             <TextField
                                 name="name"
@@ -123,6 +130,9 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                 value={editEvent.name}
                                 onChange={handleChange}
                                 fullWidth
+                                required
+                                aria-required="true"
+                                aria-describedby="name-help"
                             />
                         </Grid>
                         <Grid item xs={3} md={2}>
@@ -133,6 +143,7 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                 value={editEvent.course}
                                 onChange={handleChange}
                                 fullWidth
+                                aria-describedby="course-help"
                             />
                         </Grid>
                         <Grid item xs={7} md={8}>
@@ -143,6 +154,7 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                 value={editEvent.code}
                                 onChange={handleChange}
                                 fullWidth
+                                aria-describedby="code-help"
                             />
                         </Grid>
                         <Grid item xs={5} md={4}>
@@ -154,6 +166,7 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                     value={editEvent.type}
                                     label="Típus"
                                     onChange={handleChange}
+                                    aria-describedby="type-help"
                                 >
                                     <MenuItem value={'gyakorlat'}>gyakorlat</MenuItem>
                                     <MenuItem value={'előadás'}>előadás</MenuItem>
@@ -175,6 +188,7 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                 value={editEvent.location}
                                 onChange={handleChange}
                                 fullWidth
+                                aria-describedby="location-help"
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -186,6 +200,7 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                 value={editEvent.comment}
                                 onChange={handleChange}
                                 fullWidth
+                                aria-describedby="comment-help"
                             />
                         </Grid>
                         <Grid item xs={6} md={3}>
@@ -199,7 +214,12 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                 onChange={(newValue) => {
                                     setStartTime(newValue);
                                 }}
-                                slotProps={{ textField: { fullWidth: true } }}
+                                slotProps={{
+                                    textField: {
+                                        fullWidth: true,
+                                        'aria-describedby': 'start-time-help',
+                                    },
+                                }}
                             />
                         </Grid>
                         <Grid item xs={6} md={3}>
@@ -213,7 +233,12 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                 onChange={(newValue) => {
                                     setEndTime(newValue);
                                 }}
-                                slotProps={{ textField: { fullWidth: true } }}
+                                slotProps={{
+                                    textField: {
+                                        fullWidth: true,
+                                        'aria-describedby': 'end-time-help',
+                                    },
+                                }}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -225,6 +250,7 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                     value={editEvent.day}
                                     label="Nap"
                                     onChange={handleChange}
+                                    aria-describedby="day-help"
                                 >
                                     <MenuItem value={'Hétfő'}>Hétfő</MenuItem>
                                     <MenuItem value={'Kedd'}>Kedd</MenuItem>
@@ -239,7 +265,13 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
             </DialogContent>
             <DialogActions>
                 {editEvent.id && (
-                    <Button startIcon={<DeleteIcon />} variant="contained" color="error" onClick={handleDeleteClick}>
+                    <Button
+                        startIcon={<DeleteIcon />}
+                        variant="contained"
+                        color="error"
+                        onClick={handleDeleteClick}
+                        aria-label="Kurzus törlése"
+                    >
                         Törlés
                     </Button>
                 )}
@@ -251,10 +283,13 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                     style={{ color: 'white' }}
                     type="submit"
                     onClick={handleSaveClick}
+                    aria-label="Változtatások mentése"
                 >
                     Mentés
                 </Button>
-                <Button onClick={handleEditClose}>Bezárás</Button>
+                <Button onClick={handleEditClose} aria-label="Szerkesztés bezárása változtatások mentése nélkül">
+                    Bezárás
+                </Button>
             </DialogActions>
         </Dialog>
     );
