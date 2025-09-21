@@ -10,7 +10,6 @@ import ViewOnlyCalendar from '../calendars/ViewOnlyCalendar';
 import Results from '../Results';
 import Search from '../Search';
 import EditEvent from '../EditEvent';
-import InfoBox from './InfoBox';
 import useDownloadImage from '../utils/image';
 import { useSearchResults, useLessonOperations, useLessonHistory, useKeyboardShortcuts } from '../hooks';
 import { useTimetableContext } from '../contexts';
@@ -68,7 +67,6 @@ const TimetableLayout: React.FC<TimetableLayoutProps> = ({ viewOnly }) => {
         <>
             <Box component="main" sx={{ flex: 1, mt: 0 }} p={{ xs: 1, sm: 2, md: 4 }}>
                 <Grid container direction="column" spacing={2} alignContent="center">
-                    <InfoBox />
                     {!viewOnly && (
                         <Grid item xs={12} sm={6} md={4} lg={3}>
                             <Paper
