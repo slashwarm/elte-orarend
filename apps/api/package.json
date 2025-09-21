@@ -1,22 +1,24 @@
 {
-  "name": "elte-orarend-api",
-  "private": true,
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "start": "npx tsx src/index.ts",
-    "dev": "npx tsx src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "@hono/node-server": "^1.18.1",
-    "@hono/zod-validator": "^0.7.2",
-    "cheerio": "^1.1.2",
-    "hono": "^4.9.0",
-    "zod": "^3.22.4"
-  },
-  "devDependencies": {
-    "@types/node": "^22.10.7",
-    "typescript": "^5.9.2"
-  }
+    "name": "elte-orarend-api",
+    "private": true,
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "dev": "tsx --watch src/index.ts",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "@hono/node-server": "^1.18.1",
+        "@hono/zod-validator": "^0.7.2",
+        "cheerio": "^1.1.2",
+        "hono": "^4.9.0",
+        "zod": "^3.22.4"
+    },
+    "devDependencies": {
+        "@types/node": "^22.10.7",
+        "tsx": "^4.7.0",
+        "typescript": "^5.9.2"
+    }
 }

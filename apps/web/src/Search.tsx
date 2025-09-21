@@ -1,9 +1,8 @@
-import { DarkMode, LightMode, ManageSearch } from '@mui/icons-material';
+import { DarkMode, LightMode } from '@mui/icons-material';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import EventRepeatIcon from '@mui/icons-material/EventRepeat';
-import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import SearchIcon from '@mui/icons-material/Search';
-import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Fab, useTheme } from '@mui/material';
 import Alert from '@mui/material/Alert';
@@ -14,34 +13,25 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import { Fragment, useState } from 'react';
 import { read, utils } from 'xlsx';
-import { Course, getSemesters, SearchData, Semester } from './utils/data';
+import { Course, getSemesters, SearchData } from './utils/data';
 import { toast } from 'react-toastify';
 import { useThemeContext } from './utils/providers';
-
-const labelOptions = {
-    subject: 'Tárgy neve / kódja',
-    teacher: 'Oktató neve / Neptun-kódja',
-};
-
-const labelIcons = {
-    subject: <LibraryBooksIcon />,
-    teacher: <SwitchAccountIcon />,
-};
 
 type SearchProps = {
     onSubmit: (data: SearchData, course?: Course[]) => void;
     isLoading: boolean;
 };
-
-type SearchMode = 'subject' | 'teacher';
 
 const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => {
     const { colorScheme, setColorScheme } = useThemeContext();
@@ -49,21 +39,13 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
     const semesters = getSemesters();
 
     const [year, setYear] = useState(semesters[0]);
-    const [mode, setMode] = useState<SearchMode>('subject');
     const [error, setError] = useState(false);
     const [open, setOpen] = useState(false);
     const [file, setFile] = useState<Blob | null>(null);
+    const [showDropdown, setShowDropdown] = useState(false);
 
-    const changeYear = (event: React.MouseEvent, newAlignment: Semester) => {
-        if (newAlignment !== null) {
-            setYear(newAlignment);
-        }
-    };
-
-    const changeMode = (event: React.MouseEvent, newAlignment: SearchMode) => {
-        if (newAlignment !== null) {
-            setMode(newAlignment);
-        }
+    const changeYear = (event: any) => {
+        setYear(semesters.find((semester) => semester.value === event.target.value)!);
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -75,8 +57,7 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
 
         const formData = {
             name: name,
-            year: year,
-            mode: mode,
+            year: year.value,
         };
 
         if (!formData.name) {
@@ -125,7 +106,7 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
 
             const formData = {
                 name: courses.map((x) => x.courseCode),
-                year: year,
+                year: year.value,
                 mode: 'course' as const,
             };
 
@@ -142,6 +123,10 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
         setColorScheme(newTheme);
     };
 
+    const toggleDropdown = () => {
+        setShowDropdown((oldShowDropdown) => !oldShowDropdown);
+    };
+
     return (
         <Fragment>
             <Box component="form" onSubmit={handleSubmit} noValidate>
@@ -154,20 +139,9 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                             alignItems: 'center',
                         }}
                     >
-                        <Stack
-                            direction="row"
-                            spacing={1}
-                            sx={{
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <ManageSearch />
-
-                            <Typography variant="h6" component="h2">
-                                Keresés
-                            </Typography>
-                        </Stack>
+                        <Typography variant="h6" component="h2">
+                            Tárgykereső
+                        </Typography>
 
                         <Fab
                             onClick={toggleTheme}
@@ -184,60 +158,56 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                         fullWidth
                         id="name"
                         InputProps={{
-                            startAdornment: <InputAdornment position="start">{labelIcons[mode]}</InputAdornment>,
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon
+                                        sx={{
+                                            color: 'text.secondary',
+                                            opacity: 0.7,
+                                        }}
+                                    />
+                                </InputAdornment>
+                            ),
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        onClick={toggleDropdown}
+                                        edge="end"
+                                        aria-label="Félév kiválasztó megjelenítése/elrejtése"
+                                        title="Félév kiválasztó megjelenítése/elrejtése"
+                                    >
+                                        <CalendarMonthIcon />
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
                         }}
-                        label={labelOptions[mode]}
+                        placeholder="Írd be a tárgy nevét / kódját, vagy az oktató nevét / Neptun-kódját"
                         name="name"
                         error={error}
                         helperText={error ? 'Hibás bemenet.' : ''}
                         aria-describedby={error ? 'name-error' : undefined}
                         aria-required="true"
                     />
-                    <Stack
-                        direction={{ xs: 'column', sm: 'row' }}
-                        spacing={2}
-                        sx={{
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            '& .MuiDivider-root': {
-                                display: { xs: 'none', sm: 'block' },
-                            },
-                        }}
-                        divider={<Divider orientation="vertical" flexItem />}
-                    >
-                        <ToggleButtonGroup
-                            fullWidth
-                            size="small"
-                            value={mode}
-                            onChange={changeMode}
-                            exclusive={true}
-                            aria-label="Keresési mód kiválasztása"
-                        >
-                            <ToggleButton value="subject" key="subject" aria-label="Keresés tárgyra">
-                                Keresés tárgyra
-                            </ToggleButton>
-                            <ToggleButton value="teacher" key="teacher" aria-label="Keresés oktatóra">
-                                Keresés oktatóra
-                            </ToggleButton>
-                        </ToggleButtonGroup>
+                    {showDropdown && (
+                        <FormControl size="small">
+                            <InputLabel id="semester-select-label">Félév</InputLabel>
+                            <Select
+                                labelId="semester-select-label"
+                                value={year.value}
+                                label="Félév"
+                                onChange={changeYear}
+                                aria-label="Félév kiválasztása"
+                            >
+                                {semesters.map((semester) => (
+                                    <MenuItem value={semester.value} key={semester.value}>
+                                        {semester.label}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    )}
 
-                        <ToggleButtonGroup
-                            fullWidth
-                            size="small"
-                            value={year}
-                            onChange={changeYear}
-                            exclusive={true}
-                            aria-label="Félév kiválasztása"
-                        >
-                            {semesters.map((semester) => (
-                                <ToggleButton value={semester} key={semester} aria-label={`Félév: ${semester}`}>
-                                    {semester}
-                                </ToggleButton>
-                            ))}
-                        </ToggleButtonGroup>
-                    </Stack>
-
-                    {year !== semesters[0] && (
+                    {year.value !== semesters[0].value && (
                         <Alert severity="warning" role="alert">
                             Figyelem! Nem az éppen aktuális félév van kiválasztva!
                         </Alert>
@@ -249,7 +219,6 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                             loadingPosition="start"
                             type="submit"
                             variant="contained"
-                            startIcon={<SearchIcon />}
                             aria-label="Keresés indítása"
                         >
                             Keresés
@@ -318,7 +287,7 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                         </form>
 
                         <Alert variant="outlined" severity="info" role="status">
-                            Kiválasztott félév: <b>{year}</b>
+                            Kiválasztott félév: <b>{year.label}</b>
                         </Alert>
 
                         <Alert variant="outlined" severity="warning" role="alert">

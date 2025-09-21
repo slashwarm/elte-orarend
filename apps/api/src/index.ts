@@ -3,18 +3,12 @@ import { cors } from 'hono/cors';
 import { load } from 'cheerio';
 import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
+import { getSearchMode } from '../utils/getSearchMode.js';
 
-const ModeSchema = z.enum(['subject', 'teacher', 'course']);
 const RequestBodySchema = z.object({
-    mode: ModeSchema,
     year: z.string().regex(/^\d{4}-\d{4}-\d$/),
-    name: z.union([
-        z.string().min(1),
-        z.array(z.string().min(1)).min(1).max(100)
-    ])
+    name: z.union([z.string().min(1), z.array(z.string().min(1)).min(1).max(100)]),
 });
-
-type Mode = z.infer<typeof ModeSchema>;
 
 const app = new Hono();
 
@@ -25,26 +19,20 @@ app.use(
         allowMethods: ['POST', 'OPTIONS'],
         allowHeaders: ['*'],
         maxAge: 86400,
-    })
+    }),
 );
 
-const SEARCH_MODES: Record<Mode, string[]> = {
-    subject: ['keresnevre', 'keres_kod_azon'],
-    teacher: ['keres_okt', 'keres_oktnk'],
-    course: ['keres_kod_azon'],
-};
-
-const CACHE = new Map<string, { data: string[][], timestamp: number }>();
+const CACHE = new Map<string, { data: string[][]; timestamp: number }>();
 const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
 async function fetchSearchData(searchMode: string, searchName: string, year: string): Promise<string[][]> {
     const baseUrl = 'https://tanrend.elte.hu/tanrendnavigation.php';
-    const qs = new URLSearchParams({ 
-        m: searchMode, 
-        f: year, 
-        k: searchName 
+    const qs = new URLSearchParams({
+        m: searchMode,
+        f: year,
+        k: searchName,
     });
-    
+
     const cacheKey = `${searchMode}:${searchName}:${year}`;
     const cached = CACHE.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
@@ -54,9 +42,9 @@ async function fetchSearchData(searchMode: string, searchName: string, year: str
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    const resp = await fetch(`${baseUrl}?${qs.toString()}`, { 
+    const resp = await fetch(`${baseUrl}?${qs.toString()}`, {
         signal: controller.signal,
-        redirect: 'manual' 
+        redirect: 'manual',
     });
 
     clearTimeout(timeoutId);
@@ -83,20 +71,19 @@ async function fetchSearchData(searchMode: string, searchName: string, year: str
     return data;
 }
 
-app.post('/api', zValidator('json', RequestBodySchema), async c => {
+app.post('/api', zValidator('json', RequestBodySchema), async (c) => {
     try {
-        const { mode, year, name } = c.req.valid('json');
-        const names = Array.isArray(name) ? name : [name];
+        const { year, name } = c.req.valid('json');
+        const isListSearch = Array.isArray(name);
+        const names = isListSearch ? name : [name];
         const data: string[][] = [];
-        const searchModes = SEARCH_MODES[mode];
+        const searchModes = isListSearch ? ['keres_kod_azon'] : getSearchMode(name);
 
         for (const searchMode of searchModes) {
-            const nameTasks = names.map(searchName => 
-                fetchSearchData(searchMode, searchName, year)
-            );
-            
+            const nameTasks = names.map((searchName) => fetchSearchData(searchMode, searchName, year));
+
             const nameResults = await Promise.allSettled(nameTasks);
-            
+
             // ha van ebben a searchMode-ban találat akkor kihagyhatjuk a kövit
             let foundData = false;
             for (const result of nameResults) {
@@ -105,7 +92,7 @@ app.post('/api', zValidator('json', RequestBodySchema), async c => {
                     foundData = true;
                 }
             }
-            
+
             if (foundData) break;
         }
 
@@ -123,11 +110,11 @@ app.get('/', (c) => {
 if (process.env.NODE_ENV !== 'production') {
     const port = process.env.PORT || 3000;
     console.log(`🚀 Server starting on port ${port}...`);
-    
+
     const { serve } = await import('@hono/node-server');
     serve({
         fetch: app.fetch,
-        port: Number(port)
+        port: Number(port),
     });
     console.log(`✅ Server running at http://localhost:${port}`);
 }

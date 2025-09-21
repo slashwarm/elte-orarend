@@ -10,6 +10,11 @@ export type TimeRange = `${number}:${number}${number}-${number}:${number}${numbe
 
 export type Semester = `${number}-${number}-${1 | 2}`; // Pl "2024-2025-1", "2013-2014-2"
 
+type SemesterItem = {
+    value: Semester;
+    label: string;
+};
+
 export type Lesson = {
     name: string;
     code: string;
@@ -29,7 +34,6 @@ export type Lesson = {
 export type SearchData = {
     name: string | string[];
     year: Semester;
-    mode: 'subject' | 'teacher' | 'course';
 };
 
 // Az excel-ből betöltött adatokhoz
@@ -75,8 +79,8 @@ const fetchTimetable = async (formData?: SearchData): Promise<Data> => {
         const apiBase = (import.meta as any).env.VITE_API_URL
             ? ((import.meta as any).env.VITE_API_URL as string).replace(/\/$/, '')
             : (import.meta as any).env.DEV
-                ? 'http://localhost:3000'
-                : 'https://elte-orarend.vercel.app';
+              ? 'http://localhost:3000'
+              : 'https://elte-orarend.vercel.app';
 
         const response = await axios.post(`${apiBase}/api`, formData);
         return response.data;
@@ -243,19 +247,25 @@ const convertDataToCalendar = (data: Lesson[]): CalendarEvent[] => {
  *
  * @returns {Semester[]}
  */
-const getSemesters = (): Semester[] => {
+const getSemesters = (): SemesterItem[] => {
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth();
-    const semesters: Semester[] = [];
+    const semesters: SemesterItem[] = [];
     let prevSemester;
 
     if (currentMonth < 6) {
         // tavaszi félév
-        semesters.push(`${currentYear - 1}-${currentYear}-2` as Semester);
+        semesters.push({
+            value: `${currentYear - 1}-${currentYear}-2`,
+            label: `${currentYear - 1}-${currentYear}-2 (tavaszi félév)`,
+        });
         prevSemester = 1;
     } else {
         // őszi félév
-        semesters.push(`${currentYear}-${currentYear + 1}-1`);
+        semesters.push({
+            value: `${currentYear}-${currentYear + 1}-1`,
+            label: `${currentYear}-${currentYear + 1}-1 (őszi félév)`,
+        });
         prevSemester = 2;
     }
 
@@ -268,10 +278,10 @@ const getSemesters = (): Semester[] => {
         year--;
 
         if (prevSemester === 1) {
-            semesters.push(`${year}-${year + 1}-1`);
+            semesters.push({ value: `${year}-${year + 1}-1`, label: `${year}-${year + 1}-1 (előző őszi félév)` });
             prevSemester = 2;
         } else {
-            semesters.push(`${year}-${year + 1}-2`);
+            semesters.push({ value: `${year}-${year + 1}-2`, label: `${year}-${year + 1}-2 (előző tavaszi félév)` });
             prevSemester = 1;
         }
     }
