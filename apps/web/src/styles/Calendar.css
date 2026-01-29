@@ -3,8 +3,15 @@
     --fc-event-selected-overlay-color: transparent;
     --fc-today-bg-color: transparent;
     --fc-event-border-color: #000;
-    --lecture-color: rgb(76, 119, 199);
-    --practice-color: rgb(99, 79, 199);
+    --lesson-color-eloadas: #4c77c7;
+    --lesson-color-gyakorlat: #634fc7;
+    --lesson-color-konzultacio: #2e7d32;
+    --lesson-color-szeminarium: #ed6c02;
+    --lesson-color-labor: #d32f2f;
+    --lesson-color-vizsgakurzus: #9c27b0;
+    --lesson-color-hazidolgozat: #0288d1;
+    --lesson-color-szakmai-gyakorlat: #00695c;
+    --lesson-color-elfoglaltsag: #616161;
 }
 
 .fc th {
@@ -33,12 +40,40 @@
     overflow: hidden;
 }
 
-a.fc-event:has(div.practice) {
-    background-color: var(--practice-color);
+a.fc-event:has(div.lesson-eloadas) {
+    background-color: var(--lesson-color-eloadas);
 }
 
-a.fc-event:has(div.lecture) {
-    background-color: var(--lecture-color);
+a.fc-event:has(div.lesson-gyakorlat) {
+    background-color: var(--lesson-color-gyakorlat);
+}
+
+a.fc-event:has(div.lesson-konzultacio) {
+    background-color: var(--lesson-color-konzultacio);
+}
+
+a.fc-event:has(div.lesson-szeminarium) {
+    background-color: var(--lesson-color-szeminarium);
+}
+
+a.fc-event:has(div.lesson-labor) {
+    background-color: var(--lesson-color-labor);
+}
+
+a.fc-event:has(div.lesson-vizsgakurzus) {
+    background-color: var(--lesson-color-vizsgakurzus);
+}
+
+a.fc-event:has(div.lesson-hazidolgozat) {
+    background-color: var(--lesson-color-hazidolgozat);
+}
+
+a.fc-event:has(div.lesson-szakmai-gyakorlat) {
+    background-color: var(--lesson-color-szakmai-gyakorlat);
+}
+
+a.fc-event:has(div.lesson-elfoglaltsag) {
+    background-color: var(--lesson-color-elfoglaltsag);
 }
 
 a.fc-event:has(div.view-only) {

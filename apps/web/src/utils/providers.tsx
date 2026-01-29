@@ -6,7 +6,7 @@ import { ToastContainer } from 'react-toastify';
 import { PaletteMode } from '@mui/material';
 import useDynamicTheme from './theme';
 import { TimetableProvider } from '../contexts';
-import { useTimetableStorage } from '../hooks';
+import { useTimetableStorage, useLessonColors } from '../hooks';
 
 type ProviderProps = {
     children: ReactNode;
@@ -52,6 +52,8 @@ const Providers: React.FC<ProviderProps> = ({ children }: ProviderProps) => {
 
     const theme = useDynamicTheme(colorScheme);
     const { timetable } = useTimetableStorage();
+    
+    useLessonColors();
 
     return (
         <QueryClientProvider client={queryClient}>

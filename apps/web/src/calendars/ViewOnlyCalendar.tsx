@@ -5,6 +5,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import { Badge, Button } from '@mui/material';
 import type { Lesson } from '../utils/data';
 import LessonCalendar from './LessonCalendar';
+import { getLessonTypeClass } from '../hooks/useLessonColors';
 
 type ViewOnlyCalendarProps = {
     lessons: Lesson[]; // A megjelenítendő órák
@@ -33,9 +34,7 @@ const ViewOnlyCalendar: React.FC<ViewOnlyCalendarProps> = ({
             eventContent={(eventInfo) => {
                 return (
                     <div
-                        className={`view-only ${
-                            eventInfo.event.extendedProps.type === 'gyakorlat' ? 'practice' : 'lecture'
-                        }`}
+                        className={`view-only ${getLessonTypeClass(eventInfo.event.extendedProps.type as string)}`}
                     >
                         <div className="fc-event-time">
                             <b>{eventInfo.timeText}</b>

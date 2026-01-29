@@ -8,6 +8,8 @@ import { Badge, Box, Button, IconButton, Stack } from '@mui/material';
 import type { Lesson } from '../utils/data';
 import LessonCalendar from './LessonCalendar';
 import { Redo, Undo } from '@mui/icons-material';
+import ColorPicker from '../components/ColorPicker';
+import { getLessonTypeClass } from '../hooks/useLessonColors';
 
 type OwnCalendarProps = {
     lessons: Lesson[]; // A megjelenítendő órák
@@ -40,7 +42,7 @@ const OwnCalendar: React.FC<OwnCalendarProps> = ({
             showPopover={true}
             eventContent={(eventInfo) => {
                 return (
-                    <div className={`${eventInfo.event.extendedProps.type === 'gyakorlat' ? 'practice' : 'lecture'}`}>
+                    <div className={getLessonTypeClass(eventInfo.event.extendedProps.type as string)}>
                         <div className="fc-event-time">
                             <b>{eventInfo.timeText}</b>
                         </div>
@@ -66,6 +68,7 @@ const OwnCalendar: React.FC<OwnCalendarProps> = ({
             >
                 Saját kurzus hozzáadása
             </Button>
+            <ColorPicker />
             <Stack
                 direction="row"
                 marginLeft="auto"

@@ -7,6 +7,7 @@ import EventBusyIcon from '@mui/icons-material/EventBusy';
 import { Button } from '@mui/material';
 import { type Lesson } from '../utils/data';
 import LessonCalendar from './LessonCalendar';
+import { getLessonTypeClass } from '../hooks/useLessonColors';
 
 type ResultsCalendarProps = {
     lessonsResults: Lesson[]; // A keresési eredmények órái
@@ -41,7 +42,7 @@ const ResultsCalendar: React.FC<ResultsCalendarProps> = ({
             eventContent={(eventInfo) => {
                 return (
                     <div
-                        className={`${eventInfo.event.extendedProps.type === 'gyakorlat' ? 'practice' : 'lecture'}`}
+                        className={getLessonTypeClass(eventInfo.event.extendedProps.type as string)}
                         style={{
                             opacity: isEventInSaved(parseInt(eventInfo.event.id)) ? 0.6 : 1,
                             backgroundColor: isEventInSaved(parseInt(eventInfo.event.id)) ? 'gray' : '',
