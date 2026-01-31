@@ -9,7 +9,7 @@ import type { Lesson } from '../utils/data';
 import LessonCalendar from './LessonCalendar';
 import { Redo, Undo } from '@mui/icons-material';
 import ColorPicker from '../components/ColorPicker';
-import { getLessonTypeClass } from '../hooks/useLessonColors';
+import { getLessonTypeClass, LessonTypeKey } from '../hooks/useLessonColors';
 
 type OwnCalendarProps = {
     lessons: Lesson[]; // A megjelenítendő órák
@@ -42,7 +42,7 @@ const OwnCalendar: React.FC<OwnCalendarProps> = ({
             showPopover={true}
             eventContent={(eventInfo) => {
                 return (
-                    <div className={getLessonTypeClass(eventInfo.event.extendedProps.type as string)}>
+                    <div className={getLessonTypeClass(eventInfo.event.extendedProps.type as LessonTypeKey)}>
                         <div className="fc-event-time">
                             <b>{eventInfo.timeText}</b>
                         </div>

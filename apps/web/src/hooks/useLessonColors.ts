@@ -1,15 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 
 export const LESSON_TYPES = [
-    { key: 'előadás', label: 'Előadás' },
-    { key: 'gyakorlat', label: 'Gyakorlat' },
-    { key: 'konzultáció', label: 'Konzultáció' },
-    { key: 'szeminárium', label: 'Szeminárium' },
-    { key: 'labor', label: 'Labor' },
-    { key: 'vizsgakurzus', label: 'Vizsgakurzus' },
-    { key: 'házidolgozat', label: 'Házidolgozat' },
-    { key: 'szakmai gyakorlat', label: 'Szakmai gyakorlat' },
-    { key: 'elfoglaltság', label: 'Elfoglaltság' },
+    { key: 'előadás', label: 'Előadás', cssVar: '--lesson-color-eloadas', className: 'lesson-eloadas' },
+    { key: 'gyakorlat', label: 'Gyakorlat', cssVar: '--lesson-color-gyakorlat', className: 'lesson-gyakorlat' },
+    { key: 'konzultáció', label: 'Konzultáció', cssVar: '--lesson-color-konzultacio', className: 'lesson-konzultacio' },
+    { key: 'szeminárium', label: 'Szeminárium', cssVar: '--lesson-color-szeminarium', className: 'lesson-szeminarium' },
+    { key: 'labor', label: 'Labor', cssVar: '--lesson-color-labor', className: 'lesson-labor' },
+    { key: 'vizsgakurzus', label: 'Vizsgakurzus', cssVar: '--lesson-color-vizsgakurzus', className: 'lesson-vizsgakurzus' },
+    { key: 'házidolgozat', label: 'Házidolgozat', cssVar: '--lesson-color-hazidolgozat', className: 'lesson-hazidolgozat' },
+    { key: 'szakmai gyakorlat', label: 'Szakmai gyakorlat', cssVar: '--lesson-color-szakmai-gyakorlat', className: 'lesson-szakmai-gyakorlat' },
+    { key: 'elfoglaltság', label: 'Elfoglaltság', cssVar: '--lesson-color-elfoglaltsag', className: 'lesson-elfoglaltsag' },
 ] as const;
 
 export type LessonTypeKey = (typeof LESSON_TYPES)[number]['key'];
@@ -30,12 +30,10 @@ const DEFAULT_COLORS: LessonColors = {
 
 const STORAGE_KEY = 'LESSON_COLORS';
 
-const toCssVarName = (key: string): string => {
-    return `--lesson-color-${key.replace(/\s+/g, '-').replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ö/g, 'o').replace(/ő/g, 'o').replace(/ú/g, 'u').replace(/ü/g, 'u').replace(/ű/g, 'u')}`;
-};
+const LESSON_TYPE_MAP = new Map(LESSON_TYPES.map((t) => [t.key, t]));
 
-export const getLessonTypeClass = (type: string): string => {
-    return `lesson-${type.replace(/\s+/g, '-').replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ö/g, 'o').replace(/ő/g, 'o').replace(/ú/g, 'u').replace(/ü/g, 'u').replace(/ű/g, 'u')}`;
+export const getLessonTypeClass = (type: LessonTypeKey): string => {
+    return LESSON_TYPE_MAP.get(type)!.className;
 };
 
 export const useLessonColors = () => {
@@ -53,20 +51,22 @@ export const useLessonColors = () => {
     });
 
     useEffect(() => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(colors));
-        
-        LESSON_TYPES.forEach(({ key }) => {
-            const cssVarName = toCssVarName(key);
-            document.documentElement.style.setProperty(cssVarName, colors[key]);
+        LESSON_TYPES.forEach(({ key, cssVar }) => {
+            document.documentElement.style.setProperty(cssVar, colors[key]);
         });
     }, [colors]);
 
     const setColor = useCallback((type: LessonTypeKey, color: string) => {
-        setColors((prev) => ({ ...prev, [type]: color }));
+        setColors((prev) => {
+            const newColors = { ...prev, [type]: color };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(newColors));
+            return newColors;
+        });
     }, []);
 
     const resetColors = useCallback(() => {
         setColors(DEFAULT_COLORS);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_COLORS));
     }, []);
 
     const isDefault = useCallback(() => {

@@ -45,7 +45,7 @@ const ColorPicker: React.FC = () => {
                                     <input
                                         type="color"
                                         value={colors[key]}
-                                        onChange={(e) => setColor(key as LessonTypeKey, e.target.value)}
+                                        onChange={(e) => setColor(key, e.target.value)}
                                         style={{
                                             width: 50,
                                             height: 36,
