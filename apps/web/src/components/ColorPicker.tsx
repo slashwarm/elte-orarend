@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Button,
     Dialog,
@@ -7,19 +7,82 @@ import {
     DialogActions,
     Box,
     Typography,
-    Stack,
     Grid,
 } from '@mui/material';
 import PaletteIcon from '@mui/icons-material/Palette';
 import RestoreIcon from '@mui/icons-material/Restore';
-import { useLessonColors, LessonTypeKey } from '../hooks/useLessonColors';
+import SaveIcon from '@mui/icons-material/Save';
+import { useLessonColors, LessonTypeKey, LessonColors, LESSON_TYPES, LESSON_TYPE_MAP } from '../hooks/useLessonColors';
 
 const ColorPicker: React.FC = () => {
     const [open, setOpen] = useState(false);
-    const { colors, setColor, resetColors, isDefault, lessonTypes } = useLessonColors();
+    const { colors, setColors, lessonTypes, defaultColors } = useLessonColors();
+    
+    const [localColors, setLocalColors] = useState<LessonColors>(colors);
+    
+    const pendingUpdate = useRef<{ key: LessonTypeKey; value: string } | null>(null);
+    const rafId = useRef<number | null>(null);
+
+    useEffect(() => {
+        if (open) {
+            setLocalColors(colors);
+            LESSON_TYPES.forEach(({ key, cssVar }) => {
+                document.documentElement.style.setProperty(cssVar, colors[key]);
+            });
+        }
+    }, [open, colors]);
+
+    useEffect(() => {
+        return () => {
+            if (rafId.current !== null) {
+                cancelAnimationFrame(rafId.current);
+            }
+        };
+    }, []);
+
+    const handleColorChange = (key: LessonTypeKey, value: string) => {
+        pendingUpdate.current = { key, value };
+    
+        rafId.current ??= requestAnimationFrame(() => {
+                if (pendingUpdate.current) {
+                    const { key: updateKey, value: updateValue } = pendingUpdate.current;
+                    
+                    setLocalColors(prev => ({ ...prev, [updateKey]: updateValue }));
+
+                    const lessonType = LESSON_TYPE_MAP.get(updateKey);
+                    if (lessonType) {
+                        document.documentElement.style.setProperty(lessonType.cssVar, updateValue);
+                    }
+                    
+                    pendingUpdate.current = null;
+                }
+                rafId.current = null;
+            });
+    };
+
+    const handleSave = () => {
+        setColors(localColors);
+        setOpen(false);
+    };
+
+    const handleReset = () => {
+        setLocalColors(defaultColors);
+
+        LESSON_TYPES.forEach(({ key, cssVar }) => {
+            document.documentElement.style.setProperty(cssVar, defaultColors[key]);
+        });
+    };
 
     const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    
+    const handleClose = () => {
+        LESSON_TYPES.forEach(({ key, cssVar }) => {
+            document.documentElement.style.setProperty(cssVar, colors[key]);
+        });
+        setOpen(false);
+    };
+
+    const hasChanges = lessonTypes.some(({ key }) => localColors[key] !== colors[key]);
 
     return (
         <>
@@ -44,8 +107,8 @@ const ColorPicker: React.FC = () => {
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                                     <input
                                         type="color"
-                                        value={colors[key]}
-                                        onChange={(e) => setColor(key, e.target.value)}
+                                        value={localColors[key]}
+                                        onChange={(e) => handleColorChange(key, e.target.value)}
                                         style={{
                                             width: 50,
                                             height: 36,
@@ -59,7 +122,7 @@ const ColorPicker: React.FC = () => {
                                         sx={{
                                             flex: 1,
                                             height: 36,
-                                            backgroundColor: colors[key],
+                                            backgroundColor: localColors[key],
                                             borderRadius: 1,
                                             display: 'flex',
                                             alignItems: 'center',
@@ -80,15 +143,25 @@ const ColorPicker: React.FC = () => {
                 <DialogActions sx={{ justifyContent: 'space-between', px: 3, pb: 2 }}>
                     <Button
                         startIcon={<RestoreIcon />}
-                        onClick={resetColors}
+                        onClick={handleReset}
                         color="inherit"
-                        disabled={isDefault()}
+                        disabled={lessonTypes.every(({ key }) => localColors[key] === defaultColors[key])}
                     >
                         Alapértelmezett
                     </Button>
-                    <Button onClick={handleClose} variant="contained">
-                        Bezárás
-                    </Button>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button onClick={handleClose} color="inherit">
+                            Mégse
+                        </Button>
+                        <Button
+                            onClick={handleSave}
+                            variant="contained"
+                            startIcon={<SaveIcon />}
+                            disabled={!hasChanges}
+                        >
+                            Mentés
+                        </Button>
+                    </Box>
                 </DialogActions>
             </Dialog>
         </>

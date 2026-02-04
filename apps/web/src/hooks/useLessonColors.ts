@@ -36,6 +36,8 @@ export const getLessonTypeClass = (type: LessonTypeKey): string => {
     return LESSON_TYPE_MAP.get(type)!.className;
 };
 
+export { LESSON_TYPE_MAP };
+
 export const useLessonColors = () => {
     const [colors, setColors] = useState<LessonColors>(() => {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -64,6 +66,11 @@ export const useLessonColors = () => {
         });
     }, []);
 
+    const setAllColors = useCallback((newColors: LessonColors) => {
+        setColors(newColors);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newColors));
+    }, []);
+
     const resetColors = useCallback(() => {
         setColors(DEFAULT_COLORS);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_COLORS));
@@ -76,6 +83,7 @@ export const useLessonColors = () => {
     return {
         colors,
         setColor,
+        setColors: setAllColors,
         resetColors,
         isDefault,
         defaultColors: DEFAULT_COLORS,
