@@ -91,6 +91,9 @@ export function decodeLessonsFromSearchParam(param: string): Lesson[] {
             case 'el':
                 lesson.type = 'elfoglaltság';
                 break;
+            case 'te':
+                lesson.type = 'teremfoglalás';
+                break;
             default:
                 lesson.type = parts[i + 7];
         }
@@ -180,6 +183,7 @@ export function encodeLessonsToSearchParam(lessons: Lesson[]): string {
                 break;
             case 'elfoglaltság':
             case 'szakmai gyakorlat':
+            case 'teremfoglalás':
                 parts.push(lesson.type[0] + lesson.type[1]);
                 break;
             default:

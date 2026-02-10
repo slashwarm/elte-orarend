@@ -9,6 +9,7 @@ export const LESSON_TYPES = [
     { key: 'vizsgakurzus', label: 'Vizsgakurzus', cssVar: '--lesson-color-vizsgakurzus', className: 'lesson-vizsgakurzus' },
     { key: 'házidolgozat', label: 'Házidolgozat', cssVar: '--lesson-color-hazidolgozat', className: 'lesson-hazidolgozat' },
     { key: 'szakmai gyakorlat', label: 'Szakmai gyakorlat', cssVar: '--lesson-color-szakmai-gyakorlat', className: 'lesson-szakmai-gyakorlat' },
+    { key: 'teremfoglalás', label: 'Teremfoglalás', cssVar: '--lesson-color-teremfoglalas', className: 'lesson-teremfoglalas' },
     { key: 'elfoglaltság', label: 'Elfoglaltság', cssVar: '--lesson-color-elfoglaltsag', className: 'lesson-elfoglaltsag' },
 ] as const;
 
@@ -25,6 +26,7 @@ const DEFAULT_COLORS: LessonColors = {
     'vizsgakurzus': '#9c27b0',
     'házidolgozat': '#0288d1',
     'szakmai gyakorlat': '#00695c',
+    'teremfoglalás': '#795548',
     'elfoglaltság': '#616161',
 };
 

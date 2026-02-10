@@ -72,6 +72,10 @@ a.fc-event:has(div.lesson-szakmai-gyakorlat) {
     background-color: var(--lesson-color-szakmai-gyakorlat);
 }
 
+a.fc-event:has(div.lesson-teremfoglalas) {
+    background-color: var(--lesson-color-teremfoglalas);
+}
+
 a.fc-event:has(div.lesson-elfoglaltsag) {
     background-color: var(--lesson-color-elfoglaltsag);
 }

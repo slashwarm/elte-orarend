@@ -177,6 +177,7 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                     <MenuItem value={'vizsgakurzus'}>vizsgakurzus</MenuItem>
                                     <MenuItem value={'házidolgozat'}>házidolgozat</MenuItem>
                                     <MenuItem value={'szakmai gyakorlat'}>szakmai gyakorlat</MenuItem>
+                                    <MenuItem value={'teremfoglalás'}>teremfoglalás</MenuItem>
                                 </Select>
                             </FormControl>
                         </Grid>
