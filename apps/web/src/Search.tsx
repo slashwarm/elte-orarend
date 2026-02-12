@@ -101,7 +101,7 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
             }
 
             const courses: Course[] = importedData.map((subArray) => {
-                return { courseCode: subArray[0], courseId: subArray[2] };
+                return { courseCode: subArray[3], courseId: subArray[0] };
             });
 
             const formData = {
