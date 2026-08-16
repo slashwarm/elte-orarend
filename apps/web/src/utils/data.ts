@@ -1,6 +1,5 @@
 import axios, { isAxiosError } from 'axios';
 import CRC32 from 'crc-32';
-import { toast } from 'react-toastify';
 
 export type DayOfWeek = 'hétfő' | 'kedd' | 'szerda' | 'csütörtök' | 'péntek' | 'szombat' | 'vasárnap';
 
@@ -64,6 +63,54 @@ const regex = /[\d!@#$%^&*()_+=[\]{};':"\\|,.<>/?]/g;
 
 const daysOfWeek: DayOfWeek[] = ['hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat', 'vasárnap'];
 
+const MAX_QUERY_LENGTH = 3500;
+
+// A szerver 10 másodperc után adja fel az upstream lekérdezést. Enélkül egy beragadt kérés örökre pörögne.
+const REQUEST_TIMEOUT = 20000;
+
+const getSearchErrorMessage = (error: unknown): string => {
+    if (!isAxiosError(error)) {
+        return 'Ismeretlen hiba történt a keresés közben. Részletek a konzolban.';
+    }
+
+    if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+        return 'A keresés túl sokáig tartott. A tanrend.elte.hu most lassan válaszol, próbáld újra.';
+    }
+
+    if (!error.response) {
+        return navigator.onLine
+            ? 'Nem sikerült elérni a szervert. Ellenőrizd a kapcsolatot, majd próbáld újra.'
+            : 'Nincs internetkapcsolat. Csatlakozz újra, majd próbáld meg ismét.';
+    }
+
+    if (error.response.status >= 500) {
+        return 'A szerver hibát jelzett. Lehet, hogy a tanrend.elte.hu nem elérhető. Próbáld újra pár perc múlva.';
+    }
+
+    if (error.response.status === 400) {
+        return 'Érvénytelen keresés. Ellenőrizd a beírt nevet vagy kódot.';
+    }
+
+    return `A keresés nem sikerült (${error.response.status}). Próbáld újra.`;
+};
+
+// A kurzuskódok rendezve és duplikáció nélkül mennek ki, hogy ugyanaz a keresés ugyanazt a cache kulcsot kapja
+const buildSearchParams = (formData?: SearchData): URLSearchParams | undefined => {
+    if (!formData) {
+        return undefined;
+    }
+
+    const params = new URLSearchParams({ year: formData.year });
+
+    if (Array.isArray(formData.name)) {
+        [...new Set(formData.name)].sort().forEach((code) => params.append('code', code));
+    } else {
+        params.append('name', formData.name);
+    }
+
+    return params;
+};
+
 /**
  * Lekérdezi a szerverről a kért adatokat
  *
@@ -76,22 +123,20 @@ const daysOfWeek: DayOfWeek[] = ['hétfő', 'kedd', 'szerda', 'csütörtök', 'p
  */
 const fetchTimetable = async (formData?: SearchData): Promise<Data> => {
     try {
-        const response = await axios.post('/api', formData);
+        const params = buildSearchParams(formData);
+
+        // GET-et a CDN tudja cache-elni, tehát kevesebb kérés megy ki. Túl hosszú kurzuslistánál marad a POST.
+        const response =
+            params && params.toString().length <= MAX_QUERY_LENGTH
+                ? await axios.get(`/api?${params.toString()}`, { timeout: REQUEST_TIMEOUT })
+                : await axios.post('/api', formData, { timeout: REQUEST_TIMEOUT });
+
         return response.data;
     } catch (error: unknown) {
-        if (isAxiosError(error)) {
-            if (error.response) {
-                console.error('Server response error', error.response);
-            } else if (error.request) {
-                console.error('Network error', error.request);
-            } else {
-                console.error('Axios error:', error);
-            }
-        } else {
-            console.error('Error fetching', error);
-        }
-        toast.error('Hiba történt az adatok lekérdezése közben. Részletek a konzolban.');
-        return [];
+        console.error('Error fetching timetable', error);
+
+        // A hibát a hívó react-query kapja meg, hogy a felület hibaüzenetet és újrapróbálást tudjon mutatni
+        throw new Error(getSearchErrorMessage(error));
     }
 };
 
