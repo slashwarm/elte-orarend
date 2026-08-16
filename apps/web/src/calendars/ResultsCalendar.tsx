@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import '../styles/Calendar.css';
 
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import { Button } from '@mui/material';
@@ -67,7 +68,7 @@ const ResultsCalendar: React.FC<ResultsCalendarProps> = ({
         >
             <Button
                 variant="outlined"
-                startIcon={showOwnSubjects ? <VisibilityOff /> : <Visibility />}
+                startIcon={showOwnSubjects ? <VisibilityOffIcon /> : <VisibilityIcon />}
                 onClick={() => setShowOwnSubjects(!showOwnSubjects)}
             >
                 {showOwnSubjects ? 'Saját tárgyak elrejtése' : 'Saját tárgyak mutatása'}

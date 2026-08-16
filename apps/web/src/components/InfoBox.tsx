@@ -19,7 +19,7 @@ const InfoBox: React.FC = () => {
     return (
         <Alert
             sx={{
-                margin: 'auto',
+                alignSelf: 'center',
             }}
             severity="info"
             role="status"

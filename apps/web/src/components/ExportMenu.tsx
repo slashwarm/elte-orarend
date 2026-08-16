@@ -75,9 +75,7 @@ const ExportMenu: React.FC<ExportMenuProps> = ({ lessons, onImageDownload, onUrl
                 </MenuItem>
 
                 {(onImageDownload || onUrlExport) && <Divider />}
-                {(onImageDownload || onUrlExport) && (
-                    <ListSubheader sx={{ lineHeight: '2.5rem' }}>Egyéb</ListSubheader>
-                )}
+                {(onImageDownload || onUrlExport) && <ListSubheader sx={{ lineHeight: '2.5rem' }}>Egyéb</ListSubheader>}
 
                 {onUrlExport && (
                     <MenuItem onClick={runAndClose(onUrlExport)}>

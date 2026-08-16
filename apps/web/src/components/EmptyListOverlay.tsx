@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
+import { SPACING } from '../utils/spacing';
 
 const StyledGridOverlay = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -55,7 +56,7 @@ export default function CustomNoRowsOverlay() {
                     </g>
                 </g>
             </svg>
-            <Box sx={{ mt: 1 }}>Nincs találat</Box>
+            <Box sx={{ mt: SPACING.tight }}>Nincs találat</Box>
         </StyledGridOverlay>
     );
 }

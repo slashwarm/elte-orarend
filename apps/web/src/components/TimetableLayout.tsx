@@ -1,8 +1,8 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import OwnCalendar from '../calendars/OwnCalendar';
 import ResultsCalendar from '../calendars/ResultsCalendar';
@@ -15,6 +15,7 @@ import useDownloadImage from '../utils/image';
 import { useSearchResults, useLessonOperations, useLessonHistory, useKeyboardShortcuts } from '../hooks';
 import { useTimetableContext } from '../contexts';
 import { handleUrlExport } from '../utils/exportUtils';
+import { SPACING } from '../utils/spacing';
 import { Course, SearchData } from '../utils/data';
 
 interface TimetableLayoutProps {
@@ -66,97 +67,94 @@ const TimetableLayout: React.FC<TimetableLayoutProps> = ({ viewOnly }) => {
 
     return (
         <>
-            <Box component="main" sx={{ flex: 1, mt: 0 }} p={{ xs: 1, sm: 2, md: 4 }}>
-                <Grid container direction="column" spacing={2} alignContent="center">
+            <Box
+                component="main"
+                sx={{
+                    p: SPACING.page,
+                    flex: 1,
+                }}
+            >
+                <Stack spacing={SPACING.loose}>
                     <InfoBox />
                     {!viewOnly && (
-                        <Grid item xs={12} sm={6} md={4} lg={3}>
-                            <Paper
-                                sx={{
-                                    p: 2,
-                                    maxWidth: 700,
-                                    margin: 'auto',
-                                    overflow: 'hidden',
-                                }}
-                            >
-                                <Search onSubmit={handleSearch} isLoading={isLoading} />
-                            </Paper>
-                        </Grid>
+                        <Paper
+                            sx={{
+                                p: SPACING.base,
+                                maxWidth: 700,
+                                width: '100%',
+                                alignSelf: 'center',
+                                overflow: 'hidden',
+                            }}
+                        >
+                            <Search onSubmit={handleSearch} isLoading={isLoading} />
+                        </Paper>
                     )}
                     {dataUpdatedAt !== 0 && !viewOnly && (
-                        <Grid item xs={12}>
-                            <Paper sx={{ p: 2 }}>
-                                <Results
-                                    tableData={searchResults}
-                                    onLessonSave={handleLessonSave}
-                                    savedLessons={savedLessons}
-                                    isLoading={isLoading}
-                                    own={false}
-                                />
-                            </Paper>
-                        </Grid>
+                        <Paper sx={{ p: SPACING.base }}>
+                            <Results
+                                tableData={searchResults}
+                                onLessonSave={handleLessonSave}
+                                savedLessons={savedLessons}
+                                isLoading={isLoading}
+                                own={false}
+                            />
+                        </Paper>
                     )}
 
                     {dataUpdatedAt !== 0 && !viewOnly && (
-                        <Grid item xs={12}>
-                            <Paper sx={{ p: 2 }}>
-                                <ResultsCalendar
-                                    lessonsResults={searchResults}
-                                    ownLessons={savedLessons}
-                                    onEventClick={handleCalendarClickWrapper}
-                                />
-                            </Paper>
-                        </Grid>
+                        <Paper sx={{ p: SPACING.base }}>
+                            <ResultsCalendar
+                                lessonsResults={searchResults}
+                                ownLessons={savedLessons}
+                                onEventClick={handleCalendarClickWrapper}
+                            />
+                        </Paper>
                     )}
 
-                    <Grid item xs={12}>
+                    <Box>
                         <Typography variant="h5" component="h2">
                             {viewOnly ? 'A velem megosztott órarend' : 'Saját órarendem'}
                         </Typography>
 
                         <Divider />
-                    </Grid>
+                    </Box>
                     {!viewOnly && (
-                        <Grid item xs={12}>
-                            <Paper sx={{ p: 2 }}>
-                                <Results
-                                    tableData={savedLessons}
-                                    onLessonSave={handleLessonSave}
-                                    savedLessons={savedLessons}
-                                    isLoading={isLoading}
-                                    onEventEdit={setEditEvent}
-                                    onEventChange={handleEventChange}
-                                    own={true}
-                                />
-                            </Paper>
-                        </Grid>
+                        <Paper sx={{ p: SPACING.base }}>
+                            <Results
+                                tableData={savedLessons}
+                                onLessonSave={handleLessonSave}
+                                savedLessons={savedLessons}
+                                isLoading={isLoading}
+                                onEventEdit={setEditEvent}
+                                onEventChange={handleEventChange}
+                                own={true}
+                            />
+                        </Paper>
                     )}
 
                     {savedLessons.length > 0 && (
-                        <Grid item xs={12}>
-                            <Paper sx={{ p: 2 }}>
-                                {!viewOnly ? (
-                                    <OwnCalendar
-                                        lessons={savedLessons}
-                                        onUrlExport={handleUrlExportWrapper}
-                                        onImageDownload={handleDownloadImage}
-                                        onEventEdit={setEditEvent}
-                                        canUndo={canUndo}
-                                        canRedo={canRedo}
-                                        undo={handleUndo}
-                                        redo={handleRedo}
-                                    />
-                                ) : (
-                                    <ViewOnlyCalendar
-                                        lessons={savedLessons}
-                                        onUrlExport={handleUrlExportWrapper}
-                                        onImageDownload={handleDownloadImage}
-                                    />
-                                )}
-                            </Paper>
-                        </Grid>
+                        <Paper sx={{ p: SPACING.base }}>
+                            {!viewOnly ? (
+                                <OwnCalendar
+                                    lessons={savedLessons}
+                                    onUrlExport={handleUrlExportWrapper}
+                                    onImageDownload={handleDownloadImage}
+                                    onEventEdit={setEditEvent}
+                                    canUndo={canUndo}
+                                    canRedo={canRedo}
+                                    undo={handleUndo}
+                                    redo={handleRedo}
+                                />
+                            ) : (
+                                <ViewOnlyCalendar
+                                    lessons={savedLessons}
+                                    onUrlExport={handleUrlExportWrapper}
+                                    onImageDownload={handleDownloadImage}
+                                />
+                            )}
+                        </Paper>
                     )}
-                </Grid>
+                </Stack>
             </Box>
 
             {!!editEvent && (

@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import GitHubIcon from '@mui/icons-material/GitHub';
+import { SPACING } from '../utils/spacing';
 import PrivacyPolicy from './PrivacyPolicy';
 
 export default function Footer() {
@@ -12,18 +13,32 @@ export default function Footer() {
     return (
         <Box
             component="footer"
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            gap="8px"
             role="contentinfo"
             aria-label="Oldal lábléce"
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: SPACING.tight,
+            }}
         >
-            <Typography variant="body2" color="text.secondary" align="center">
+            <Typography
+                variant="body2"
+                align="center"
+                sx={{
+                    color: 'text.secondary',
+                }}
+            >
                 Készült ❤️-el és sok ☕-al az ELTE-n.
             </Typography>
 
-            <Typography variant="caption" color="text.secondary" align="center">
+            <Typography
+                variant="caption"
+                align="center"
+                sx={{
+                    color: 'text.secondary',
+                }}
+            >
                 Nem hivatalos oldal, nem áll kapcsolatban az ELTE-vel.{' '}
                 <Link component="button" type="button" variant="caption" onClick={() => setPrivacyOpen(true)}>
                     Adatkezelési tájékoztató

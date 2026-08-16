@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import Footer from './components/Footer';
+import { SPACING } from './utils/spacing';
 import TimetableLayout from './components/TimetableLayout';
 import { useTimetableStorage } from './hooks';
 
@@ -11,7 +12,12 @@ const App: React.FC = () => {
     const { viewOnly } = useTimetableStorage();
 
     return (
-        <Box display="flex" minHeight="100vh">
+        <Box
+            sx={{
+                display: 'flex',
+                minHeight: '100vh',
+            }}
+        >
             <CssBaseline />
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', maxWidth: '100%' }}>
                 <Typography
@@ -30,7 +36,7 @@ const App: React.FC = () => {
 
                 <TimetableLayout viewOnly={viewOnly} />
 
-                <Box component="footer" sx={{ p: 2 }}>
+                <Box component="footer" sx={{ p: SPACING.base }}>
                     <Footer />
                 </Box>
             </Box>
