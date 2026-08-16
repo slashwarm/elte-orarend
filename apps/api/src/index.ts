@@ -1,9 +1,8 @@
 import { Hono } from 'hono';
-import { cors } from 'hono/cors';
 import { load } from 'cheerio';
 import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
-import { getSearchMode } from '../utils/getSearchMode.js';
+import { getSearchMode } from './utils/getSearchMode.js';
 
 const RequestBodySchema = z.object({
     year: z.string().regex(/^\d{4}-\d{4}-\d$/),
@@ -11,16 +10,6 @@ const RequestBodySchema = z.object({
 });
 
 const app = new Hono();
-
-app.use(
-    '*',
-    cors({
-        origin: '*',
-        allowMethods: ['POST', 'OPTIONS'],
-        allowHeaders: ['*'],
-        maxAge: 86400,
-    }),
-);
 
 const CACHE = new Map<string, { data: string[][]; timestamp: number }>();
 const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
@@ -103,20 +92,8 @@ app.post('/api', zValidator('json', RequestBodySchema), async (c) => {
     }
 });
 
-app.get('/', (c) => {
+app.get('/api', (c) => {
     return c.json({ status: 'ok', message: 'ELTE Órarend API is running 🚀' });
 });
-
-if (process.env.NODE_ENV !== 'production') {
-    const port = process.env.PORT || 3000;
-    console.log(`🚀 Server starting on port ${port}...`);
-
-    const { serve } = await import('@hono/node-server');
-    serve({
-        fetch: app.fetch,
-        port: Number(port),
-    });
-    console.log(`✅ Server running at http://localhost:${port}`);
-}
 
 export default app;

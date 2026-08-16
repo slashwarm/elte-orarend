@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+# pnpm
+.pnpm-store
+.pnpm-debug.log
+
+# Other package managers
+package-lock.json
+yarn.lock
+
 # Editor directories and files
 .vscode/*
 .history/*
@@ -28,3 +36,5 @@ dist-ssr
 # Environment variables
 .env
 .env.*
+
+.omc

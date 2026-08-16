@@ -1,13 +1,14 @@
 {
-    "name": "elte-orarend-api",
+    "name": "@elte-orarend/api",
     "private": true,
     "version": "1.0.0",
     "type": "module",
+    "main": "./src/index.ts",
     "scripts": {
+        "dev": "tsx --watch src/dev.ts",
         "build": "tsc",
-        "start": "node dist/index.js",
-        "dev": "tsx --watch src/index.ts",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "typecheck": "tsc --noEmit",
+        "start": "node dist/dev.js"
     },
     "dependencies": {
         "@hono/node-server": "^1.18.1",
