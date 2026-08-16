@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import { useTheme } from '@mui/material';
-import html2canvas from 'html2canvas';
 
 export default function useDownloadImage() {
     const theme = useTheme();
@@ -10,6 +9,8 @@ export default function useDownloadImage() {
             const element = ref.current;
 
             if (element) {
+                const { default: html2canvas } = await import('html2canvas');
+
                 const canvas = await html2canvas(element, {
                     backgroundColor: backgroundColor,
                 });

@@ -23,7 +23,6 @@ import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import { Fragment, useState } from 'react';
 import { SPACING } from './utils/spacing';
-import { read, utils } from 'xlsx';
 import { Course, getSemesters, SearchData } from './utils/data';
 import { toast } from 'react-toastify';
 import { useThemeContext } from './utils/providers';
@@ -88,6 +87,8 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
 
     const handleUpload = async () => {
         if (file) {
+            const { read, utils } = await import('xlsx');
+
             const data = await file.arrayBuffer();
             const workbook = read(data);
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
