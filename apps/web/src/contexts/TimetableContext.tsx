@@ -39,6 +39,7 @@ export const TimetableProvider: React.FC<TimetableProviderProps> = ({ children, 
     return <TimetableContext.Provider value={value}>{children}</TimetableContext.Provider>;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useTimetableContext = () => {
     const context = useContext(TimetableContext);
     if (context === undefined) {

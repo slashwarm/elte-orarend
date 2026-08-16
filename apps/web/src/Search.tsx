@@ -17,7 +17,7 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import Select from '@mui/material/Select';
+import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
@@ -44,8 +44,12 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
     const [file, setFile] = useState<Blob | null>(null);
     const [showDropdown, setShowDropdown] = useState(false);
 
-    const changeYear = (event: any) => {
-        setYear(semesters.find((semester) => semester.value === event.target.value)!);
+    const changeYear = (event: SelectChangeEvent<string>) => {
+        const selected = semesters.find((semester) => semester.value === event.target.value);
+
+        if (selected) {
+            setYear(selected);
+        }
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
