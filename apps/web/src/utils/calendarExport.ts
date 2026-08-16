@@ -188,6 +188,15 @@ export const generateIcs = (lessons: Lesson[]): string => {
 };
 
 /**
+ * Megszámolja azokat a látható órákat, amiket időpont híján nem lehet naptárba tenni
+ *
+ * @param {Lesson[]} lessons
+ * @returns {number}
+ */
+const countSkippedLessons = (lessons: Lesson[]): number =>
+    lessons.filter((lesson) => !lesson.hidden && !getLessonOccurrence(lesson)).length;
+
+/**
  * Letölti az órarendet .ics fájlként
  *
  * @param {Lesson[]} lessons
@@ -197,8 +206,16 @@ export const handleIcsExport = (lessons: Lesson[]): boolean => {
     const ics = generateIcs(lessons);
 
     if (!ics.includes('BEGIN:VEVENT')) {
-        toast.error('Nincs exportálható óra az órarendben');
+        toast.error('Egyik órának sincs időpontja, így nincs mit naptárba exportálni');
         return false;
+    }
+
+    const skipped = countSkippedLessons(lessons);
+
+    if (skipped > 0) {
+        toast.warning(
+            `${skipped} óra kimaradt az exportból, mert nincs ${skipped === 1 ? 'időpontja' : 'időpontjuk'} ⚠️`,
+        );
     }
 
     const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });

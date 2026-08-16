@@ -3,13 +3,11 @@ import '../styles/Calendar.css';
 import { EventClickArg } from '@fullcalendar/core';
 import AddIcon from '@mui/icons-material/Add';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
-import LinkIcon from '@mui/icons-material/Link';
 import { Button, IconButton, Stack } from '@mui/material';
 import type { Lesson } from '../utils/data';
 import LessonCalendar from './LessonCalendar';
 import { Redo, Undo } from '@mui/icons-material';
 import ColorPicker from '../components/ColorPicker';
-import CalendarExportButton from '../components/CalendarExportButton';
 import { getLessonTypeClass, LessonTypeKey } from '../hooks/useLessonColors';
 
 type OwnCalendarProps = {
@@ -39,8 +37,19 @@ const OwnCalendar: React.FC<OwnCalendarProps> = ({
         <LessonCalendar
             lessons={lessons}
             onImageDownload={onImageDownload}
+            onUrlExport={onUrlExport}
             onEventClick={onEventClick}
             showPopover={true}
+            toolbarEnd={
+                <Stack direction="row">
+                    <IconButton aria-label="Visszavonás" color="success" onClick={undo} disabled={!canUndo}>
+                        <Undo />
+                    </IconButton>
+                    <IconButton aria-label="Újra csinálás" color="success" onClick={redo} disabled={!canRedo}>
+                        <Redo />
+                    </IconButton>
+                </Stack>
+            }
             eventContent={(eventInfo) => {
                 return (
                     <div className={getLessonTypeClass(eventInfo.event.extendedProps.type as LessonTypeKey)}>
@@ -56,43 +65,15 @@ const OwnCalendar: React.FC<OwnCalendarProps> = ({
             popoverActionIcon={() => <EditCalendarIcon fontSize="small" />}
             popoverActionText={() => 'Kattints a szerkesztéshez'}
         >
-            
-            <Button variant="outlined" startIcon={<LinkIcon />} onClick={onUrlExport} >
-                Mentés hivatkozásként
-            </Button>
-            <CalendarExportButton lessons={lessons} />
             <Button
-                variant="outlined"
+                variant="contained"
                 color="success"
                 startIcon={<AddIcon />}
                 onClick={() => (onEventEdit ? onEventEdit(-1) : undefined)}
-                sx={{ visibility: 'visible' }}
             >
                 Saját kurzus hozzáadása
             </Button>
             <ColorPicker />
-            <Stack
-                direction="row"
-                marginLeft="auto"
-            >
-                <IconButton
-                    aria-label='Visszavonás'
-                    color="success"
-                    onClick={undo}
-                    disabled={!canUndo}
-                    sx={{marginRight: "auto"}}
-                >
-                    <Undo/>
-                </IconButton>
-                <IconButton
-                    aria-label="Újra csinálás"
-                    color="success"
-                    onClick={redo}
-                    disabled={!canRedo}
-                >
-                    <Redo/>
-                </IconButton>
-            </Stack>
         </LessonCalendar>
     );
 };
