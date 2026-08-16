@@ -9,6 +9,7 @@ import type { Lesson } from '../utils/data';
 import LessonCalendar from './LessonCalendar';
 import { Redo, Undo } from '@mui/icons-material';
 import ColorPicker from '../components/ColorPicker';
+import CalendarExportButton from '../components/CalendarExportButton';
 import { getLessonTypeClass, LessonTypeKey } from '../hooks/useLessonColors';
 
 type OwnCalendarProps = {
@@ -59,6 +60,7 @@ const OwnCalendar: React.FC<OwnCalendarProps> = ({
             <Button variant="outlined" startIcon={<LinkIcon />} onClick={onUrlExport} >
                 Mentés hivatkozásként
             </Button>
+            <CalendarExportButton lessons={lessons} />
             <Button
                 variant="outlined"
                 color="success"

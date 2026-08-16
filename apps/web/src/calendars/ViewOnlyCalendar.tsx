@@ -6,6 +6,7 @@ import { Button } from '@mui/material';
 import type { Lesson } from '../utils/data';
 import LessonCalendar from './LessonCalendar';
 import { getLessonTypeClass, LessonTypeKey } from '../hooks/useLessonColors';
+import CalendarExportButton from '../components/CalendarExportButton';
 
 type ViewOnlyCalendarProps = {
     lessons: Lesson[]; // A megjelenítendő órák
@@ -50,7 +51,8 @@ const ViewOnlyCalendar: React.FC<ViewOnlyCalendarProps> = ({
             <Button variant="outlined" startIcon={<LinkIcon />} onClick={onUrlExport}>
                 Mentés hivatkozásként
             </Button>
-          
+
+            <CalendarExportButton lessons={lessons} />
 
             <Button
                 variant="outlined"
