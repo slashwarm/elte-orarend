@@ -6,7 +6,8 @@ import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import { Button, IconButton, Stack } from '@mui/material';
 import type { Lesson } from '../utils/data';
 import LessonCalendar from './LessonCalendar';
-import { Redo, Undo } from '@mui/icons-material';
+import RedoIcon from '@mui/icons-material/Redo';
+import UndoIcon from '@mui/icons-material/Undo';
 import ColorPicker from '../components/ColorPicker';
 import { getLessonTypeClass, LessonTypeKey } from '../hooks/useLessonColors';
 
@@ -43,10 +44,10 @@ const OwnCalendar: React.FC<OwnCalendarProps> = ({
             toolbarEnd={
                 <Stack direction="row">
                     <IconButton aria-label="Visszavonás" color="success" onClick={undo} disabled={!canUndo}>
-                        <Undo />
+                        <UndoIcon />
                     </IconButton>
                     <IconButton aria-label="Újra csinálás" color="success" onClick={redo} disabled={!canRedo}>
-                        <Redo />
+                        <RedoIcon />
                     </IconButton>
                 </Stack>
             }

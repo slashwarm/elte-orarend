@@ -239,15 +239,15 @@ const Results: React.FC<ResultsProps> = ({
                 noRowsOverlay: CustomNoRowsOverlay,
                 loadingOverlay: LoadingOverlay,
             }}
-            sx={{
+            sx={(theme) => ({
                 '--DataGrid-overlayHeight': '300px',
                 '& .MuiDataGrid-virtualScroller': {
                     '&:focus': {
-                        outline: '2px solid #1976d2',
+                        outline: `2px solid ${theme.palette.primary.main}`,
                         outlineOffset: '2px',
                     },
                 },
-            }}
+            })}
             loading={isLoading}
             aria-label={own ? 'Saját órarend táblázat' : 'Keresési eredmények táblázat'}
         />

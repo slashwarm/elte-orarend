@@ -1,4 +1,5 @@
-import { DarkMode, LightMode } from '@mui/icons-material';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import EventRepeatIcon from '@mui/icons-material/EventRepeat';
@@ -154,7 +155,7 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                             title={`Téma váltása ${colorScheme === 'light' ? 'sötét' : 'világos'} módra`}
                             size="small"
                         >
-                            {colorScheme === 'light' ? <DarkMode /> : <LightMode />}
+                            {colorScheme === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
                         </Fab>
                     </Stack>
 
