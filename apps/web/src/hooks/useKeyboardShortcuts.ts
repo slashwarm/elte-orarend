@@ -6,10 +6,27 @@ interface UseKeyboardShortcutsProps {
     enabled: boolean;
 }
 
+/**
+ * Megmondja, hogy a billentyűleütés szövegbevitel közben történt-e.
+ * Ilyenkor a böngésző saját visszavonása kell, nem az órarendé
+ */
+const isTextEntry = (target: EventTarget | null): boolean => {
+    if (!(target instanceof HTMLElement)) {
+        return false;
+    }
+
+    return (
+        target.isContentEditable ||
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement
+    );
+};
+
 export const useKeyboardShortcuts = ({ onUndo, onRedo, enabled }: UseKeyboardShortcutsProps) => {
     const handleKeyPress = useCallback<(event: KeyboardEvent) => void>(
         (event) => {
-            if (!enabled) return;
+            if (!enabled || isTextEntry(event.target)) return;
 
             if (event.ctrlKey && event.key.toLowerCase() === 'z') {
                 onUndo();

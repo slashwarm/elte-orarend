@@ -27,7 +27,14 @@ export const useLessonOperations = () => {
 
     const handleCalendarClick = useCallback(
         (id: number, searchResults: Lesson[]) => {
-            const lesson = savedLessons.concat(searchResults).find((lesson) => lesson.id === id) as Lesson;
+            const lesson = savedLessons.concat(searchResults).find((lesson) => lesson.id === id);
+
+            if (!lesson) {
+                console.error('A naptárban kattintott órához nincs adat', id);
+                toast.error('Ez az óra már nem érhető el 😞');
+                return;
+            }
+
             handleLessonSave(lesson);
         },
         [savedLessons, handleLessonSave],
