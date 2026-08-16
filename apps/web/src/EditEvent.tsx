@@ -15,6 +15,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs, { Dayjs } from 'dayjs';
+import { SPACING } from './utils/spacing';
 import 'dayjs/locale/hu';
 import { useEffect, useState } from 'react';
 import './styles/Calendar.css';
@@ -121,8 +122,21 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
             <DialogTitle id="edit-event-dialog-title">Kurzus módosítása</DialogTitle>
             <DialogContent id="edit-event-dialog-description">
                 <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="hu">
-                    <Grid container spacing={2} marginTop={1} component="form" role="form">
-                        <Grid item xs={9} md={10}>
+                    <Grid
+                        container
+                        spacing={SPACING.base}
+                        component="form"
+                        role="form"
+                        sx={{
+                            marginTop: SPACING.tight,
+                        }}
+                    >
+                        <Grid
+                            size={{
+                                xs: 9,
+                                md: 10,
+                            }}
+                        >
                             <TextField
                                 name="name"
                                 label="Tárgy neve"
@@ -135,7 +149,12 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                 aria-describedby="name-help"
                             />
                         </Grid>
-                        <Grid item xs={3} md={2}>
+                        <Grid
+                            size={{
+                                xs: 3,
+                                md: 2,
+                            }}
+                        >
                             <TextField
                                 name="course"
                                 label="Kurzus"
@@ -146,7 +165,12 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                 aria-describedby="course-help"
                             />
                         </Grid>
-                        <Grid item xs={7} md={8}>
+                        <Grid
+                            size={{
+                                xs: 7,
+                                md: 8,
+                            }}
+                        >
                             <TextField
                                 name="code"
                                 label="Tárgy kódja"
@@ -157,7 +181,12 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                 aria-describedby="code-help"
                             />
                         </Grid>
-                        <Grid item xs={5} md={4}>
+                        <Grid
+                            size={{
+                                xs: 5,
+                                md: 4,
+                            }}
+                        >
                             <FormControl fullWidth>
                                 <InputLabel id="type-select-label">Típus</InputLabel>
                                 <Select
@@ -181,7 +210,7 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                 </Select>
                             </FormControl>
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                             <TextField
                                 name="location"
                                 label="Helyszín"
@@ -192,7 +221,7 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                 aria-describedby="location-help"
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                             <TextField
                                 name="comment"
                                 label="Oktató / Megjegyzés"
@@ -204,7 +233,12 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                 aria-describedby="comment-help"
                             />
                         </Grid>
-                        <Grid item xs={6} md={3}>
+                        <Grid
+                            size={{
+                                xs: 6,
+                                md: 3,
+                            }}
+                        >
                             <TimePicker
                                 name="start"
                                 skipDisabled
@@ -223,12 +257,17 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                 }}
                             />
                         </Grid>
-                        <Grid item xs={6} md={3}>
+                        <Grid
+                            size={{
+                                xs: 6,
+                                md: 3,
+                            }}
+                        >
                             <TimePicker
                                 name="end"
                                 skipDisabled
                                 label="Vége"
-                                minTime={startTime}
+                                minTime={startTime ?? undefined}
                                 maxTime={dayjs('2024-01-01T22:00')}
                                 value={endTime}
                                 onChange={(newValue) => {
@@ -242,7 +281,12 @@ const EditEvent: React.FC<EditEventProps> = ({ savedLessons, onEventChange, onEv
                                 }}
                             />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid
+                            size={{
+                                xs: 12,
+                                md: 6,
+                            }}
+                        >
                             <FormControl fullWidth>
                                 <InputLabel id="day-select-label">Nap</InputLabel>
                                 <Select

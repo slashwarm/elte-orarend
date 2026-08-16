@@ -18,14 +18,6 @@ const useDynamicTheme = (colorScheme: PaletteMode) => {
                         },
                     },
                     components: {
-                        MuiGrid: {
-                            styleOverrides: {
-                                item: {
-                                    width: '100%',
-                                    maxWidth: '100vw !important',
-                                },
-                            },
-                        },
                         MuiCssBaseline: {
                             styleOverrides: {
                                 ':root': colorScheme === 'light' ? null : { '--fc-border-color': '#515151' },

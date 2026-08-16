@@ -1,25 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-    Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Box,
-    Typography,
-    Grid,
-} from '@mui/material';
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Box, Typography, Grid } from '@mui/material';
 import PaletteIcon from '@mui/icons-material/Palette';
 import RestoreIcon from '@mui/icons-material/Restore';
 import SaveIcon from '@mui/icons-material/Save';
 import { useLessonColors, LessonTypeKey, LessonColors, LESSON_TYPES, LESSON_TYPE_MAP } from '../hooks/useLessonColors';
+import { SPACING } from '../utils/spacing';
 
 const ColorPicker: React.FC = () => {
     const [open, setOpen] = useState(false);
     const { colors, setColors, lessonTypes, defaultColors } = useLessonColors();
-    
+
     const [localColors, setLocalColors] = useState<LessonColors>(colors);
-    
+
     const pendingUpdate = useRef<{ key: LessonTypeKey; value: string } | null>(null);
     const rafId = useRef<number | null>(null);
 
@@ -42,22 +34,22 @@ const ColorPicker: React.FC = () => {
 
     const handleColorChange = (key: LessonTypeKey, value: string) => {
         pendingUpdate.current = { key, value };
-    
-        rafId.current ??= requestAnimationFrame(() => {
-                if (pendingUpdate.current) {
-                    const { key: updateKey, value: updateValue } = pendingUpdate.current;
-                    
-                    setLocalColors(prev => ({ ...prev, [updateKey]: updateValue }));
 
-                    const lessonType = LESSON_TYPE_MAP.get(updateKey);
-                    if (lessonType) {
-                        document.documentElement.style.setProperty(lessonType.cssVar, updateValue);
-                    }
-                    
-                    pendingUpdate.current = null;
+        rafId.current ??= requestAnimationFrame(() => {
+            if (pendingUpdate.current) {
+                const { key: updateKey, value: updateValue } = pendingUpdate.current;
+
+                setLocalColors((prev) => ({ ...prev, [updateKey]: updateValue }));
+
+                const lessonType = LESSON_TYPE_MAP.get(updateKey);
+                if (lessonType) {
+                    document.documentElement.style.setProperty(lessonType.cssVar, updateValue);
                 }
-                rafId.current = null;
-            });
+
+                pendingUpdate.current = null;
+            }
+            rafId.current = null;
+        });
     };
 
     const handleSave = () => {
@@ -74,7 +66,7 @@ const ColorPicker: React.FC = () => {
     };
 
     const handleOpen = () => setOpen(true);
-    
+
     const handleClose = () => {
         LESSON_TYPES.forEach(({ key, cssVar }) => {
             document.documentElement.style.setProperty(cssVar, colors[key]);
@@ -86,25 +78,26 @@ const ColorPicker: React.FC = () => {
 
     return (
         <>
-            <Button
-                variant="outlined"
-                startIcon={<PaletteIcon />}
-                onClick={handleOpen}
-                color="secondary"
-            >
+            <Button variant="outlined" startIcon={<PaletteIcon />} onClick={handleOpen} color="secondary">
                 Színek testreszabása
             </Button>
 
             <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
                 <DialogTitle>Óratípusok színei</DialogTitle>
                 <DialogContent>
-                    <Grid container spacing={2} sx={{ mt: 0.5 }}>
+                    <Grid container spacing={SPACING.base} sx={{ mt: SPACING.tight }}>
                         {lessonTypes.map(({ key, label }) => (
-                            <Grid item xs={12} sm={6} key={key}>
+                            <Grid
+                                key={key}
+                                size={{
+                                    xs: 12,
+                                    sm: 6,
+                                }}
+                            >
                                 <Typography variant="subtitle2" gutterBottom>
                                     {label}
                                 </Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: SPACING.tight }}>
                                     <input
                                         type="color"
                                         value={localColors[key]}
@@ -140,7 +133,7 @@ const ColorPicker: React.FC = () => {
                         ))}
                     </Grid>
                 </DialogContent>
-                <DialogActions sx={{ justifyContent: 'space-between', px: 3, pb: 2 }}>
+                <DialogActions sx={{ justifyContent: 'space-between', px: SPACING.loose, pb: SPACING.base }}>
                     <Button
                         startIcon={<RestoreIcon />}
                         onClick={handleReset}
@@ -149,7 +142,7 @@ const ColorPicker: React.FC = () => {
                     >
                         Alapértelmezett
                     </Button>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Box sx={{ display: 'flex', gap: SPACING.tight }}>
                         <Button onClick={handleClose} color="inherit">
                             Mégse
                         </Button>

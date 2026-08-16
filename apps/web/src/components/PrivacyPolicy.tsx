@@ -9,6 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
+import { SPACING } from '../utils/spacing';
 
 type PrivacyPolicyProps = {
     open: boolean;
@@ -17,7 +18,7 @@ type PrivacyPolicyProps = {
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
     <>
-        <Typography variant="h6" component="h3" sx={{ mt: 3, mb: 1, fontSize: '1.05rem' }}>
+        <Typography variant="h6" component="h3" sx={{ mt: SPACING.loose, mb: SPACING.tight, fontSize: '1.05rem' }}>
             {title}
         </Typography>
         {children}
@@ -46,24 +47,34 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ open, onClose }) => {
             </DialogTitle>
 
             <DialogContent dividers>
-                <Alert severity="warning" sx={{ mb: 2 }}>
-                    Ez az oldal <strong>nem hivatalos</strong>. Nem áll kapcsolatban az Eötvös Loránd Tudományegyetemmel,
-                    nem az ELTE üzemelteti és nem is támogatja. Egy nyílt forráskódú, hallgatói kezdeményezés. A hivatalos
-                    órarendi és tanulmányi adatokért mindig a{' '}
+                <Alert severity="warning" sx={{ mb: SPACING.base }}>
+                    Ez az oldal <strong>nem hivatalos</strong>. Nem áll kapcsolatban az Eötvös Loránd
+                    Tudományegyetemmel, nem az ELTE üzemelteti és nem is támogatja. Egy nyílt forráskódú, hallgatói
+                    kezdeményezés. A hivatalos órarendi és tanulmányi adatokért mindig a{' '}
                     <Link href="https://tanrend.elte.hu" target="_blank" rel="noopener noreferrer">
                         tanrend.elte.hu
                     </Link>{' '}
                     oldalt és a Neptunt vedd alapul.
                 </Alert>
 
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                    variant="body2"
+                    sx={{
+                        color: 'text.secondary',
+                    }}
+                >
                     Röviden: <strong>nem gyűjtünk és nem tárolunk személyes adatot.</strong> Nincs regisztráció, nincs
                     bejelentkezés, nincsenek marketing- vagy nyomkövető sütik, és semmilyen adatot nem adunk el vagy
                     tovább harmadik félnek.
                 </Typography>
 
                 <Section title="1. Ki üzemelteti az oldalt?">
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            color: 'text.secondary',
+                        }}
+                    >
                         Az oldalt ELTE-s hallgatók készítették és tartják karban, önkéntes alapon, nonprofit módon. A
                         forráskód nyilvános:{' '}
                         <Link
@@ -78,7 +89,13 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ open, onClose }) => {
                 </Section>
 
                 <Section title="2. Milyen adat marad a saját eszközödön?">
-                    <Typography variant="body2" color="text.secondary" component="div">
+                    <Typography
+                        variant="body2"
+                        component="div"
+                        sx={{
+                            color: 'text.secondary',
+                        }}
+                    >
                         Az órarended <strong>kizárólag a saját böngésződben</strong>, a localStorage tárolóban marad. Ez
                         nem sütinek számít, nem kerül fel szerverre, és mi nem látjuk. Ezt tároljuk:
                         <ul>
@@ -103,7 +120,13 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ open, onClose }) => {
                 </Section>
 
                 <Section title="3. Mi történik a szerveren?">
-                    <Typography variant="body2" color="text.secondary" component="div">
+                    <Typography
+                        variant="body2"
+                        component="div"
+                        sx={{
+                            color: 'text.secondary',
+                        }}
+                    >
                         A keresés úgy működik, hogy az API a nyilvános{' '}
                         <Link href="https://tanrend.elte.hu" target="_blank" rel="noopener noreferrer">
                             tanrend.elte.hu
@@ -112,8 +135,8 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ open, onClose }) => {
                         <ul>
                             <li>Csak a keresőkifejezés és a félév megy át a szerverre.</li>
                             <li>
-                                Nincs felhasználói fiók, nincs adatbázis, nincs profilépítés. A találatokat legfeljebb 10
-                                percig tartjuk a memóriában gyorsítótárként, felhasználóhoz nem kötve.
+                                Nincs felhasználói fiók, nincs adatbázis, nincs profilépítés. A találatokat legfeljebb
+                                10 percig tartjuk a memóriában gyorsítótárként, felhasználóhoz nem kötve.
                             </li>
                             <li>
                                 Ha oktató nevére keresel, az a név átmegy a szerveren – ez ugyanaz a nyilvános adat,
@@ -124,7 +147,12 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ open, onClose }) => {
                 </Section>
 
                 <Section title="4. Neptunból exportált Excel fájl">
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            color: 'text.secondary',
+                        }}
+                    >
                         A feltöltött <code>.xlsx</code> fájlt <strong>a saját böngésződ dolgozza fel</strong>. A fájl
                         maga soha nem kerül fel semmilyen szerverre. Belőle csak a kurzuskódokat olvassuk ki, és
                         kizárólag azokat küldjük el a kereséshez. A benne szereplő neved, Neptun-kódod, jegyeid vagy
@@ -133,7 +161,12 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ open, onClose }) => {
                 </Section>
 
                 <Section title="5. Megosztható link">
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            color: 'text.secondary',
+                        }}
+                    >
                         Ha megosztod az órarendedet, az órák adatai tömörítve, magába a linkbe kerülnek bele. Szerveren
                         semmit nem tárolunk el belőle. Akinek elküldöd a linket, látja az órarended tartalmát – ezért
                         csak olyannak add oda, akivel meg akarod osztani.
@@ -141,7 +174,13 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ open, onClose }) => {
                 </Section>
 
                 <Section title="6. Látogatottsági statisztika (Vercel Analytics)">
-                    <Typography variant="body2" color="text.secondary" component="div">
+                    <Typography
+                        variant="body2"
+                        component="div"
+                        sx={{
+                            color: 'text.secondary',
+                        }}
+                    >
                         Az oldalt a Vercel Inc. szolgáltatja, és a{' '}
                         <Link
                             href="https://vercel.com/docs/analytics/privacy-policy"
@@ -166,7 +205,12 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ open, onClose }) => {
                 </Section>
 
                 <Section title="7. Kiszolgáló naplói">
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            color: 'text.secondary',
+                        }}
+                    >
                         A tárhelyszolgáltató (Vercel Inc.) adatfeldolgozóként rövid ideig technikai naplókat kezelhet az
                         üzemeltetéshez és a visszaélések elleni védelemhez. Ehhez mi nem adunk hozzá semmit, és nem
                         építünk belőle felhasználói profilt. Részletek a{' '}
@@ -178,7 +222,12 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ open, onClose }) => {
                 </Section>
 
                 <Section title="8. Jogaid">
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            color: 'text.secondary',
+                        }}
+                    >
                         Mivel nem tárolunk hozzád köthető adatot, a hozzáféréshez, helyesbítéshez vagy törléshez való
                         jogodat a gyakorlatban nincs mihez kötni – a saját adataid a te eszközödön vannak, és bármikor
                         törölheted őket. Ha mégis kérdésed van, keress minket a GitHubon. Panasszal a Nemzeti
@@ -191,14 +240,26 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ open, onClose }) => {
                 </Section>
 
                 <Section title="9. Felelősség">
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            color: 'text.secondary',
+                        }}
+                    >
                         Az adatok a tanrend.elte.hu oldalról származnak, és hibásak vagy elavultak lehetnek. Az oldal
                         „ahogy van” állapotban érhető el, garancia nélkül. Vizsga- és órarendi ügyekben a hivatalos ELTE
                         felületek a mérvadóak.
                     </Typography>
                 </Section>
 
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 3 }}>
+                <Typography
+                    variant="caption"
+                    sx={{
+                        color: 'text.secondary',
+                        display: 'block',
+                        mt: SPACING.loose,
+                    }}
+                >
                     Utolsó frissítés: 2026. augusztus 16.
                 </Typography>
             </DialogContent>

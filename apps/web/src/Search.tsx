@@ -3,7 +3,6 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import EventRepeatIcon from '@mui/icons-material/EventRepeat';
 import SearchIcon from '@mui/icons-material/Search';
-import LoadingButton from '@mui/lab/LoadingButton';
 import { Fab, useTheme } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -23,6 +22,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import { Fragment, useState } from 'react';
+import { SPACING } from './utils/spacing';
 import { read, utils } from 'xlsx';
 import { Course, getSemesters, SearchData } from './utils/data';
 import { toast } from 'react-toastify';
@@ -134,10 +134,10 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
     return (
         <Fragment>
             <Box component="form" onSubmit={handleSubmit} noValidate>
-                <Stack spacing={2}>
+                <Stack spacing={SPACING.base}>
                     <Stack
                         direction="row"
-                        spacing={2}
+                        spacing={SPACING.base}
                         sx={{
                             justifyContent: 'space-between',
                             alignItems: 'center',
@@ -158,39 +158,40 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                     </Stack>
 
                     <TextField
-                        margin="normal"
                         fullWidth
                         id="name"
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon
-                                        sx={{
-                                            color: 'text.secondary',
-                                            opacity: 0.7,
-                                        }}
-                                    />
-                                </InputAdornment>
-                            ),
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        onClick={toggleDropdown}
-                                        edge="end"
-                                        aria-label="Félév kiválasztó megjelenítése/elrejtése"
-                                        title="Félév kiválasztó megjelenítése/elrejtése"
-                                    >
-                                        <CalendarMonthIcon />
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
                         placeholder="Írd be a tárgy nevét / kódját, vagy az oktató nevét / Neptun-kódját"
                         name="name"
                         error={error}
                         helperText={error ? 'Hibás bemenet.' : ''}
                         aria-describedby={error ? 'name-error' : undefined}
                         aria-required="true"
+                        slotProps={{
+                            input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon
+                                            sx={{
+                                                color: 'text.secondary',
+                                                opacity: 0.7,
+                                            }}
+                                        />
+                                    </InputAdornment>
+                                ),
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={toggleDropdown}
+                                            edge="end"
+                                            aria-label="Félév kiválasztó megjelenítése/elrejtése"
+                                            title="Félév kiválasztó megjelenítése/elrejtése"
+                                        >
+                                            <CalendarMonthIcon />
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            },
+                        }}
                     />
                     {showDropdown && (
                         <FormControl size="small">
@@ -217,8 +218,8 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                         </Alert>
                     )}
 
-                    <Stack spacing={1}>
-                        <LoadingButton
+                    <Stack spacing={SPACING.tight}>
+                        <Button
                             loading={isLoading}
                             loadingPosition="start"
                             type="submit"
@@ -226,7 +227,7 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                             aria-label="Keresés indítása"
                         >
                             Keresés
-                        </LoadingButton>
+                        </Button>
 
                         <Divider
                             sx={{
@@ -264,19 +265,27 @@ const Search: React.FC<SearchProps> = ({ onSubmit, isLoading }: SearchProps) => 
                         </ol>
                     </Typography>
 
-                    <Stack direction="column" spacing={2} alignItems="center">
+                    <Stack
+                        direction="column"
+                        spacing={SPACING.base}
+                        sx={{
+                            alignItems: 'center',
+                        }}
+                    >
                         <form>
-                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={SPACING.base}>
                                 <TextField
                                     type={'file'}
-                                    inputProps={{
-                                        accept: '.xlsx',
-                                        'aria-label': 'Excel fájl kiválasztása',
-                                    }}
                                     onChange={(e) => setFile(((e.target as HTMLInputElement).files as FileList)[0])}
                                     disabled={isLoading}
                                     label="Fájl kiválasztása"
                                     variant="outlined"
+                                    slotProps={{
+                                        htmlInput: {
+                                            accept: '.xlsx',
+                                            'aria-label': 'Excel fájl kiválasztása',
+                                        },
+                                    }}
                                 />
                                 <Button
                                     variant="contained"

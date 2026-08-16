@@ -9,9 +9,25 @@ import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
 import Link from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
-import { DataGrid, GridColDef, huHU } from '@mui/x-data-grid';
+import { DataGrid, GridAutosizeOptions, GridColDef, useGridApiRef } from '@mui/x-data-grid';
+import { huHU } from '@mui/x-data-grid/locales';
+import { useEffect, useMemo } from 'react';
 import { Lesson } from './utils/data';
 import CustomNoRowsOverlay from './components/EmptyListOverlay';
+
+const ACTIONS_WIDTH = 172;
+const REVIEWS_WIDTH = 116;
+const AUTOSIZED_FIELDS = ['code', 'name', 'type', 'course', 'teacher', 'comment', 'location', 'day', 'time'];
+
+const AUTOSIZE_OPTIONS: GridAutosizeOptions = {
+    columns: AUTOSIZED_FIELDS,
+    includeHeaders: true,
+    includeOutliers: false,
+    outliersFactor: 1.5,
+    expand: true,
+};
+
+const LoadingOverlay = () => <LinearProgress />;
 
 type ResultsProps = {
     tableData: Lesson[];
@@ -32,161 +48,181 @@ const Results: React.FC<ResultsProps> = ({
     isLoading,
     own,
 }: ResultsProps) => {
-    const columns: GridColDef<Lesson>[] = [
-        {
-            field: 'actions',
-            type: 'actions',
-            headerName: 'Műveletek',
-            width: 160,
-            cellClassName: 'actions',
-            sortable: false,
-            renderCell: (params) => {
-                const onDeleteClick = (e: React.MouseEvent): void => {
-                    e.stopPropagation();
-                    return onLessonSave(params.row);
-                };
+    const apiRef = useGridApiRef();
 
-                if (own) {
-                    const lesson = savedLessons.find((lesson) => lesson.id === params.id);
-                    const isHidden = savedLessons && lesson && lesson.hidden;
-
-                    const onHideClick = (e: React.MouseEvent): void => {
+    const columns: GridColDef<Lesson>[] = useMemo(
+        () => [
+            {
+                field: 'actions',
+                type: 'actions',
+                headerName: 'Műveletek',
+                width: ACTIONS_WIDTH,
+                resizable: false,
+                cellClassName: 'actions',
+                sortable: false,
+                renderCell: (params) => {
+                    const onDeleteClick = (e: React.MouseEvent): void => {
                         e.stopPropagation();
-                        return onEventChange ? onEventChange({ ...(lesson as Lesson), hidden: !isHidden }) : undefined;
+                        return onLessonSave(params.row);
                     };
 
-                    return (
-                        <>
-                            <Tooltip title="Eltávolítás" placement="top" disableInteractive>
-                                <IconButton
-                                    color="error"
-                                    onClick={onDeleteClick}
-                                    aria-label={`Eltávolítás: ${params.row.name}`}
-                                    tabIndex={params.tabIndex}
+                    if (own) {
+                        const lesson = savedLessons.find((lesson) => lesson.id === params.id);
+                        const isHidden = savedLessons && lesson && lesson.hidden;
+
+                        const onHideClick = (e: React.MouseEvent): void => {
+                            e.stopPropagation();
+                            return onEventChange
+                                ? onEventChange({ ...(lesson as Lesson), hidden: !isHidden })
+                                : undefined;
+                        };
+
+                        return (
+                            <>
+                                <Tooltip title="Eltávolítás" placement="top" disableInteractive>
+                                    <IconButton
+                                        color="error"
+                                        onClick={onDeleteClick}
+                                        aria-label={`Eltávolítás: ${params.row.name}`}
+                                        tabIndex={params.tabIndex}
+                                    >
+                                        <BookmarkRemoveIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Szerkesztés" placement="top" disableInteractive>
+                                    <IconButton
+                                        onClick={() => (onEventEdit ? onEventEdit(Number(params.id)) : undefined)}
+                                        aria-label={`Szerkesztés: ${params.row.name}`}
+                                        tabIndex={params.tabIndex}
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip
+                                    title={isHidden ? 'Megjelenítés a naptárban' : 'Elrejtés a naptárból'}
+                                    placement="top"
+                                    disableInteractive
                                 >
-                                    <BookmarkRemoveIcon />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Szerkesztés" placement="top" disableInteractive>
-                                <IconButton
-                                    onClick={() => (onEventEdit ? onEventEdit(Number(params.id)) : undefined)}
-                                    aria-label={`Szerkesztés: ${params.row.name}`}
-                                    tabIndex={params.tabIndex}
-                                >
-                                    <EditIcon />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip
-                                title={isHidden ? 'Megjelenítés a naptárban' : 'Elrejtés a naptárból'}
-                                placement="top"
-                                disableInteractive
+                                    <IconButton
+                                        color={isHidden ? 'secondary' : 'primary'}
+                                        onClick={onHideClick}
+                                        aria-label={`${isHidden ? 'Megjelenítés' : 'Elrejtés'} a naptárból: ${params.row.name}`}
+                                        tabIndex={params.tabIndex}
+                                    >
+                                        {isHidden ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        );
+                    } else {
+                        const isSaved = savedLessons && savedLessons.some((obj) => obj.id === params.id);
+
+                        return (
+                            <Button
+                                variant="outlined"
+                                onClick={onDeleteClick}
+                                color={!isSaved ? 'success' : 'error'}
+                                startIcon={!isSaved ? <BookmarkAddIcon /> : <BookmarkRemoveIcon />}
+                                aria-label={`${!isSaved ? 'Mentés' : 'Eltávolítás'}: ${params.row.name}`}
+                                tabIndex={params.tabIndex}
                             >
-                                <IconButton
-                                    color={isHidden ? 'secondary' : 'primary'}
-                                    onClick={onHideClick}
-                                    aria-label={`${isHidden ? 'Megjelenítés' : 'Elrejtés'} a naptárból: ${params.row.name}`}
-                                    tabIndex={params.tabIndex}
-                                >
-                                    {isHidden ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                                </IconButton>
-                            </Tooltip>
-                        </>
-                    );
-                } else {
-                    const isSaved = savedLessons && savedLessons.some((obj) => obj.id === params.id);
+                                {!isSaved ? 'Mentés' : 'Eltávolítás'}
+                            </Button>
+                        );
+                    }
+                },
+            },
+            {
+                field: 'code',
+                headerName: 'Tárgykód',
+                minWidth: 110,
+            },
+            {
+                field: 'name',
+                headerName: 'Tárgynév',
+                minWidth: 160,
+            },
+            {
+                field: 'type',
+                headerName: 'Típus',
+                minWidth: 90,
+            },
+            {
+                field: 'course',
+                headerName: 'Kurzus',
+                minWidth: 70,
+            },
+            {
+                field: 'teacher',
+                headerName: 'Oktató neve',
+                minWidth: 120,
+            },
+            {
+                field: 'reviews',
+                type: 'actions',
+                headerName: 'Vélemények',
+                width: REVIEWS_WIDTH,
+                resizable: false,
+                cellClassName: 'actions',
+                sortable: false,
+                renderCell: (params) => {
+                    if (params.row.teacher === '') return '';
+
+                    const teacherName = params.row.teacher;
+                    const url = 'https://www.markmyprofessor.com/kereses?q=' + encodeURI(teacherName);
 
                     return (
-                        <Button
+                        <Chip
+                            label="MMP"
+                            component={Link}
                             variant="outlined"
-                            onClick={onDeleteClick}
-                            color={!isSaved ? 'success' : 'error'}
-                            startIcon={!isSaved ? <BookmarkAddIcon /> : <BookmarkRemoveIcon />}
-                            aria-label={`${!isSaved ? 'Mentés' : 'Eltávolítás'}: ${params.row.name}`}
+                            href={url}
+                            target="_blank"
+                            clickable
+                            aria-label={`Vélemények megtekintése: ${teacherName}`}
                             tabIndex={params.tabIndex}
-                        >
-                            {!isSaved ? 'Mentés' : 'Eltávolítás'}
-                        </Button>
+                        />
                     );
-                }
+                },
             },
-        },
-        {
-            field: 'code',
-            headerName: 'Tárgykód',
-            width: 140,
-        },
-        {
-            field: 'name',
-            headerName: 'Tárgynév',
-            width: 280,
-        },
-        {
-            field: 'type',
-            headerName: 'Típus',
-            width: 100,
-        },
-        {
-            field: 'course',
-            headerName: 'Kurzus',
-            width: 70,
-        },
-        {
-            field: 'teacher',
-            headerName: 'Oktató neve',
-            width: 140,
-        },
-        {
-            field: 'reviews',
-            type: 'actions',
-            headerName: 'Vélemények',
-            width: 100,
-            cellClassName: 'actions',
-            sortable: false,
-            renderCell: (params) => {
-                if (params.row.teacher === '') return '';
-
-                const teacherName = params.row.teacher;
-                const url = 'https://www.markmyprofessor.com/kereses?q=' + encodeURI(teacherName);
-
-                return (
-                    <Chip
-                        label="MMP"
-                        component={Link}
-                        variant="outlined"
-                        href={url}
-                        target="_blank"
-                        clickable
-                        aria-label={`Vélemények megtekintése: ${teacherName}`}
-                        tabIndex={params.tabIndex}
-                    />
-                );
+            {
+                field: 'comment',
+                headerName: 'Oktató / Megjegyzés',
+                minWidth: 150,
             },
-        },
-        {
-            field: 'comment',
-            headerName: 'Oktató / Megjegyzés',
-            width: 250,
-        },
-        {
-            field: 'location',
-            headerName: 'Helyszín',
-            width: 230,
-        },
-        {
-            field: 'day',
-            headerName: 'Nap',
-            width: 85,
-        },
-        {
-            field: 'time',
-            headerName: 'Időpont',
-            width: 100,
-        },
-    ];
+            {
+                field: 'location',
+                headerName: 'Helyszín',
+                minWidth: 150,
+            },
+            {
+                field: 'day',
+                headerName: 'Nap',
+                minWidth: 85,
+            },
+            {
+                field: 'time',
+                headerName: 'Időpont',
+                minWidth: 100,
+            },
+        ],
+        [own, savedLessons, onLessonSave, onEventChange, onEventEdit],
+    );
+
+    useEffect(() => {
+        if (isLoading || !tableData.length) {
+            return;
+        }
+
+        apiRef.current?.autosizeColumns(AUTOSIZE_OPTIONS);
+    }, [apiRef, tableData, columns, isLoading]);
 
     return (
         <DataGrid
             autoHeight
+            apiRef={apiRef}
+            autosizeOnMount
+            autosizeOptions={AUTOSIZE_OPTIONS}
             rows={tableData}
             columns={columns}
             initialState={{
@@ -201,14 +237,10 @@ const Results: React.FC<ResultsProps> = ({
             localeText={huHU.components.MuiDataGrid.defaultProps.localeText}
             slots={{
                 noRowsOverlay: CustomNoRowsOverlay,
-                loadingOverlay: LinearProgress,
+                loadingOverlay: LoadingOverlay,
             }}
             sx={{
                 '--DataGrid-overlayHeight': '300px',
-                '& .MuiDataGrid-cellContent': {
-                    whiteSpace: 'normal',
-                    lineHeight: 'normal',
-                },
                 '& .MuiDataGrid-virtualScroller': {
                     '&:focus': {
                         outline: '2px solid #1976d2',

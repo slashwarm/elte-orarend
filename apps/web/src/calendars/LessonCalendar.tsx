@@ -10,6 +10,7 @@ import { EventClickArg, EventContentArg, EventHoveringArg, EventInput } from '@f
 import { Box, Divider, Fade, Popper } from '@mui/material';
 import { convertDataToCalendar, type Lesson } from '../utils/data';
 import ExportMenu from '../components/ExportMenu';
+import { SPACING } from '../utils/spacing';
 import Paper from '@mui/material/Paper';
 import { EventImpl } from '@fullcalendar/core/internal';
 import dayjs from 'dayjs';
@@ -99,16 +100,18 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
 
     // A naptár alatti eszköztár, ami a képmentésbe már nem kerül bele
     const toolbar = (children || toolbarEnd || hasExportMenu) && !isCalendarSaving && (
-        <Box sx={isBottom ? { mt: 2 } : { mb: 2 }}>
-            {isBottom && <Divider sx={{ mb: 2 }} />}
+        <Box sx={isBottom ? { mt: SPACING.base } : { mb: SPACING.base }}>
+            {isBottom && <Divider sx={{ mb: SPACING.base }} />}
             <Stack
                 direction={{ xs: 'column', sm: 'row' }}
-                spacing={1.5}
+                spacing={SPACING.tight}
                 useFlexGap
-                flexWrap="wrap"
-                alignItems={{ xs: 'stretch', sm: 'center' }}
                 component="nav"
                 aria-label="Órarend műveletek"
+                sx={{
+                    flexWrap: 'wrap',
+                    alignItems: { xs: 'stretch', sm: 'center' },
+                }}
             >
                 {children}
                 {hasExportMenu && (
@@ -187,7 +190,7 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
                 >
                     {({ TransitionProps }) => (
                         <Fade {...TransitionProps} timeout={350}>
-                            <Paper sx={{ p: 1 }}>
+                            <Paper sx={{ p: SPACING.tight }}>
                                 <div>
                                     {dayjs(start).format('HH:mm')} - {dayjs(end).format('HH:mm')}
                                 </div>
@@ -197,9 +200,12 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
                                 {(popoverActionIcon || popoverActionText) && (
                                     <Stack
                                         direction="row"
-                                        spacing={0.5}
-                                        sx={{ fontSize: 'small', color: 'gray' }}
-                                        marginTop={0.5}
+                                        spacing={SPACING.tight}
+                                        sx={{
+                                            marginTop: SPACING.tight,
+                                            fontSize: 'small',
+                                            color: 'gray',
+                                        }}
                                     >
                                         <div>{eventId && popoverActionIcon && popoverActionIcon(eventId)}</div>
                                         <div>{eventId && popoverActionText && popoverActionText(eventId)}</div>
