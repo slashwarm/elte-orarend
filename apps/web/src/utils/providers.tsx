@@ -1,5 +1,7 @@
 import React, { ReactNode, useState, useEffect, createContext, useContext } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
+import { PersistQueryClientProvider, removeOldestQuery } from '@tanstack/react-query-persist-client';
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ThemeProvider } from '@mui/material/styles';
 import { ToastContainer } from 'react-toastify';
@@ -28,7 +30,26 @@ export const useThemeContext = () => {
     return context;
 };
 
-const queryClient = new QueryClient();
+const CACHE_MAX_AGE = 1000 * 60 * 60 * 24; // 24 óra
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 1000 * 60 * 45, // 45 perc
+            gcTime: CACHE_MAX_AGE, // legalább akkora, mint a staleTime, különben feleslegesen kérdezünk újra
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+            retry: 1,
+        },
+    },
+});
+
+// Az újratöltés így nem indít új lekérdezést a tanrend.elte.hu felé
+const persister = createAsyncStoragePersister({
+    storage: window.localStorage,
+    key: 'elte-orarend-query-cache',
+    retry: removeOldestQuery, // ha megtelne a localStorage, a legrégebbi keresés esik ki
+});
 
 const Providers: React.FC<ProviderProps> = ({ children }: ProviderProps) => {
     const themePreference = window.matchMedia('(prefers-color-scheme: dark)');
@@ -53,11 +74,11 @@ const Providers: React.FC<ProviderProps> = ({ children }: ProviderProps) => {
 
     const theme = useDynamicTheme(colorScheme);
     const { timetable } = useTimetableStorage();
-    
+
     useLessonColors();
 
     return (
-        <QueryClientProvider client={queryClient}>
+        <PersistQueryClientProvider client={queryClient} persistOptions={{ persister, maxAge: CACHE_MAX_AGE }}>
             <TimetableProvider initialLessons={timetable}>
                 <ThemeContext.Provider value={{ colorScheme, setColorScheme }}>
                     <ThemeProvider theme={theme}>{children}</ThemeProvider>
@@ -65,7 +86,7 @@ const Providers: React.FC<ProviderProps> = ({ children }: ProviderProps) => {
                     <ToastContainer theme={colorScheme} />
                 </ThemeContext.Provider>
             </TimetableProvider>
-        </QueryClientProvider>
+        </PersistQueryClientProvider>
     );
 };
 

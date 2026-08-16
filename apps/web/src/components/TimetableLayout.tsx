@@ -1,6 +1,10 @@
 import React from 'react';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -25,7 +29,7 @@ interface TimetableLayoutProps {
 const TimetableLayout: React.FC<TimetableLayoutProps> = ({ viewOnly }) => {
     const { savedLessons, setSavedLessons, setSearchQuery, setSelectedCourses } = useTimetableContext();
 
-    const { searchResults, isLoading, dataUpdatedAt } = useSearchResults();
+    const { searchResults, isLoading, isError, error, refetch, dataUpdatedAt } = useSearchResults();
     const { editEvent, setEditEvent, handleLessonSave, handleCalendarClick, handleEventChange } = useLessonOperations();
     const { canUndo, canRedo, undo, redo } = useLessonHistory();
     const handleDownloadImage = useDownloadImage();
@@ -88,6 +92,28 @@ const TimetableLayout: React.FC<TimetableLayoutProps> = ({ viewOnly }) => {
                         >
                             <Search onSubmit={handleSearch} isLoading={isLoading} />
                         </Paper>
+                    )}
+                    {!viewOnly && isError && (
+                        <Alert
+                            severity="error"
+                            role="alert"
+                            sx={{ maxWidth: 700, width: '100%', alignSelf: 'center' }}
+                            action={
+                                <Button
+                                    color="inherit"
+                                    size="small"
+                                    startIcon={<RefreshIcon />}
+                                    onClick={() => refetch()}
+                                    disabled={isLoading}
+                                    aria-label="Keresés újrapróbálása"
+                                >
+                                    Újra
+                                </Button>
+                            }
+                        >
+                            <AlertTitle>A keresés nem sikerült</AlertTitle>
+                            {error?.message}
+                        </Alert>
                     )}
                     {dataUpdatedAt !== 0 && !viewOnly && (
                         <Paper sx={{ p: SPACING.base }}>

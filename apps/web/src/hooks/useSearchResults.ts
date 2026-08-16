@@ -5,12 +5,11 @@ import { useTimetableContext } from '../contexts';
 
 export const useSearchResults = () => {
     const { searchQuery, selectedCourses } = useTimetableContext();
-    const { isLoading, dataUpdatedAt, data } = useQuery<Data>({
+    const { isFetching, isError, error, refetch, dataUpdatedAt, data } = useQuery<Data, Error>({
         queryKey: ['results', searchQuery],
-        staleTime: 1000 * 60 * 45, // 45 perc
-        gcTime: 1000 * 60 * 10, // 10 perc
         queryFn: () => fetchTimetable(searchQuery),
         enabled: Boolean(searchQuery),
+        retry: false, // gyorsan hibát mutatunk, újrapróbálni a felületen lehet
     });
 
     const searchResults = useMemo<Lesson[]>(() => {
@@ -22,7 +21,10 @@ export const useSearchResults = () => {
 
     return {
         searchResults,
-        isLoading,
+        isLoading: isFetching,
+        isError,
+        error,
+        refetch,
         dataUpdatedAt,
         data,
     };
