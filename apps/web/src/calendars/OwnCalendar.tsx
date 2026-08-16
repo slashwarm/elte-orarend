@@ -4,7 +4,7 @@ import { EventClickArg } from '@fullcalendar/core';
 import AddIcon from '@mui/icons-material/Add';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import LinkIcon from '@mui/icons-material/Link';
-import { Badge, Box, Button, IconButton, Stack } from '@mui/material';
+import { Button, IconButton, Stack } from '@mui/material';
 import type { Lesson } from '../utils/data';
 import LessonCalendar from './LessonCalendar';
 import { Redo, Undo } from '@mui/icons-material';

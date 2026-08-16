@@ -6,7 +6,7 @@ A modern web application for managing and viewing ELTE (Eötvös Loránd Univers
 
 ## 🌐 Live Demo
 
-Try the application online: [https://gernyimark.web.elte.hu](https://gernyimark.web.elte.hu)
+Try the application online: [https://elte-orarend.vercel.app](https://elte-orarend.vercel.app)
 
 ## 🎯 Features
 
@@ -21,32 +21,54 @@ Try the application online: [https://gernyimark.web.elte.hu](https://gernyimark.
 
 ### Prerequisites
 
--   Node.js (v18 or higher)
--   npm or yarn
+-   Node.js 22 or higher
+-   pnpm 10 or higher (`corepack enable pnpm`)
 
 ### Development Setup
 
-1. **Backend (API)**
+Install every workspace once from the repository root:
 
-    ```bash
-    cd apps/api
-    npm install
-    npm run dev
-    ```
+```bash
+pnpm install
+```
 
-2. **Frontend (Web)**
-    ```bash
-    cd apps/web
-    npm install
-    npm run dev
-    ```
+Then start both apps together:
 
-The API will be available at `http://localhost:3000` and the web app at `http://localhost:5173`.
+```bash
+pnpm dev
+```
+
+Or start one app at a time:
+
+```bash
+pnpm dev:api   # API on http://localhost:3000/api
+pnpm dev:web   # Web app on http://localhost:5173
+```
+
+The web app calls `/api` on its own origin. In development the Vite dev server
+proxies that path to the local API, so no API URL has to be configured.
+
+## 📦 Repository Layout
+
+```
+.
+├── api/index.ts      Vercel Function entry point. Mounts the Hono app on /api.
+├── apps/api          Hono API. Scrapes tanrend.elte.hu.
+├── apps/web          React + Vite front end.
+├── pnpm-workspace.yaml
+└── vercel.json       Build configuration for the single Vercel project.
+```
 
 ## 🚀 Deployment
 
-The frontend builds to static files that can be deployed to any static hosting service.
-The backend can be deployed to any Node.js hosting platform.
+One Vercel project serves both parts from one origin:
+
+-   `apps/web` builds to static files that Vercel serves from the domain root.
+-   `apps/api` runs as a Vercel Function on `/api`, mounted by `api/index.ts`.
+
+Vercel deploys automatically on every push to `main`. The relevant project
+settings are Root Directory `./` and Node.js 22.x. Everything else comes from
+`vercel.json`.
 
 ## 📝 License
 

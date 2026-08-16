@@ -1,0 +1,8 @@
+packages:
+    - 'apps/*'
+    - 'packages/*'
+
+# pnpm 10 blocks postinstall by default, vite build dies without these
+onlyBuiltDependencies:
+    - '@swc/core'
+    - esbuild
