@@ -38,6 +38,7 @@ const ResultsCalendar: React.FC<ResultsCalendarProps> = ({
         <LessonCalendar
             lessons={filteredTable}
             showPopover={true}
+            toolbarPosition="top"
             onEventClick={(eventInfo) => onEventClick(parseInt(eventInfo.event.id), false)}
             eventContent={(eventInfo) => {
                 return (

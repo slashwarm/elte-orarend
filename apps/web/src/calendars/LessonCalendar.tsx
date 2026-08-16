@@ -2,14 +2,14 @@ import huLocale from '@fullcalendar/core/locales/hu';
 import momentTimezonePlugin from '@fullcalendar/moment-timezone';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import DownloadIcon from '@mui/icons-material/Download';
 import Stack from '@mui/material/Stack';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import '../styles/Calendar.css';
 
 import { EventClickArg, EventContentArg, EventHoveringArg, EventInput } from '@fullcalendar/core';
-import { Button, Fade, Popper } from '@mui/material';
+import { Box, Divider, Fade, Popper } from '@mui/material';
 import { convertDataToCalendar, type Lesson } from '../utils/data';
+import ExportMenu from '../components/ExportMenu';
 import Paper from '@mui/material/Paper';
 import { EventImpl } from '@fullcalendar/core/internal';
 import dayjs from 'dayjs';
@@ -27,8 +27,11 @@ type LessonCalendarProps = {
     showPopover?: boolean; // Megadja, hogyha az órák felett van a kurzor, akkor megjelenik-e a popover. Ha nincs megadva, nincs popover
     popoverActionIcon?: (id: number) => React.ReactNode; // A popover alján megjelenő icon. Pl a naptárszerkesztés ikon
     popoverActionText?: (id: number) => string; // A popover alján megjelenő akcióra figyelmet felhívó szöveg. Pl "Kattints a szerkesztéshez"
-    onImageDownload?: (ref: React.MutableRefObject<HTMLElement>) => Promise<void>; // A kép letöltés kezelése, ha nincs megadva akkor nem lesz kép letöltő gomb
-    children?: React.ReactNode; // A naptár felé kerülő elemek
+    onImageDownload?: (ref: React.MutableRefObject<HTMLElement>) => Promise<void>; // A kép letöltés kezelése, ha nincs megadva akkor nem lesz kép mentés opció
+    onUrlExport?: () => void; // Hivatkozás másolása, ha nincs megadva akkor nem lesz hivatkozás opció
+    toolbarPosition?: 'top' | 'bottom'; // Az eszköztár helye a naptárhoz képest. Alapból alul
+    toolbarEnd?: React.ReactNode; // Az eszköztár jobb szélére kerülő elemek. Pl visszavonás gombok
+    children?: React.ReactNode; // Az eszköztárba kerülő elemek
 };
 
 /**
@@ -45,6 +48,9 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
     popoverActionIcon,
     popoverActionText,
     onImageDownload,
+    onUrlExport,
+    toolbarPosition = 'bottom',
+    toolbarEnd,
     children,
 }: LessonCalendarProps) => {
     const events = useMemo(() => convertDataToCalendar(lessons), [lessons]);
@@ -88,21 +94,40 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
         }
     }, [isCalendarSaving, onImageDownload]);
 
+    const hasExportMenu = Boolean(onImageDownload || onUrlExport);
+    const isBottom = toolbarPosition === 'bottom';
+
+    // A naptár alatti eszköztár, ami a képmentésbe már nem kerül bele
+    const toolbar = (children || toolbarEnd || hasExportMenu) && !isCalendarSaving && (
+        <Box sx={isBottom ? { mt: 2 } : { mb: 2 }}>
+            {isBottom && <Divider sx={{ mb: 2 }} />}
+            <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={1.5}
+                useFlexGap
+                flexWrap="wrap"
+                alignItems={{ xs: 'stretch', sm: 'center' }}
+                component="nav"
+                aria-label="Órarend műveletek"
+            >
+                {children}
+                {hasExportMenu && (
+                    <ExportMenu
+                        lessons={lessons}
+                        onImageDownload={onImageDownload ? handlePrintClick : undefined}
+                        onUrlExport={onUrlExport}
+                    />
+                )}
+                {toolbarEnd && (
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', ml: { sm: 'auto' } }}>{toolbarEnd}</Box>
+                )}
+            </Stack>
+        </Box>
+    );
+
     return (
         <>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} marginBottom={2} useFlexGap>
-                {onImageDownload && (
-                    <Button
-                        variant="outlined"
-                        startIcon={<DownloadIcon />}
-                        onClick={handlePrintClick}
-                        aria-label="Órarend mentése képként"
-                    >
-                        Mentés képként
-                    </Button>
-                )}
-                {children}
-            </Stack>
+            {!isBottom && toolbar}
 
             <div
                 ref={printRef}
@@ -146,6 +171,8 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({
                     }}
                 />
             </div>
+
+            {isBottom && toolbar}
 
             {showPopover && !isCalendarSaving && activePopper.event && (
                 <Popper
