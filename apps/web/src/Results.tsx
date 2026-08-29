@@ -12,7 +12,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { DataGrid, GridAutosizeOptions, GridColDef, useGridApiRef } from '@mui/x-data-grid';
 import { huHU } from '@mui/x-data-grid/locales';
 import { useEffect, useMemo } from 'react';
-import { Lesson } from './utils/data';
+import { compareDayOfWeek, compareTimeRange, Lesson } from './utils/data';
 import CustomNoRowsOverlay from './components/EmptyListOverlay';
 
 const ACTIONS_WIDTH = 172;
@@ -199,11 +199,13 @@ const Results: React.FC<ResultsProps> = ({
                 field: 'day',
                 headerName: 'Nap',
                 minWidth: 85,
+                sortComparator: compareDayOfWeek,
             },
             {
                 field: 'time',
                 headerName: 'Időpont',
                 minWidth: 100,
+                sortComparator: compareTimeRange,
             },
         ],
         [own, savedLessons, onLessonSave, onEventChange, onEventEdit],
