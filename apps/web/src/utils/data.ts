@@ -63,6 +63,20 @@ const regex = /[\d!@#$%^&*()_+=[\]{};':"\\|,.<>/?]/g;
 
 const daysOfWeek: DayOfWeek[] = ['hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat', 'vasárnap'];
 
+export const compareDayOfWeek = (a: DayOfWeekCapital, b: DayOfWeekCapital): number =>
+    daysOfWeek.indexOf(a.toLowerCase() as DayOfWeek) - daysOfWeek.indexOf(b.toLowerCase() as DayOfWeek);
+
+const startOf = (time: TimeRange): number => {
+    if (!time) {
+        return -1;
+    }
+
+    const [hours, minutes] = time.split('-')[0].split(':');
+    return new Date(1970, 0, 1, Number(hours), Number(minutes)).getTime();
+};
+
+export const compareTimeRange = (a: TimeRange, b: TimeRange): number => startOf(a) - startOf(b);
+
 const MAX_QUERY_LENGTH = 3500;
 
 // A szerver 10 másodperc után adja fel az upstream lekérdezést. Enélkül egy beragadt kérés örökre pörögne.
